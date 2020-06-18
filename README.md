@@ -51,6 +51,9 @@ cmsrel CMSSW_10_6_12
 cd CMSSW_10_6_12/src
 cmsenv
 
+mkdir plots
+mkdir output
+
 export PYTHONPATH=$CONDA_PREFIX/lib/python3.6/site-packages/
 ```
 
