@@ -34,13 +34,16 @@ python3 -m pip install --upgrade --ignore-installed --force-reinstall coffea
 python3 -m pip install --upgrade --ignore-installed --force-reinstall pick
 python3 -m pip install --upgrade --ignore-installed --force-reinstall tabulate
 python3 -m pip install --upgrade --ignore-installed --force-reinstall millify
+python3 -m pip install --upgrade --ignore-installed --force-reinstall pyyaml
 python3 -m pip install --upgrade --ignore-installed --force-reinstall jupyterlab
 
 conda install -y gcc_linux-64 gxx_linux-64
 python3 -m pip install --upgrade --ignore-installed --force-reinstall cppyy
+python3 -m pip install --upgrade --ignore installed --force-reinstall nbresuse==0.3.3
 conda install -y -c conda-forge nodejs
 
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
+jupyter labextension install jupyterlab-topbar-extension jupyterlab-system-monitor
 
 export SCRAM_ARCH=slc7_amd64_gcc700
 
