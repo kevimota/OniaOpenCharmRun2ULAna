@@ -7,16 +7,24 @@ import numpy as np
 class AnalyzerProcessor(processor.ProcessorABC):
    def __init__(self):
       dataset_axis = hist.Cat("dataset", "Primary dataset")
-      mass_axis = hist.Bin("mass", r"$m_{\mu\mu}$ [GeV]", 3600, 0.25, 120)
-      pt_axis = hist.Bin("pt", r"$p_{T,\mu\mu}$ [GeV]", 3000, 0.25, 300)
-      eta_axis = hist.Bin("eta", r"$\eta_{\mu\mu}$ [GeV]", 50, -2.5, 2.5)
-      phi_axis = hist.Bin("phi", r"$\phi_{T,\mu\mu}$ [GeV]", 70, -3.5, 3.5)
+
+      muon_pt_axis = hist.Bin("pt", r"$p_{T,\mu}$ [GeV]", 3000, 0.25, 300)
+      muon_eta_axis = hist.Bin("eta", r"$\eta_{\mu}$", 60, -3.0, 3.0)
+      muon_phi_axis = hist.Bin("phi", r"$\phi_{\mu}$", 70, -3.5, 3.5)
+
+      dimu_mass_axis = hist.Bin("mass", r"$m_{\mu\mu}$ [GeV]", 3600, 0.25, 120)
+      dimu_pt_axis = hist.Bin("pt", r"$p_{T,\mu\mu}$ [GeV]", 3000, 0.25, 300)
+      dimu_eta_axis = hist.Bin("eta", r"$\eta_{\mu\mu}$", 100, -5.0, 5.0)
+      dimu_phi_axis = hist.Bin("phi", r"$\phi_{\mu\mu}$", 70, -3.5, 3.5)
       
       self._accumulator = processor.dict_accumulator({
-         'mass': hist.Hist("Counts", dataset_axis, mass_axis),
-         'pt': hist.Hist("Counts", dataset_axis, pt_axis),
-         'eta': hist.Hist("Counts", dataset_axis, eta_axis),
-         'phi': hist.Hist("Counts", dataset_axis, phi_axis),
+         'muon_pt': hist.Hist("Counts", dataset_axis, muon_pt_axis),
+         'muon_eta': hist.Hist("Counts", dataset_axis, muon_eta_axis),
+         'muon_phi': hist.Hist("Counts", dataset_axis, muon_phi_axis),
+         'dimu_mass': hist.Hist("Counts", dataset_axis, dimu_mass_axis),
+         'dimu_pt': hist.Hist("Counts", dataset_axis, dimu_pt_axis),
+         'dimu_eta': hist.Hist("Counts", dataset_axis, dimu_eta_axis),
+         'dimu_phi': hist.Hist("Counts", dataset_axis, dimu_phi_axis),
          'cutflow': processor.defaultdict_accumulator(int),
       })
     
@@ -107,10 +115,14 @@ class AnalyzerProcessor(processor.ProcessorABC):
       dimuons = dimuons[same_vtx]
       output['cutflow']['same vtx'] += same_vtx.any().sum()
       
-      output['mass'].fill(dataset=dataset,mass=dimuons.mass.flatten())
-      output['pt'].fill(dataset=dataset, pt=dimuons.pt.flatten())
-      output['eta'].fill(dataset=dataset, eta=dimuons.eta.flatten())
-      output['phi'].fill(dataset=dataset, phi=dimuons.phi.flatten())
+      output['muon_pt'].fill(dataset=dataset, pt=muons.pt.flatten())
+      output['muon_eta'].fill(dataset=dataset, eta=muons.eta.flatten())
+      output['muon_phi'].fill(dataset=dataset, phi=muons.phi.flatten())
+
+      output['dimu_mass'].fill(dataset=dataset,mass=dimuons.mass.flatten())
+      output['dimu_pt'].fill(dataset=dataset, pt=dimuons.pt.flatten())
+      output['dimu_eta'].fill(dataset=dataset, eta=dimuons.eta.flatten())
+      output['dimu_phi'].fill(dataset=dataset, phi=dimuons.phi.flatten())
       
       return output
 
