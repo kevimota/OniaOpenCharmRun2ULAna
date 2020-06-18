@@ -9,71 +9,53 @@ from awkward import JaggedArray
 import numpy as np
 
 from nanoAODplus_handler.AnalyzerProcessor import AnalyzerProcessor
+from data.fileset import filesets
 
 import matplotlib.pyplot as plt
 import mplhep as hep
 
 plt.style.use(hep.style.CMS)
 
-tstart = time.time()    
-'''fileset = {
-    'Data10': [
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_500.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_501.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_502.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_503.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_504.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_505.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_506.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_507.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_508.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_509.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_510.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_511.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_512.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_513.root',
-        'root://t2-cms-xrootd01.desy.de:1094//store/user/nujomhar/Data2010/CRAB_UserFiles/Data10MuOniaRunAtrigobj4/200301_205327/0000/Data10_Mu_trigobj4_514.root'
+tstart = time.time()
 
-    ]
-}'''
+files = {'Charmonium2017MINIAOD': filesets['Charmonium2017MINIAOD'][0:10], 
+           'MuOnia2017MINIAOD': filesets['MuOnia2017MINIAOD'][0:10], 
+           'DoubleMuon2017AOD': filesets['DoubleMuon2017AOD'][0:100]
+          }
 
-path = open("datasets/data2010_0000_path.txt")
-files = path.read().splitlines()
-files = files[0:80]
-
-fileset = {'Data10': files}
-
-output = processor.run_uproot_job(fileset,
+output = processor.run_uproot_job(files,
                                   treename='Events',
                                   processor_instance=AnalyzerProcessor(),
                                   executor=processor.futures_executor,
-                                  #executor_args={'workers': 6, 'flatten': True},
                                   executor_args={'workers': 8, 'flatten': True},
-                                  chunksize=1000000000000,
+                                  #executor=processor.iterative_executor,
+                                  #executor_args={'flatten': True},
+                                  chunksize=10000,
                                  )
 
 elapsed = time.time() - tstart
 
-""" ax_mass = hist.plot1d(output['mass'], overlay='dataset')
+ax_mass = hist.plot1d(output['mass'], overlay='dataset')
+ax_mass.set_xlim(0,12)
 fig = ax_mass.get_figure()
 fig.savefig("plots/mass.png")
+fig.clf()
 
 ax_pt = hist.plot1d(output['pt'], overlay='dataset')
 ax_pt.set_xlim(0,20)
 fig = ax_pt.get_figure()
 fig.savefig("plots/pt.png")
-
+fig.clf()
 
 ax_eta = hist.plot1d(output['eta'], overlay='dataset')
 fig = ax_eta.get_figure()
 fig.savefig("plots/eta.png")
+fig.clf()
 
 ax_phi = hist.plot1d(output['phi'], overlay='dataset')
 fig = ax_phi.get_figure()
-fig.savefig("plots/phi.png") """
+fig.savefig("plots/phi.png")
+fig.clf()
 
 print("Events/s:", output['cutflow']['all events']/elapsed, "Time elapsed:", elapsed)
 print(output['cutflow'])
-
-
-
