@@ -996,4 +996,3 @@ root://xrootd.hepgrid.uerj.br:1095//store/user/mabarros/Data17DoubleMuonSet/Doub
 root://xrootd.hepgrid.uerj.br:1095//store/user/mabarros/Data17DoubleMuonSet/DoubleMuon/Data17DoubleMuonRunE_AOD/200614_185911/0000//Data17DoubleMuonRunE_AOD_997.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/mabarros/Data17DoubleMuonSet/DoubleMuon/Data17DoubleMuonRunE_AOD/200614_185911/0000//Data17DoubleMuonRunE_AOD_998.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/mabarros/Data17DoubleMuonSet/DoubleMuon/Data17DoubleMuonRunE_AOD/200614_185911/0000//Data17DoubleMuonRunE_AOD_999.root
-root://xrootd.hepgrid.uerj.br:1095//store/user/mabarros/Data17DoubleMuonSet/DoubleMuon/Data17DoubleMuonRunE_AOD/200614_185911/0000//log

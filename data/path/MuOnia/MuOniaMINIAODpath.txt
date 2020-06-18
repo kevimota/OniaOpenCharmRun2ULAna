@@ -71,6 +71,7 @@ root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_162.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_163.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_164.root
+root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_165.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_166.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_167.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_168.root
@@ -79,6 +80,7 @@ root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_170.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_171.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_172.root
+root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_173.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_174.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_175.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_176.root
@@ -123,6 +125,7 @@ root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_210.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_211.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_212.root
+root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_213.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_214.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_215.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_216.root
@@ -291,6 +294,7 @@ root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_363.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_364.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_365.root
+root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_366.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_367.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_368.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_369.root
@@ -316,6 +320,7 @@ root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_387.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_388.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_389.root
+root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_39.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_390.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_391.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_392.root
@@ -328,6 +333,7 @@ root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_399.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_4.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_40.root
+root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_400.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_401.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_402.root
 root://xrootd.hepgrid.uerj.br:1095//store/user/kmotaama/Data17test/MuOnia/Data17MuOniaRunE_MINIAOD/200612_115812/0000//Data17MuOniaRunE_MINIAOD_403.root
