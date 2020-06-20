@@ -4,7 +4,7 @@ import coffea.processor as processor
 from awkward import JaggedArray
 import numpy as np
 
-class AnalyzerProcessor(processor.ProcessorABC):
+class EventSelectorProcessor(processor.ProcessorABC):
    def __init__(self):
       dataset_axis = hist.Cat("dataset", "Primary dataset")
 
@@ -16,6 +16,11 @@ class AnalyzerProcessor(processor.ProcessorABC):
       dimu_pt_axis = hist.Bin("pt", r"$p_{T,\mu\mu}$ [GeV]", 3000, 0.25, 300)
       dimu_eta_axis = hist.Bin("eta", r"$\eta_{\mu\mu}$", 100, -5.0, 5.0)
       dimu_phi_axis = hist.Bin("phi", r"$\phi_{\mu\mu}$", 70, -3.5, 3.5)
+
+      D0_mass_axis = hist.Bin("mass", r"$m_{D^0}$ [GeV]", 100, 0.25, 3)
+      D0_pt_axis = hist.Bin("pt", r"$p_{T,D^0}$ [GeV]", 3000, 0.25, 300)
+      D0_eta_axis = hist.Bin("eta", r"$\eta_{D^0}$", 100, -5.0, 5.0)
+      D0_phi_axis = hist.Bin("phi", r"$\phi_{D^0}$", 70, -3.5, 3.5)
       
       self._accumulator = processor.dict_accumulator({
          'muon_pt': hist.Hist("Counts", dataset_axis, muon_pt_axis),
@@ -25,6 +30,10 @@ class AnalyzerProcessor(processor.ProcessorABC):
          'dimu_pt': hist.Hist("Counts", dataset_axis, dimu_pt_axis),
          'dimu_eta': hist.Hist("Counts", dataset_axis, dimu_eta_axis),
          'dimu_phi': hist.Hist("Counts", dataset_axis, dimu_phi_axis),
+         'D0_mass': hist.Hist("Counts", dataset_axis, D0_mass_axis),
+         'D0_pt': hist.Hist("Counts", dataset_axis, D0_pt_axis),
+         'D0_eta': hist.Hist("Counts", dataset_axis, D0_eta_axis),
+         'D0_phi': hist.Hist("Counts", dataset_axis, D0_phi_axis),
          'cutflow': processor.defaultdict_accumulator(int),
       })
     
@@ -35,6 +44,7 @@ class AnalyzerProcessor(processor.ProcessorABC):
    def process(self, df):
       output = self.accumulator.identity()
       
+      # Muon candidates
       dataset = df['dataset']
       if df['nMuon'].size != 0:
          muons = JaggedCandidateArray.candidatesfromcounts(
@@ -69,8 +79,35 @@ class AnalyzerProcessor(processor.ProcessorABC):
                z=np.array([]),
                )        
       
+      # Dzero candidates
+      if df['nD0'].size != 0:
+         D0 = JaggedCandidateArray.candidatesfromcounts(
+               df['nD0'],
+               pt=df['D0_pt'],
+               eta=df['D0_eta'],
+               phi=df['D0_phi'],
+               mass=df['D0_mass12'],
+               vtxIdx=df['D0_vtxIdx'],
+               x=df['D0_x'],
+               y=df['D0_y'],
+               z=df['D0_z'],
+               )
+      else:  
+         D0 = JaggedCandidateArray.candidatesfromcounts(
+               np.array([]),
+               pt=np.array([]),
+               eta=np.array([]),
+               phi=np.array([]),
+               mass=np.array([]),
+               vtxIdx=np.array([]),
+               x=np.array([]),
+               y=np.array([]),
+               z=np.array([]),
+               )
+
       output['cutflow']['all events'] += muons.size
       output['cutflow']['all muons'] += muons.counts.sum()
+      output['cutflow']['all D0'] += D0.counts.sum()
       
       # global and soft muon
       soft_id = (muons.softId > 0)
@@ -104,6 +141,8 @@ class AnalyzerProcessor(processor.ProcessorABC):
       twomuons = (muons.counts >= 2)
       output['cutflow']['two muons'] += twomuons.sum()
       
+      D0 = D0[twomuons]
+      output['cutflow']['D0 two muons'] += D0.counts.sum()
       dimuons = muons[twomuons].distincts()
 
       opposite_charge = (dimuons.i0['charge'] * dimuons.i1['charge'] < 0)
@@ -123,6 +162,11 @@ class AnalyzerProcessor(processor.ProcessorABC):
       output['dimu_pt'].fill(dataset=dataset, pt=dimuons.pt.flatten())
       output['dimu_eta'].fill(dataset=dataset, eta=dimuons.eta.flatten())
       output['dimu_phi'].fill(dataset=dataset, phi=dimuons.phi.flatten())
+
+      output['D0_mass'].fill(dataset=dataset,mass=D0.mass.flatten())
+      output['D0_pt'].fill(dataset=dataset, pt=D0.pt.flatten())
+      output['D0_eta'].fill(dataset=dataset, eta=D0.eta.flatten())
+      output['D0_phi'].fill(dataset=dataset, phi=D0.phi.flatten())
       
       return output
 

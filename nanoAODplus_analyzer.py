@@ -8,7 +8,7 @@ import coffea.processor as processor
 from awkward import JaggedArray
 import numpy as np
 
-from nanoAODplus_processor.AnalyzerProcessor import AnalyzerProcessor
+from nanoAODplus_processor.EventSelectorProcessor import EventSelectorProcessor
 from data.fileset import filesets
 import yaml
 
