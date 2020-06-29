@@ -6,7 +6,11 @@ fi
 
 cd ..
 conda deactivate ; conda deactivate 
-cmsenv
+
+# activate if CMSSW Needed:
+# cmsenv
+###########################
+
 conda activate OniaOpenCharmRun2ULenv
 export PYTHONPATH=$CONDA_PREFIX/lib/python3.6/site-packages
 cd OniaOpenCharmRun2ULAna

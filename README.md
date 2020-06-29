@@ -45,11 +45,15 @@ conda install -y -c conda-forge nodejs
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
 jupyter labextension install jupyterlab-topbar-extension jupyterlab-system-monitor
 
+#only if CMSSW needed:
+
 export SCRAM_ARCH=slc7_amd64_gcc700
 
 cmsrel CMSSW_10_6_12
 cd CMSSW_10_6_12/src
 cmsenv
+
+#######################
 
 mkdir plots
 mkdir output
