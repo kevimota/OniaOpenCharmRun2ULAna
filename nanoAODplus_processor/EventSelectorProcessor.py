@@ -41,129 +41,87 @@ class EventSelectorProcessor(processor.ProcessorABC):
    def accumulator(self):
       return self._accumulator
     
-   def process(self, df):
+   def process(self, events):
+      dataset = events.metadata['dataset']
       output = self.accumulator.identity()
       
-      # Muon candidates
-      dataset = df['dataset']
-      if df['nMuon'].size != 0:
-         muons = JaggedCandidateArray.candidatesfromcounts(
-               df['nMuon'],
-               pt=df['Muon_pt'],
-               eta=df['Muon_eta'],
-               phi=df['Muon_phi'],
-               mass=df['Muon_mass'],
-               charge=df['Muon_charge'],
-               isGlobal=df['Muon_isGlobal'],
-               softId=df['Muon_softId'],
-               vtxIdx=df['Muon_vtxIdx'],
-               pfRelIso04_all=df['Muon_pfRelIso04_all'],
-               x=df['Muon_x'],
-               y=df['Muon_y'],
-               z=df['Muon_z'],
-               )
-      else:  
-         muons = JaggedCandidateArray.candidatesfromcounts(
-               np.array([]),
-               pt=np.array([]),
-               eta=np.array([]),
-               phi=np.array([]),
-               mass=np.array([]),
-               charge=np.array([]),
-               isGlobal=np.array([]),
-               softId=np.array([]),
-               vtxIdx=np.array([]),
-               pfRelIso04_all=np.array([]),
-               x=np.array([]),
-               y=np.array([]),
-               z=np.array([]),
-               )        
-      
-      # Dzero candidates
-      if df['nD0'].size != 0:
-         D0 = JaggedCandidateArray.candidatesfromcounts(
-               df['nD0'],
-               pt=df['D0_pt'],
-               eta=df['D0_eta'],
-               phi=df['D0_phi'],
-               mass=df['D0_mass12'],
-               vtxIdx=df['D0_vtxIdx'],
-               x=df['D0_x'],
-               y=df['D0_y'],
-               z=df['D0_z'],
-               )
-      else:  
-         D0 = JaggedCandidateArray.candidatesfromcounts(
-               np.array([]),
-               pt=np.array([]),
-               eta=np.array([]),
-               phi=np.array([]),
-               mass=np.array([]),
-               vtxIdx=np.array([]),
-               x=np.array([]),
-               y=np.array([]),
-               z=np.array([]),
-               )
+      Muons = events.Muon
+      D0 = events.D0
+      Dstar = events.Dstar
 
-      output['cutflow']['all events'] += muons.size
-      output['cutflow']['all muons'] += muons.counts.sum()
-      output['cutflow']['all D0'] += D0.counts.sum()
+      output['cutflow']['all events']  += Muons.size
+      output['cutflow']['all muons']   += Muons.counts.sum()
+      output['cutflow']['all D0']      += D0.counts.sum()
+      output['cutflow']['all Dstar']   += Dstar.counts.sum()
       
       # global and soft muon
-      soft_id = (muons.softId > 0)
-      muons = muons[soft_id]
-      output['cutflow']['soft muon'] += soft_id.sum().sum()
+      soft_id = (Muons.softId > 0)
+      Muons = Muons[soft_id]
+      output['cutflow']['soft muon'] += Muons.counts.sum()
 
-      global_muon = (muons.isGlobal > 0)
-      muons = muons[global_muon]
-      output['cutflow']['global muon'] += global_muon.sum().sum()
+      global_muon = (Muons.isGlobal > 0)
+      Muons = Muons[global_muon]
+      output['cutflow']['global muon'] += Muons.counts.sum()
 
       #pt and eta cuts
-      pt_cut = (muons.pt > 3)
-      muons = muons[pt_cut]
-      output['cutflow']['pt cut'] += pt_cut.sum().sum()
+      pt_cut = (Muons.pt > 3)
+      Muons = Muons[pt_cut]
+      output['cutflow']['pt cut'] += Muons.counts.sum()
 
-      eta_cut = (np.absolute(muons.eta) <= 2.4)
-      muons = muons[eta_cut]
-      output['cutflow']['eta cut'] += eta_cut.sum().sum()
+      eta_cut = (np.absolute(Muons.eta) <= 2.4)
+      Muons = Muons[eta_cut]
+      output['cutflow']['eta cut'] += Muons.counts.sum()
 
       #isolated muon
-      iso_muon = (muons.pfRelIso04_all < 0.4)
-      muons = muons[iso_muon]
-      output['cutflow']['iso muon'] += iso_muon.sum().sum()
+      iso_muon = (Muons.pfRelIso04_all < 0.4)
+      Muons = Muons[iso_muon]
+      output['cutflow']['iso muon'] += Muons.counts.sum()
 
       #valid vtx
-      valid_vtx = (muons.vtxIdx != -1)
-      muons = muons[valid_vtx]
-      output['cutflow']['valid vtx'] += valid_vtx.sum().sum()
+      valid_vtx = (Muons.vtxIdx != -1)
+      Muons = Muons[valid_vtx]
+      output['cutflow']['valid vtx'] += Muons.counts.sum()
 
       #dimuon
-      twomuons = (muons.counts >= 2)
-      output['cutflow']['two muons'] += twomuons.sum()
-      
+      twomuons = (Muons.counts > 1)
+      Muons = Muons[twomuons]
       D0 = D0[twomuons]
-      output['cutflow']['D0 two muons'] += D0.counts.sum()
-      dimuons = muons[twomuons].distincts()
+      Dstar = Dstar[twomuons]
+      output['cutflow']['two muons']         += Muons.counts.sum()
+      output['cutflow']['D0 two muons']      += D0.counts.sum()
+      output['cutflow']['Dstar two muons']   += Dstar.counts.sum()
+      Dimuons = Muons.distincts()
+      output['cutflow']['all dimuons'] += Dimuons.counts.sum()
 
-      opposite_charge = (dimuons.i0['charge'] * dimuons.i1['charge'] < 0)
-      dimuons = dimuons[opposite_charge]
-      output['cutflow']['opposite charge'] += opposite_charge.any().sum()
+      opposite_charge = (Dimuons.i0['charge'] * Dimuons.i1['charge'] < 0)
+      Dimuons = Dimuons[opposite_charge]
+      output['cutflow']['opposite charge'] += Dimuons.counts.sum()
 
       #same vtx or close in z
-      same_vtx = (dimuons.i0['vtxIdx'] == dimuons.i1['vtxIdx']) | (np.absolute(dimuons.i0['z'] - dimuons.i1['z']) < 0.2)
-      dimuons = dimuons[same_vtx]
-      output['cutflow']['same vtx'] += same_vtx.any().sum()
+      same_vtx = (Dimuons.i0['vtxIdx'] == Dimuons.i1['vtxIdx']) | (np.absolute(Dimuons.i0['z'] - Dimuons.i1['z']) < 0.2)
+      Dimuons = Dimuons[same_vtx]
+      output['cutflow']['same vtx'] += Dimuons.counts.sum()
+
+      # Only events with at least 1 dimuon
+      evtcut = (Dimuons.counts > 0)
+      Dimuons = Dimuons[evtcut]
+      D0 = D0[evtcut]
+      Dstar = Dstar[evtcut]
+      output['cutflow']['D0 evt cut'] += D0.counts.sum()
+      output['cutflow']['Dstar evt cut'] += Dstar.counts.sum()
+
+      Dimuons = Dimuons.i0 + Dimuons.i1 
       
-      output['muon_pt'].fill(dataset=dataset, pt=muons.pt.flatten())
-      output['muon_eta'].fill(dataset=dataset, eta=muons.eta.flatten())
-      output['muon_phi'].fill(dataset=dataset, phi=muons.phi.flatten())
+      output['muon_pt'].fill(dataset=dataset, pt=Muons.pt.flatten())
+      output['muon_eta'].fill(dataset=dataset, eta=Muons.eta.flatten())
+      output['muon_phi'].fill(dataset=dataset, phi=Muons.phi.flatten())
 
-      output['dimu_mass'].fill(dataset=dataset,mass=dimuons.mass.flatten())
-      output['dimu_pt'].fill(dataset=dataset, pt=dimuons.pt.flatten())
-      output['dimu_eta'].fill(dataset=dataset, eta=dimuons.eta.flatten())
-      output['dimu_phi'].fill(dataset=dataset, phi=dimuons.phi.flatten())
+      output['dimu_mass'].fill(dataset=dataset,mass=Dimuons.mass.flatten())
+      output['dimu_pt'].fill(dataset=dataset, pt=Dimuons.pt.flatten())
+      output['dimu_eta'].fill(dataset=dataset, eta=Dimuons.eta.flatten())
+      output['dimu_phi'].fill(dataset=dataset, phi=Dimuons.phi.flatten())
 
-      output['D0_mass'].fill(dataset=dataset,mass=D0.mass.flatten())
+      output['D0_mass'].fill(dataset=dataset,mass=D0.mass12.flatten())
       output['D0_pt'].fill(dataset=dataset, pt=D0.pt.flatten())
       output['D0_eta'].fill(dataset=dataset, eta=D0.eta.flatten())
       output['D0_phi'].fill(dataset=dataset, phi=D0.phi.flatten())
