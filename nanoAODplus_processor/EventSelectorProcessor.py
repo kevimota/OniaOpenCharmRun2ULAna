@@ -3,6 +3,7 @@ from coffea.analysis_objects import JaggedCandidateArray
 import coffea.processor as processor
 from awkward import JaggedArray
 import numpy as np
+from coffea.util import save
 
 class EventSelectorProcessor(processor.ProcessorABC):
    def __init__(self):
@@ -34,6 +35,9 @@ class EventSelectorProcessor(processor.ProcessorABC):
          'D0_pt': hist.Hist("Counts", dataset_axis, D0_pt_axis),
          'D0_eta': hist.Hist("Counts", dataset_axis, D0_eta_axis),
          'D0_phi': hist.Hist("Counts", dataset_axis, D0_phi_axis),
+         'Muon_pt': processor.column_accumulator(np.zeros(shape=(0,))),
+         'Muon_eta': processor.column_accumulator(np.zeros(shape=(0,))),
+         'Muon_phi': processor.column_accumulator(np.zeros(shape=(0,))),
          'cutflow': processor.defaultdict_accumulator(int),
       })
     
@@ -111,6 +115,10 @@ class EventSelectorProcessor(processor.ProcessorABC):
       output['cutflow']['Dstar evt cut'] += Dstar.counts.sum()
 
       Dimuons = Dimuons.i0 + Dimuons.i1 
+
+      output['Muon_pt'] += processor.column_accumulator(Muons.pt.flatten())
+      output['Muon_eta'] += processor.column_accumulator(Muons.eta.flatten())
+      output['Muon_phi'] += processor.column_accumulator(Muons.phi.flatten())
       
       output['muon_pt'].fill(dataset=dataset, pt=Muons.pt.flatten())
       output['muon_eta'].fill(dataset=dataset, eta=Muons.eta.flatten())
