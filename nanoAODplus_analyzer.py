@@ -12,9 +12,10 @@ from nanoAODplus_processor.EventSelectorProcessor import EventSelectorProcessor
 from data.fileset import filesets
 import yaml
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import mplhep as hep
-
 plt.style.use(hep.style.CMS)
 
 config_yaml = yaml.load(open("config/local.yaml", "r"), Loader=yaml.FullLoader)
@@ -31,7 +32,7 @@ files = {'Charmonium2017MINIAOD': filesets['Charmonium2017MINIAOD'][0:10],
 
 output = processor.run_uproot_job(files,
                                   treename='Events',
-                                  processor_instance=AnalyzerProcessor(),
+                                  processor_instance=EventSelectorProcessor(),
                                   executor=executor,
                                   executor_args={'workers': config_yaml['n_cores'], 'flatten': True},
                                   chunksize=config_yaml['chunksize'],
