@@ -8,32 +8,41 @@ class EventSelectorProcessor(processor.ProcessorABC):
    def __init__(self):
       dataset_axis = hist.Cat("dataset", "Primary dataset")
 
-      muon_pt_axis = hist.Bin("pt", r"$p_{T,\mu}$ [GeV]", 3000, 0.25, 300)
-      muon_eta_axis = hist.Bin("eta", r"$\eta_{\mu}$", 60, -3.0, 3.0)
-      muon_phi_axis = hist.Bin("phi", r"$\phi_{\mu}$", 70, -3.5, 3.5)
+      Muon_pt_axis = hist.Bin("pt", r"$p_{T,\mu}$ [GeV]", 3000, 0.25, 300)
+      Muon_eta_axis = hist.Bin("eta", r"$\eta_{\mu}$", 60, -3.0, 3.0)
+      Muon_phi_axis = hist.Bin("phi", r"$\phi_{\mu}$", 70, -3.5, 3.5)
 
-      dimu_mass_axis = hist.Bin("mass", r"$m_{\mu\mu}$ [GeV]", 3600, 0.25, 120)
-      dimu_pt_axis = hist.Bin("pt", r"$p_{T,\mu\mu}$ [GeV]", 3000, 0.25, 300)
-      dimu_eta_axis = hist.Bin("eta", r"$\eta_{\mu\mu}$", 100, -5.0, 5.0)
-      dimu_phi_axis = hist.Bin("phi", r"$\phi_{\mu\mu}$", 70, -3.5, 3.5)
+      Dimuon_mass_axis = hist.Bin("mass", r"$m_{\mu\mu}$ [GeV]", 3600, 0.25, 120)
+      Dimuon_pt_axis = hist.Bin("pt", r"$p_{T,\mu\mu}$ [GeV]", 3000, 0.25, 300)
+      Dimuon_eta_axis = hist.Bin("eta", r"$\eta_{\mu\mu}$", 100, -5.0, 5.0)
+      Dimuon_phi_axis = hist.Bin("phi", r"$\phi_{\mu\mu}$", 70, -3.5, 3.5)
 
       D0_mass_axis = hist.Bin("mass", r"$m_{D^0}$ [GeV]", 100, 0.25, 3)
       D0_pt_axis = hist.Bin("pt", r"$p_{T,D^0}$ [GeV]", 3000, 0.25, 300)
       D0_eta_axis = hist.Bin("eta", r"$\eta_{D^0}$", 100, -5.0, 5.0)
       D0_phi_axis = hist.Bin("phi", r"$\phi_{D^0}$", 70, -3.5, 3.5)
+
+      Dstar_mass_axis = hist.Bin("mass", r"$m_{D^*}$ [GeV]", 100, 0.25, 3)
+      Dstar_pt_axis = hist.Bin("pt", r"$p_{T,D^*}$ [GeV]", 3000, 0.25, 300)
+      Dstar_eta_axis = hist.Bin("eta", r"$\eta_{D^*}$", 100, -5.0, 5.0)
+      Dstar_phi_axis = hist.Bin("phi", r"$\phi_{D^*}$", 70, -3.5, 3.5)
       
       self._accumulator = processor.dict_accumulator({
-         'muon_pt': hist.Hist("Counts", dataset_axis, muon_pt_axis),
-         'muon_eta': hist.Hist("Counts", dataset_axis, muon_eta_axis),
-         'muon_phi': hist.Hist("Counts", dataset_axis, muon_phi_axis),
-         'dimu_mass': hist.Hist("Counts", dataset_axis, dimu_mass_axis),
-         'dimu_pt': hist.Hist("Counts", dataset_axis, dimu_pt_axis),
-         'dimu_eta': hist.Hist("Counts", dataset_axis, dimu_eta_axis),
-         'dimu_phi': hist.Hist("Counts", dataset_axis, dimu_phi_axis),
+         'Muon_pt': hist.Hist("Counts", dataset_axis, Muon_pt_axis),
+         'Muon_eta': hist.Hist("Counts", dataset_axis, Muon_eta_axis),
+         'Muon_phi': hist.Hist("Counts", dataset_axis, Muon_phi_axis),
+         'Dimuon_mass': hist.Hist("Counts", dataset_axis, Dimuon_mass_axis),
+         'Dimuon_pt': hist.Hist("Counts", dataset_axis, Dimuon_pt_axis),
+         'Dimuon_eta': hist.Hist("Counts", dataset_axis, Dimuon_eta_axis),
+         'Dimuon_phi': hist.Hist("Counts", dataset_axis, Dimuon_phi_axis),
          'D0_mass': hist.Hist("Counts", dataset_axis, D0_mass_axis),
          'D0_pt': hist.Hist("Counts", dataset_axis, D0_pt_axis),
          'D0_eta': hist.Hist("Counts", dataset_axis, D0_eta_axis),
          'D0_phi': hist.Hist("Counts", dataset_axis, D0_phi_axis),
+         'Dstar_mass': hist.Hist("Counts", dataset_axis, Dstar_mass_axis),
+         'Dstar_pt': hist.Hist("Counts", dataset_axis, Dstar_pt_axis),
+         'Dstar_eta': hist.Hist("Counts", dataset_axis, Dstar_eta_axis),
+         'Dstar_phi': hist.Hist("Counts", dataset_axis, Dstar_phi_axis),
          'cutflow': processor.defaultdict_accumulator(int),
       })
     
@@ -47,7 +56,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
       # Muon candidates
       dataset = df['dataset']
       if df['nMuon'].size != 0:
-         muons = JaggedCandidateArray.candidatesfromcounts(
+         Muon = JaggedCandidateArray.candidatesfromcounts(
                df['nMuon'],
                pt=df['Muon_pt'],
                eta=df['Muon_eta'],
@@ -63,7 +72,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
                z=df['Muon_z'],
                )
       else:  
-         muons = JaggedCandidateArray.candidatesfromcounts(
+         Muon = JaggedCandidateArray.candidatesfromcounts(
                np.array([]),
                pt=np.array([]),
                eta=np.array([]),
@@ -105,68 +114,112 @@ class EventSelectorProcessor(processor.ProcessorABC):
                z=np.array([]),
                )
 
-      output['cutflow']['all events'] += muons.size
-      output['cutflow']['all muons'] += muons.counts.sum()
-      output['cutflow']['all D0'] += D0.counts.sum()
+      if df['nDstar'].size != 0:
+         Dstar = JaggedCandidateArray.candidatesfromcounts(
+               df['nDstar'],
+               pt=df['Dstar_pt'],
+               eta=df['Dstar_eta'],
+               phi=df['Dstar_phi'],
+               mass=df['Dstar_mass'],
+               vtxIdx=df['Dstar_vtxIdx'],
+               x=df['Dstar_x'],
+               y=df['Dstar_y'],
+               z=df['Dstar_z'],
+               )
+      else:  
+         Dstar = JaggedCandidateArray.candidatesfromcounts(
+               np.array([]),
+               pt=np.array([]),
+               eta=np.array([]),
+               phi=np.array([]),
+               mass=np.array([]),
+               vtxIdx=np.array([]),
+               x=np.array([]),
+               y=np.array([]),
+               z=np.array([]),
+               )
+
+      output['cutflow']['all events']  += Muon.size
+      output['cutflow']['all muons']   += Muon.counts.sum()
+      output['cutflow']['all D0']      += D0.counts.sum()
+      output['cutflow']['all Dstar']   += Dstar.counts.sum()
       
       # global and soft muon
-      soft_id = (muons.softId > 0)
-      muons = muons[soft_id]
+      soft_id = (Muon.softId > 0)
+      Muon = Muon[soft_id]
       output['cutflow']['soft muon'] += soft_id.sum().sum()
 
-      global_muon = (muons.isGlobal > 0)
-      muons = muons[global_muon]
+      global_muon = (Muon.isGlobal > 0)
+      Muon = Muon[global_muon]
       output['cutflow']['global muon'] += global_muon.sum().sum()
 
       #pt and eta cuts
-      pt_cut = (muons.pt > 3)
-      muons = muons[pt_cut]
-      output['cutflow']['pt cut'] += pt_cut.sum().sum()
+      pt_cut = (Muon.pt > 3)
+      Muon = Muon[pt_cut]
+      output['cutflow']['pt cut'] += Muon.counts.sum()
 
-      eta_cut = (np.absolute(muons.eta) <= 2.4)
-      muons = muons[eta_cut]
-      output['cutflow']['eta cut'] += eta_cut.sum().sum()
+      eta_cut = (np.absolute(Muon.eta) <= 2.4)
+      Muon = Muon[eta_cut]
+      output['cutflow']['eta cut'] += Muon.counts.sum()
 
       #isolated muon
-      iso_muon = (muons.pfRelIso04_all < 0.4)
-      muons = muons[iso_muon]
-      output['cutflow']['iso muon'] += iso_muon.sum().sum()
+      iso_muon = (Muon.pfRelIso04_all < 0.4)
+      Muon = Muon[iso_muon]
+      output['cutflow']['iso muon'] += Muon.counts.sum()
 
       #valid vtx
-      valid_vtx = (muons.vtxIdx != -1)
-      muons = muons[valid_vtx]
-      output['cutflow']['valid vtx'] += valid_vtx.sum().sum()
+      valid_vtx = (Muon.vtxIdx != -1)
+      Muon = Muon[valid_vtx]
+      output['cutflow']['valid vtx'] += Muon.counts.sum()
 
       #dimuon
-      twomuons = (muons.counts >= 2)
-      output['cutflow']['two muons'] += twomuons.sum()
-      
+      twomuons = (Muon.counts > 1)
+      Muon = Muon[twomuons]
       D0 = D0[twomuons]
-      output['cutflow']['D0 two muons'] += D0.counts.sum()
-      dimuons = muons[twomuons].distincts()
+      Dstar = Dstar[twomuons]
+      output['cutflow']['two muons']         += Muons.counts.sum()
+      output['cutflow']['D0 two muons']      += D0.counts.sum()
+      output['cutflow']['Dstar two muons']   += Dstar.counts.sum()
 
-      opposite_charge = (dimuons.i0['charge'] * dimuons.i1['charge'] < 0)
-      dimuons = dimuons[opposite_charge]
-      output['cutflow']['opposite charge'] += opposite_charge.any().sum()
+      Dimuon = Muon.distincts()
+      output['cutflow']['all dimuons'] += Dimuon.counts.sum()
+
+      #opposite charge muons
+      opposite_charge = (Dimuon.i0['charge'] * Dimuon.i1['charge'] < 0)
+      Dimuon = Dimuon[opposite_charge]
+      output['cutflow']['opposite charge'] += Dimuon.counts.sum()
 
       #same vtx or close in z
-      same_vtx = (dimuons.i0['vtxIdx'] == dimuons.i1['vtxIdx']) | (np.absolute(dimuons.i0['z'] - dimuons.i1['z']) < 0.2)
-      dimuons = dimuons[same_vtx]
-      output['cutflow']['same vtx'] += same_vtx.any().sum()
+      same_vtx = (Dimuon.i0['vtxIdx'] == Dimuon.i1['vtxIdx']) | (np.absolute(Dimuon.i0['z'] - Dimuon.i1['z']) < 0.2)
+      Dimuon = Dimuon[same_vtx]
+      output['cutflow']['same vtx'] += Dimuon.counts.sum()
+
+      # Only events with at least 1 dimuon
+      evtcut = (Dimuon.counts > 0)
+      Dimuon = Dimuon[evtcut]
+      D0 = D0[evtcut]
+      Dstar = Dstar[evtcut]
+      output['cutflow']['D0 evt cut'] += D0.counts.sum()
+      output['cutflow']['Dstar evt cut'] += Dstar.counts.sum()
       
-      output['muon_pt'].fill(dataset=dataset, pt=muons.pt.flatten())
-      output['muon_eta'].fill(dataset=dataset, eta=muons.eta.flatten())
-      output['muon_phi'].fill(dataset=dataset, phi=muons.phi.flatten())
+      output['muon_pt'].fill(dataset=dataset, pt=Muon.pt.flatten())
+      output['muon_eta'].fill(dataset=dataset, eta=Muon.eta.flatten())
+      output['muon_phi'].fill(dataset=dataset, phi=Muon.phi.flatten())
 
-      output['dimu_mass'].fill(dataset=dataset,mass=dimuons.mass.flatten())
-      output['dimu_pt'].fill(dataset=dataset, pt=dimuons.pt.flatten())
-      output['dimu_eta'].fill(dataset=dataset, eta=dimuons.eta.flatten())
-      output['dimu_phi'].fill(dataset=dataset, phi=dimuons.phi.flatten())
+      output['dimu_mass'].fill(dataset=dataset, mass=Dimuon.mass.flatten())
+      output['dimu_pt'].fill(dataset=dataset, pt=Dimuon.pt.flatten())
+      output['dimu_eta'].fill(dataset=dataset, eta=Dimuon.eta.flatten())
+      output['dimu_phi'].fill(dataset=dataset, phi=Dimuon.phi.flatten())
 
-      output['D0_mass'].fill(dataset=dataset,mass=D0.mass.flatten())
+      output['D0_mass'].fill(dataset=dataset, mass=D0.mass.flatten())
       output['D0_pt'].fill(dataset=dataset, pt=D0.pt.flatten())
       output['D0_eta'].fill(dataset=dataset, eta=D0.eta.flatten())
       output['D0_phi'].fill(dataset=dataset, phi=D0.phi.flatten())
+
+      output['Dstar_mass'].fill(dataset=dataset, mass=Dstar.mass.flatten())
+      output['Dstar_pt'].fill(dataset=dataset, pt=Dstar.pt.flatten())
+      output['Dstar_eta'].fill(dataset=dataset, eta=Dstar.eta.flatten())
+      output['Dstar_phi'].fill(dataset=dataset, phi=Dstar.phi.flatten())
       
       return output
 
