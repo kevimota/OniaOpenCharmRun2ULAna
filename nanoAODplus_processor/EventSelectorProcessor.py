@@ -199,6 +199,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
       Dimuon = Dimuon[evtcut]
       D0 = D0[evtcut]
       Dstar = Dstar[evtcut]
+
       output['cutflow']['D0 evt cut'] += D0.counts.sum()
       output['cutflow']['Dstar evt cut'] += Dstar.counts.sum()
       
