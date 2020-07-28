@@ -3,47 +3,16 @@ from coffea.analysis_objects import JaggedCandidateArray
 import coffea.processor as processor
 from awkward import JaggedArray
 import numpy as np
+from coffea.util import save, load
+import random
 
 class EventSelectorProcessor(processor.ProcessorABC):
-   def __init__(self):
-      dataset_axis = hist.Cat("dataset", "Primary dataset")
-
-      Muon_pt_axis = hist.Bin("pt", r"$p_{T,\mu}$ [GeV]", 3000, 0.25, 300)
-      Muon_eta_axis = hist.Bin("eta", r"$\eta_{\mu}$", 60, -3.0, 3.0)
-      Muon_phi_axis = hist.Bin("phi", r"$\phi_{\mu}$", 70, -3.5, 3.5)
-
-      Dimuon_mass_axis = hist.Bin("mass", r"$m_{\mu\mu}$ [GeV]", 3600, 0.25, 120)
-      Dimuon_pt_axis = hist.Bin("pt", r"$p_{T,\mu\mu}$ [GeV]", 3000, 0.25, 300)
-      Dimuon_eta_axis = hist.Bin("eta", r"$\eta_{\mu\mu}$", 100, -5.0, 5.0)
-      Dimuon_phi_axis = hist.Bin("phi", r"$\phi_{\mu\mu}$", 70, -3.5, 3.5)
-
-      D0_mass_axis = hist.Bin("mass", r"$m_{D^0}$ [GeV]", 100, 0.25, 3)
-      D0_pt_axis = hist.Bin("pt", r"$p_{T,D^0}$ [GeV]", 3000, 0.25, 300)
-      D0_eta_axis = hist.Bin("eta", r"$\eta_{D^0}$", 100, -5.0, 5.0)
-      D0_phi_axis = hist.Bin("phi", r"$\phi_{D^0}$", 70, -3.5, 3.5)
-
-      Dstar_mass_axis = hist.Bin("mass", r"$m_{D^*}$ [GeV]", 100, 0.25, 3)
-      Dstar_pt_axis = hist.Bin("pt", r"$p_{T,D^*}$ [GeV]", 3000, 0.25, 300)
-      Dstar_eta_axis = hist.Bin("eta", r"$\eta_{D^*}$", 100, -5.0, 5.0)
-      Dstar_phi_axis = hist.Bin("phi", r"$\phi_{D^*}$", 70, -3.5, 3.5)
+   def __init__(self, analyzer_name):
+      self.analyzer_name = analyzer_name
       
       self._accumulator = processor.dict_accumulator({
-         'Muon_pt': hist.Hist("Counts", dataset_axis, Muon_pt_axis),
-         'Muon_eta': hist.Hist("Counts", dataset_axis, Muon_eta_axis),
-         'Muon_phi': hist.Hist("Counts", dataset_axis, Muon_phi_axis),
-         'Dimuon_mass': hist.Hist("Counts", dataset_axis, Dimuon_mass_axis),
-         'Dimuon_pt': hist.Hist("Counts", dataset_axis, Dimuon_pt_axis),
-         'Dimuon_eta': hist.Hist("Counts", dataset_axis, Dimuon_eta_axis),
-         'Dimuon_phi': hist.Hist("Counts", dataset_axis, Dimuon_phi_axis),
-         'D0_mass': hist.Hist("Counts", dataset_axis, D0_mass_axis),
-         'D0_pt': hist.Hist("Counts", dataset_axis, D0_pt_axis),
-         'D0_eta': hist.Hist("Counts", dataset_axis, D0_eta_axis),
-         'D0_phi': hist.Hist("Counts", dataset_axis, D0_phi_axis),
-         'Dstar_mass': hist.Hist("Counts", dataset_axis, Dstar_mass_axis),
-         'Dstar_pt': hist.Hist("Counts", dataset_axis, Dstar_pt_axis),
-         'Dstar_eta': hist.Hist("Counts", dataset_axis, Dstar_eta_axis),
-         'Dstar_phi': hist.Hist("Counts", dataset_axis, Dstar_phi_axis),
          'cutflow': processor.defaultdict_accumulator(int),
+         'dataset': processor.value_accumulator(str)
       })
     
    @property
@@ -54,7 +23,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
       output = self.accumulator.identity()
       
       # Muon candidates
-      dataset = df['dataset']
+      output['dataset'] = df['dataset']
       if df['nMuon'].size != 0:
          Muon = JaggedCandidateArray.candidatesfromcounts(
                df['nMuon'],
@@ -120,11 +89,11 @@ class EventSelectorProcessor(processor.ProcessorABC):
                pt=df['Dstar_pt'],
                eta=df['Dstar_eta'],
                phi=df['Dstar_phi'],
-               mass=df['Dstar_mass'],
+               mass=df['Dstar_deltam'] + df['DstarD0_mass'],
                vtxIdx=df['Dstar_vtxIdx'],
-               x=df['Dstar_x'],
-               y=df['Dstar_y'],
-               z=df['Dstar_z'],
+               D0x=df['DstarD0_x'],
+               D0y=df['DstarD0_y'],
+               D0z=df['DstarD0_z'],
                )
       else:  
          Dstar = JaggedCandidateArray.candidatesfromcounts(
@@ -177,7 +146,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
       Muon = Muon[twomuons]
       D0 = D0[twomuons]
       Dstar = Dstar[twomuons]
-      output['cutflow']['two muons']         += Muons.counts.sum()
+      output['cutflow']['two muons']         += Muon.counts.sum()
       output['cutflow']['D0 two muons']      += D0.counts.sum()
       output['cutflow']['Dstar two muons']   += Dstar.counts.sum()
 
@@ -203,26 +172,61 @@ class EventSelectorProcessor(processor.ProcessorABC):
       output['cutflow']['D0 evt cut'] += D0.counts.sum()
       output['cutflow']['Dstar evt cut'] += Dstar.counts.sum()
       
-      output['muon_pt'].fill(dataset=dataset, pt=Muon.pt.flatten())
-      output['muon_eta'].fill(dataset=dataset, eta=Muon.eta.flatten())
-      output['muon_phi'].fill(dataset=dataset, phi=Muon.phi.flatten())
+      # Leading and Trailing muon separation
+      leading_mu = (Dimuon.i0.pt.content > Dimuon.i1.pt.content)
+      Muon_lead = JaggedCandidateArray.candidatesfromoffsets(Dimuon.offsets, 
+                                                       pt=np.where(leading_mu, Dimuon.i0.pt.content, Dimuon.i1.pt.content),
+                                                       eta=np.where(leading_mu, Dimuon.i0.eta.content, Dimuon.i1.eta.content),
+                                                       phi=np.where(leading_mu, Dimuon.i0.phi.content, Dimuon.i1.phi.content),
+                                                       mass=np.where(leading_mu, Dimuon.i0.mass.content, Dimuon.i1.mass.content),)
 
-      output['dimu_mass'].fill(dataset=dataset, mass=Dimuon.mass.flatten())
-      output['dimu_pt'].fill(dataset=dataset, pt=Dimuon.pt.flatten())
-      output['dimu_eta'].fill(dataset=dataset, eta=Dimuon.eta.flatten())
-      output['dimu_phi'].fill(dataset=dataset, phi=Dimuon.phi.flatten())
+      Muon_trail = JaggedCandidateArray.candidatesfromoffsets(Dimuon.offsets, 
+                                                       pt=np.where(~leading_mu, Dimuon.i0.pt.content, Dimuon.i1.pt.content),
+                                                       eta=np.where(~leading_mu, Dimuon.i0.eta.content, Dimuon.i1.eta.content),
+                                                       phi=np.where(~leading_mu, Dimuon.i0.phi.content, Dimuon.i1.phi.content),
+                                                       mass=np.where(~leading_mu, Dimuon.i0.mass.content, Dimuon.i1.mass.content),)
 
-      output['D0_mass'].fill(dataset=dataset, mass=D0.mass.flatten())
-      output['D0_pt'].fill(dataset=dataset, pt=D0.pt.flatten())
-      output['D0_eta'].fill(dataset=dataset, eta=D0.eta.flatten())
-      output['D0_phi'].fill(dataset=dataset, phi=D0.phi.flatten())
+      Dimuon = Dimuon.i0 + Dimuon.i1
 
-      output['Dstar_mass'].fill(dataset=dataset, mass=Dstar.mass.flatten())
-      output['Dstar_pt'].fill(dataset=dataset, pt=Dstar.pt.flatten())
-      output['Dstar_eta'].fill(dataset=dataset, eta=Dstar.eta.flatten())
-      output['Dstar_phi'].fill(dataset=dataset, phi=Dstar.phi.flatten())
+      #Create the accumulators to save output
+      muon_lead_acc = processor.dict_accumulator({})
+      for var in Muon_lead.columns:
+         muon_lead_acc[var] = processor.column_accumulator(np.array(Muon_lead[var].flatten()))
+      muon_lead_acc["nMuon"] = processor.column_accumulator(Muon_lead.counts)
+      output += muon_lead_acc
+
+      muon_trail_acc = processor.dict_accumulator({})
+      for var in Muon_trail.columns:
+         muon_trail_acc[var] = processor.column_accumulator(np.array(Muon_trail[var].flatten()))
+      muon_trail_acc["nMuon"] = processor.column_accumulator(Muon_trail.counts)
+      output += muon_trail_acc
       
-      return output
+      dimuon_acc = processor.dict_accumulator({})
+      for var in Dimuon.columns:
+         dimuon_acc[var] = processor.column_accumulator(np.array(Dimuon[var].flatten()))
+      dimuon_acc["nMuon"] = processor.column_accumulator(Dimuon.counts)
+      output += dimuon_acc
+      
+      D0_acc = processor.dict_accumulator({})
+      for var in D0.columns:
+         D0_acc[var] = processor.column_accumulator(np.array(D0[var].flatten()))
+      D0_acc["nMuon"] = processor.column_accumulator(D0.counts)
+      output += D0_acc
+
+      Dstar_acc = processor.dict_accumulator({})
+      for var in Dstar.columns:
+         Dstar_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
+      Dstar_acc["nMuon"] = processor.column_accumulator(Dstar.counts)
+      output += Dstar_acc
+
+      file_hash = str(random.getrandbits(128)) + str(df.size)
+      save(output, "output/" + self.analyzer_name + "/output_" + file_hash + ".coffea")
+
+      # return dummy accumulator
+      return processor.dict_accumulator({
+            'foo': processor.defaultdict_accumulator(float),
+        })
+
 
    def postprocess(self, accumulator):
       return accumulator
