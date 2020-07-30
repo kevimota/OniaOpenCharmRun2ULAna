@@ -204,23 +204,23 @@ class EventSelectorProcessor(processor.ProcessorABC):
       dimuon_acc = processor.dict_accumulator({})
       for var in Dimuon.columns:
          dimuon_acc[var] = processor.column_accumulator(np.array(Dimuon[var].flatten()))
-      dimuon_acc["nMuon"] = processor.column_accumulator(Dimuon.counts)
+      dimuon_acc["nDimuon"] = processor.column_accumulator(Dimuon.counts)
       output += dimuon_acc
       
       D0_acc = processor.dict_accumulator({})
       for var in D0.columns:
          D0_acc[var] = processor.column_accumulator(np.array(D0[var].flatten()))
-      D0_acc["nMuon"] = processor.column_accumulator(D0.counts)
+      D0_acc["nD0"] = processor.column_accumulator(D0.counts)
       output += D0_acc
 
       Dstar_acc = processor.dict_accumulator({})
       for var in Dstar.columns:
          Dstar_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
-      Dstar_acc["nMuon"] = processor.column_accumulator(Dstar.counts)
+      Dstar_acc["nDstar"] = processor.column_accumulator(Dstar.counts)
       output += Dstar_acc
 
       file_hash = str(random.getrandbits(128)) + str(df.size)
-      save(output, "output/" + self.analyzer_name + "/output_" + file_hash + ".coffea")
+      save(output, "output/" + self.analyzer_name + "/" + self.analyzer_name + "_" + file_hash + ".coffea")
 
       # return dummy accumulator
       return processor.dict_accumulator({
