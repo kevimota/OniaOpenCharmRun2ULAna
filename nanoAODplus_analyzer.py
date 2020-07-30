@@ -32,15 +32,19 @@ if args.merge:
     if (subprocess.run("find output/ -type d -name '" + args.name + "'", shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8") == ''):
         raise Exception("Folder not found!")
     print("Merging files in output/" + args.name)
-    files = subprocess.run("ls -d output/" + args.name + "/*", shell=True, stdout=subprocess.PIPE)
+    files = subprocess.run("find output/" + args.name + "/ -type f -name '" + args.name + "*' -not -path *merged*", shell=True, stdout=subprocess.PIPE)
     file_list = files.stdout.decode("utf-8").splitlines()
+    if len(file_list) == 0:
+        raise Exception("no files in folder!")
     acc = load(file_list[0])
+    os.system("rm -rf " + file_list[0])
     for idx, f in tqdm(enumerate(file_list), desc="Merging", unit=" files", total=len(file_list)):
         if (idx == 0): continue
         acc += load(f)
-    print("Saving as output/merged/" + args.name + "_merged.coffea")
-    os.system("mkdir -p output/merged")
-    save(acc, "output/merged/" + args.name + "_merged.coffea")
+        os.system("rm -rf " + f)
+    print("Saving as output/" + args.name + "/merged/" + args.name + "_merged.coffea")
+    os.system("mkdir -p output/" + args.name + "/merged")
+    save(acc, "output/" + args.name + "/merged/" + args.name + "_merged.coffea")
             
 else:
     config_yaml = yaml.load(open("config/local.yaml", "r"), Loader=yaml.FullLoader)
