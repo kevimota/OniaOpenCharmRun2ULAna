@@ -31,6 +31,7 @@ conda activate OniaOpenCharmRun2ULenv
 
 python3 -m pip install --upgrade pip
 python3 -m pip install --upgrade --ignore-installed --force-reinstall coffea
+python3 -m pip install --upgrade --ignore-installed --force-reinstall boost-histogram
 python3 -m pip install --upgrade --ignore-installed --force-reinstall pick
 python3 -m pip install --upgrade --ignore-installed --force-reinstall tabulate
 python3 -m pip install --upgrade --ignore-installed --force-reinstall millify
