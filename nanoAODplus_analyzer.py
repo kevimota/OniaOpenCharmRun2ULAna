@@ -3,10 +3,7 @@
 import time
 import os, sys, subprocess
 
-from coffea import hist
-from coffea.analysis_objects import JaggedCandidateArray
 import coffea.processor as processor
-from coffea.util import save, load
 from awkward import JaggedArray
 import numpy as np
 
@@ -27,25 +24,10 @@ parser.add_argument("-n", "--name", help="Analyser name", type=str, required=Tru
 parser.add_argument("-m","--merge", help="Merge the accumulators that were output from a analyzer", action="store_true")
 args = parser.parse_args()
 
+
 if args.merge:
-    from tqdm import tqdm
-    if (subprocess.run("find output/ -type d -name '" + args.name + "'", shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8") == ''):
-        raise Exception("Folder not found!")
-    print("Merging files in output/" + args.name)
-    files = subprocess.run("find output/" + args.name + "/ -type f -name '" + args.name + "*' -not -path *merged*", shell=True, stdout=subprocess.PIPE)
-    file_list = files.stdout.decode("utf-8").splitlines()
-    if len(file_list) == 0:
-        raise Exception("no files in folder!")
-    acc = load(file_list[0])
-    os.system("rm -rf " + file_list[0])
-    for idx, f in tqdm(enumerate(file_list), desc="Merging", unit=" files", total=len(file_list)):
-        if (idx == 0): continue
-        acc += load(f)
-        os.system("rm -rf " + f)
-    print("Saving as output/" + args.name + "/merged/" + args.name + "_merged.coffea")
-    os.system("mkdir -p output/" + args.name + "/merged")
-    save(acc, "output/" + args.name + "/merged/" + args.name + "_merged.coffea")
-            
+    from tools.merger import merger
+    merger(args.name)    
 else:
     config_yaml = yaml.load(open("config/local.yaml", "r"), Loader=yaml.FullLoader)
 
@@ -68,6 +50,5 @@ else:
                                     chunksize=config_yaml['chunksize'],
                                     )
 
-    elapsed = time.time() - tstart
-
-    print("Time elapsed:", elapsed)
+    elapsed = round(time.time() - tstart, 2)
+    print(f"Process finished in: {elapsed} s")
