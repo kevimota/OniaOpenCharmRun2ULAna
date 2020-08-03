@@ -25,22 +25,10 @@ After installation, reload the session.
 
 ```
 conda deactivate ; conda deactivate 
-conda create -y -n OniaOpenCharmRun2ULenv python=3.6 xrootd -c conda-forge
 
-conda activate OniaOpenCharmRun2ULenv
+conda env create
 
-python3 -m pip install --upgrade pip
-python3 -m pip install --upgrade --ignore-installed --force-reinstall coffea
-python3 -m pip install --upgrade --ignore-installed --force-reinstall boost-histogram
-python3 -m pip install --upgrade --ignore-installed --force-reinstall pick
-python3 -m pip install --upgrade --ignore-installed --force-reinstall tabulate
-python3 -m pip install --upgrade --ignore-installed --force-reinstall millify
-python3 -m pip install --upgrade --ignore-installed --force-reinstall pyyaml
-python3 -m pip install --upgrade --ignore-installed --force-reinstall jupyterlab
-
-python3 -m pip install --upgrade --ignore installed --force-reinstall nbresuse==0.3.3
-conda install -y -c conda-forge nodejs
-
+# for jupyterlab w/ ipython widgets
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 #only if CMSSW needed:
@@ -55,8 +43,6 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 mkdir plots
 mkdir output
-
-export PYTHONPATH=$CONDA_PREFIX/lib/python3.6/site-packages/
 ```
 
 ## Set the virtual environment after setup:
