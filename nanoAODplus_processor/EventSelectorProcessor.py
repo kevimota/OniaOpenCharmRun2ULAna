@@ -1,4 +1,3 @@
-from coffea import hist
 from coffea.analysis_objects import JaggedCandidateArray
 import coffea.processor as processor
 from awkward import JaggedArray
@@ -193,31 +192,31 @@ class EventSelectorProcessor(processor.ProcessorABC):
       for var in Muon_lead.columns:
          muon_lead_acc[var] = processor.column_accumulator(np.array(Muon_lead[var].flatten()))
       muon_lead_acc["nMuon"] = processor.column_accumulator(Muon_lead.counts)
-      output += muon_lead_acc
+      output["Muon_lead"] = muon_lead_acc
 
       muon_trail_acc = processor.dict_accumulator({})
       for var in Muon_trail.columns:
          muon_trail_acc[var] = processor.column_accumulator(np.array(Muon_trail[var].flatten()))
       muon_trail_acc["nMuon"] = processor.column_accumulator(Muon_trail.counts)
-      output += muon_trail_acc
+      output["Muon_trail"] = muon_trail_acc
       
       dimuon_acc = processor.dict_accumulator({})
       for var in Dimuon.columns:
          dimuon_acc[var] = processor.column_accumulator(np.array(Dimuon[var].flatten()))
       dimuon_acc["nDimuon"] = processor.column_accumulator(Dimuon.counts)
-      output += dimuon_acc
+      output["Dimuon"] = dimuon_acc
       
       D0_acc = processor.dict_accumulator({})
       for var in D0.columns:
          D0_acc[var] = processor.column_accumulator(np.array(D0[var].flatten()))
       D0_acc["nD0"] = processor.column_accumulator(D0.counts)
-      output += D0_acc
+      output["D0"] = D0_acc
 
       Dstar_acc = processor.dict_accumulator({})
       for var in Dstar.columns:
          Dstar_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
       Dstar_acc["nDstar"] = processor.column_accumulator(Dstar.counts)
-      output += Dstar_acc
+      output["Dstar"] = Dstar_acc
 
       file_hash = str(random.getrandbits(128)) + str(df.size)
       save(output, "output/" + self.analyzer_name + "/" + self.analyzer_name + "_" + file_hash + ".coffea")
