@@ -32,7 +32,7 @@ def create_plot1d(hist, name):
    ax = hep.cms.label(data=True, paper=False, year='2017', ax=ax)
 
    fig = ax.get_figure()
-   fig.savefig("plots/test/" + name)
+   fig.savefig("plots/" + self.analyzer_name + "/" + name)
    ax.clear()
 
 class HistogramingProcessor(processor.ProcessorABC):
@@ -106,14 +106,14 @@ class HistogramingProcessor(processor.ProcessorABC):
       hist_Dstar_mass.fill(acc["D0"]["__fast_mass"].value)
 
       # Saving histograms
-      save(hist_muon_lead, "output/test/hist/hist_muon_lead.hist")
-      save(hist_muon_trail, "output/test/hist/hist_muon_trail.hist")
-      save(hist_dimuon, "output/test/hist/hist_dimuon.hist")
-      save(hist_dimuon_mass, "output/test/hist/hist_dimuon_mass.hist")
-      save(hist_D0, "output/test/hist/hist_D0.hist")
-      save(hist_D0_mass, "output/test/hist/hist_D0_mass.hist")
-      save(hist_Dstar, "output/test/hist/hist_Dstar.hist")
-      save(hist_Dstar_mass, "output/test/hist/hist_Dstar_mass.hist")
+      save(hist_muon_lead, "output/" + self.analyzer_name + "/hist/hist_muon_lead.hist")
+      save(hist_muon_trail, "output/" + self.analyzer_name + "/hist/hist_muon_trail.hist")
+      save(hist_dimuon, "output/" + self.analyzer_name + "/hist/hist_dimuon.hist")
+      save(hist_dimuon_mass, "output/" + self.analyzer_name + "/hist/hist_dimuon_mass.hist")
+      save(hist_D0, "output/" + self.analyzer_name + "/hist/hist_D0.hist")
+      save(hist_D0_mass, "output/" + self.analyzer_name + "/hist/hist_D0_mass.hist")
+      save(hist_Dstar, "output/" + self.analyzer_name + "/hist/hist_Dstar.hist")
+      save(hist_Dstar_mass, "output/" + self.analyzer_name + "/hist/hist_Dstar_mass.hist")
 
       # Creating plots
       create_plot1d(hist_muon_lead[:, sum, sum], "muon_lead_pt.png")
