@@ -11,19 +11,12 @@ from nanoAODplus_processor.EventSelectorProcessor import EventSelectorProcessor
 from data.fileset import filesets
 import yaml
 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import mplhep as hep
-plt.style.use(hep.style.CMS)
-
 # for argument parsing
 import argparse
 parser = argparse.ArgumentParser(description="Onia Open Charm NanoAOD analyzer")
 parser.add_argument("-n", "--name", help="Analyser name", type=str, required=True)
 parser.add_argument("-m","--merge", help="Merge the accumulators that were output from a analyzer", action="store_true")
 args = parser.parse_args()
-
 
 if args.merge:
     from tools.merger import merger
@@ -36,9 +29,9 @@ else:
 
     tstart = time.time()
 
-    files = {'Charmonium2017MINIAOD': filesets['Charmonium2017MINIAOD'][0:1]}
+    files = {'MuOnia2017MINIAOD': filesets['MuOnia2017MINIAOD'][0:5]}
 
-    # creating necessary folders into dor output data
+    # creating necessary folders into dir output data
     os.system("mkdir -p output/" + args.name)
     os.system("rm -rf output/" + args.name + "/*")          
 
