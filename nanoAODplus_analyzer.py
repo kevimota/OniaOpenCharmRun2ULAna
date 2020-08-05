@@ -14,14 +14,14 @@ import yaml
 # for argument parsing
 import argparse
 parser = argparse.ArgumentParser(description="Onia Open Charm NanoAOD analyzer")
-parser.add_argument("-n", "--name", help="Analyser name", type=str, required=True)
+parser.add_argument("-n", "--name", help="Analyzer name", type=str, required=True)
+parser.add_argument("-s", "--select", help="Do the evt selection", action="store_true")
 parser.add_argument("-m","--merge", help="Merge the accumulators that were output from a analyzer", action="store_true")
+parser.add_argument("-p","--plots", help="Create the plots from the merged accumulator", action="store_true")
+parser.add_argument("-a","--analyze", help="Do the full analysis chain", action="store_true")
 args = parser.parse_args()
 
-if args.merge:
-    from tools.merger import merger
-    merger(args.name)    
-else:
+if (args.select or args.analyze):
     config_yaml = yaml.load(open("config/local.yaml", "r"), Loader=yaml.FullLoader)
 
     if config_yaml['executor'] == 'futures_executor': 
@@ -45,3 +45,11 @@ else:
 
     elapsed = round(time.time() - tstart, 2)
     print(f"Process finished in: {elapsed} s")
+
+if (args.merge or args.analyze):
+    from tools.merger import merger
+    merger(args.name)
+
+if (args.plots or args.analyze):
+    from tools.plotter import plotter
+    plotter(args.name)    
