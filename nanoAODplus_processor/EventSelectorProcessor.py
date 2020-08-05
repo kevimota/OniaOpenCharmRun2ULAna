@@ -102,9 +102,9 @@ class EventSelectorProcessor(processor.ProcessorABC):
                phi=np.array([]),
                mass=np.array([]),
                vtxIdx=np.array([]),
-               x=np.array([]),
-               y=np.array([]),
-               z=np.array([]),
+               D0x=np.array([]),
+               D0y=np.array([]),
+               D0z=np.array([]),
                )
 
       output['cutflow']['all events']  += Muon.size
@@ -185,35 +185,34 @@ class EventSelectorProcessor(processor.ProcessorABC):
                                                        phi=np.where(~leading_mu, Dimuon.i0.phi.content, Dimuon.i1.phi.content),
                                                        mass=np.where(~leading_mu, Dimuon.i0.mass.content, Dimuon.i1.mass.content),)
 
-      Dimuon = Dimuon.i0 + Dimuon.i1
-
       #Create the accumulators to save output
+      columns = ['__fast_pt', '__fast_phi', '__fast_eta', '__fast_mass']
       muon_lead_acc = processor.dict_accumulator({})
-      for var in Muon_lead.columns:
+      for var in columns:
          muon_lead_acc[var] = processor.column_accumulator(np.array(Muon_lead[var].flatten()))
       muon_lead_acc["nMuon"] = processor.column_accumulator(Muon_lead.counts)
       output["Muon_lead"] = muon_lead_acc
 
       muon_trail_acc = processor.dict_accumulator({})
-      for var in Muon_trail.columns:
+      for var in columns:
          muon_trail_acc[var] = processor.column_accumulator(np.array(Muon_trail[var].flatten()))
       muon_trail_acc["nMuon"] = processor.column_accumulator(Muon_trail.counts)
       output["Muon_trail"] = muon_trail_acc
       
       dimuon_acc = processor.dict_accumulator({})
-      for var in Dimuon.columns:
+      for var in columns:
          dimuon_acc[var] = processor.column_accumulator(np.array(Dimuon[var].flatten()))
       dimuon_acc["nDimuon"] = processor.column_accumulator(Dimuon.counts)
       output["Dimuon"] = dimuon_acc
       
       D0_acc = processor.dict_accumulator({})
-      for var in D0.columns:
+      for var in columns:
          D0_acc[var] = processor.column_accumulator(np.array(D0[var].flatten()))
       D0_acc["nD0"] = processor.column_accumulator(D0.counts)
       output["D0"] = D0_acc
 
       Dstar_acc = processor.dict_accumulator({})
-      for var in Dstar.columns:
+      for var in columns:
          Dstar_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
       Dstar_acc["nDstar"] = processor.column_accumulator(Dstar.counts)
       output["Dstar"] = Dstar_acc
@@ -223,7 +222,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
       # return dummy accumulator
       return processor.dict_accumulator({
-            'foo': processor.defaultdict_accumulator(float),
+            'foo': processor.defaultdict_accumulator(int),
         })
 
 
