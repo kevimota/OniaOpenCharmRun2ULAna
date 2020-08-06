@@ -6,11 +6,11 @@ from coffea.util import save, load
 
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import mplhep as hep
-plt.style.use(hep.style.CMS)
 
 def create_plot1d(hist, save_name):
+   import matplotlib.pyplot as plt
+   import mplhep as hep
+   plt.style.use(hep.style.CMS)
    # plot 
    ax = hep.histplot(hist)
 
@@ -21,16 +21,14 @@ def create_plot1d(hist, save_name):
    mean = (hist.view() * hist.axes[0].centers).sum()/hist.sum()
    std = np.sqrt((hist.view()*((hist.axes[0].centers - mean)**2)).sum()/hist.sum())
 
-   anotation = f"Total {hist.sum()}" \
+   annotation = f"Total {hist.sum()}" \
                + "\n" + f"Mean: {round(mean,2)}" \
                + "\n" + f"Std: {round(std,2)}"
    
-   ax.annotate(anotation, xy=(0.80, 0.85), xycoords='axes fraction', fontsize = "small",
-               ha='center', annotation_clip=False)
+   ax.annotate(annotation, xy=(0.85, 0.85), xycoords='axes fraction', fontsize = "small",
+               ha='center', annotation_clip=False, bbox=dict(boxstyle='round', fc='None'))
 
-   # aply CMS label
-   ax = hep.cms.label(data=True, paper=False, year='2017', ax=ax)
-
+   ax.ticklabel_format(axis='y', style='sci', scilimits=(0,3), useMathText=True)
    fig = ax.get_figure()
    fig.savefig(save_name)
    ax.clear()
