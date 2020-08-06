@@ -3,10 +3,7 @@
 import time
 import os, sys, subprocess
 
-from coffea import hist
-from coffea.analysis_objects import JaggedCandidateArray
 import coffea.processor as processor
-from coffea.util import save, load
 from awkward import JaggedArray
 import numpy as np
 
@@ -14,39 +11,17 @@ from nanoAODplus_processor.EventSelectorProcessor import EventSelectorProcessor
 from data.fileset import filesets
 import yaml
 
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import mplhep as hep
-plt.style.use(hep.style.CMS)
-
 # for argument parsing
 import argparse
 parser = argparse.ArgumentParser(description="Onia Open Charm NanoAOD analyzer")
-parser.add_argument("-n", "--name", help="Analyser name", type=str, required=True)
+parser.add_argument("-n", "--name", help="Analyzer name", type=str, required=True)
+parser.add_argument("-s", "--select", help="Do the evt selection", action="store_true")
 parser.add_argument("-m","--merge", help="Merge the accumulators that were output from a analyzer", action="store_true")
+parser.add_argument("-p","--plots", help="Create the plots from the merged accumulator", action="store_true")
+parser.add_argument("-a","--analyze", help="Do the full analysis chain", action="store_true")
 args = parser.parse_args()
 
-if args.merge:
-    from tqdm import tqdm
-    if (subprocess.run("find output/ -type d -name '" + args.name + "'", shell=True, stdout=subprocess.PIPE).stdout.decode("utf-8") == ''):
-        raise Exception("Folder not found!")
-    print("Merging files in output/" + args.name)
-    files = subprocess.run("find output/" + args.name + "/ -type f -name '" + args.name + "*' -not -path *merged*", shell=True, stdout=subprocess.PIPE)
-    file_list = files.stdout.decode("utf-8").splitlines()
-    if len(file_list) == 0:
-        raise Exception("no files in folder!")
-    acc = load(file_list[0])
-    os.system("rm -rf " + file_list[0])
-    for idx, f in tqdm(enumerate(file_list), desc="Merging", unit=" files", total=len(file_list)):
-        if (idx == 0): continue
-        acc += load(f)
-        os.system("rm -rf " + f)
-    print("Saving as output/" + args.name + "/merged/" + args.name + "_merged.coffea")
-    os.system("mkdir -p output/" + args.name + "/merged")
-    save(acc, "output/" + args.name + "/merged/" + args.name + "_merged.coffea")
-            
-else:
+if (args.select or args.analyze):
     config_yaml = yaml.load(open("config/local.yaml", "r"), Loader=yaml.FullLoader)
 
     if config_yaml['executor'] == 'futures_executor': 
@@ -54,9 +29,9 @@ else:
 
     tstart = time.time()
 
-    files = {'Charmonium2017MINIAOD': filesets['Charmonium2017MINIAOD'][0:1]}
+    files = {'MuOnia2017MINIAOD': filesets['MuOnia2017MINIAOD'][0:5]}
 
-    # creating necessary folders into dor output data
+    # creating necessary folders into dir output data
     os.system("mkdir -p output/" + args.name)
     os.system("rm -rf output/" + args.name + "/*")          
 
@@ -68,6 +43,13 @@ else:
                                     chunksize=config_yaml['chunksize'],
                                     )
 
-    elapsed = time.time() - tstart
+    elapsed = round(time.time() - tstart, 2)
+    print(f"Process finished in: {elapsed} s")
 
-    print("Time elapsed:", elapsed)
+if (args.merge or args.analyze):
+    from tools.merger import merger
+    merger(args.name)
+
+if (args.plots or args.analyze):
+    from tools.plotter import plotter
+    plotter(args.name)    

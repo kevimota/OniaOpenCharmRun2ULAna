@@ -12,6 +12,5 @@ conda deactivate ; conda deactivate
 ###########################
 
 conda activate OniaOpenCharmRun2ULenv
-export PYTHONPATH=$CONDA_PREFIX/lib/python3.6/site-packages
 cd OniaOpenCharmRun2ULAna
 voms-proxy-init --rfc --voms cms
