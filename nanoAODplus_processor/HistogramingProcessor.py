@@ -14,8 +14,8 @@ def create_plot1d(hist, save_name):
    # plot 
    ax = hep.histplot(hist)
 
-   ax.set_xlabel(hist.axes[0].metadata, ha='right')
-   ax.set_ylabel("Counts", ha='right')
+   ax.set_xlabel(hist.axes[0].metadata, loc='right')
+   ax.set_ylabel("Counts", loc='top')
 
    # compute mean and std:
    mean = (hist.view() * hist.axes[0].centers).sum()/hist.sum()
@@ -34,9 +34,7 @@ def create_plot1d(hist, save_name):
    ax.clear()
 
 class HistogramingProcessor(processor.ProcessorABC):
-   def __init__(self, analyzer_name):
-      self.analyzer_name = analyzer_name
-
+   def __init__(self):
       self._accumulator = processor.dict_accumulator({
          'foo': processor.defaultdict_accumulator(int)
       })

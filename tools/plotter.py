@@ -21,7 +21,7 @@ def plotter(name):
 
     tstart = time.time()
 
-    _processor = HistogramingProcessor(name)
+    _processor = HistogramingProcessor()
     _dummy_accumulator = _processor.accumulator.identity()
     ds = [{"file": "output/" + name + "/merged/test_merged.coffea", "analyzer_name": name}]
     processor.iterative_executor(ds, _processor.process, _dummy_accumulator)
