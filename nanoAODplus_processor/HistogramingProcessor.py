@@ -11,8 +11,9 @@ def create_plot1d(hist, save_name):
    import matplotlib.pyplot as plt
    import mplhep as hep
    plt.style.use(hep.style.CMS)
-   # plot 
-   ax = hep.histplot(hist)
+   # plot
+   ax = plt.gca()
+   hep.histplot(hist, ax=ax)
 
    ax.set_xlabel(hist.axes[0].metadata, loc='right')
    ax.set_ylabel("Counts", loc='top')
@@ -29,6 +30,7 @@ def create_plot1d(hist, save_name):
                ha='center', annotation_clip=False, bbox=dict(boxstyle='round', fc='None'))
 
    ax.ticklabel_format(axis='y', style='sci', scilimits=(0,3), useMathText=True)
+   ax.set_xlim(hist.axes[0].edges[0], hist.axes[0].edges[-1] + hist.axes[0].widths[-1])
    fig = ax.get_figure()
    fig.savefig(save_name)
    ax.clear()
@@ -60,19 +62,19 @@ class HistogramingProcessor(processor.ProcessorABC):
                                  bh.axis.Regular(80, -4.0, 4.0, metadata=r"$\eta_{\mu^+\mu^-}$"),
                                  bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu^+\mu^-}$"),)
 
-      hist_dimuon_mass = bh.Histogram(bh.axis.Regular(1000, 0, 100, metadata=r"$m_{\mu^+\mu^-}$ [GeV]"))
+      hist_dimuon_mass = bh.Histogram(bh.axis.Regular(100, 8, 12, metadata=r"$m_{\mu^+\mu^-}$ [GeV]"))
 
       hist_D0 = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D^0}$ [GeV]"),
                               bh.axis.Regular(80, -4.0, 4.0, metadata=r"$\eta_{D^0}$"),
                               bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D^0}$"),)
 
-      hist_D0_mass = bh.Histogram(bh.axis.Regular(20, 1.8, 2.2, metadata=r"$m_{D^0}$ [GeV]"))
+      hist_D0_mass = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D^0}$ [GeV]"))
 
       hist_Dstar = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D*}$ [GeV]"),
                                  bh.axis.Regular(60, -3.0, 3.0, metadata=r"$\eta_{D*}$"),
                                  bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D*}$"),)
 
-      hist_Dstar_mass = bh.Histogram(bh.axis.Regular(20, 1.8, 2.2, metadata=r"$m_{D*}$ [GeV]"))
+      hist_Dstar_mass = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D*}$ [GeV]"))
 
       # Filling histograms
       hist_muon_lead.fill(acc["Muon_lead"]["__fast_pt"].value,
