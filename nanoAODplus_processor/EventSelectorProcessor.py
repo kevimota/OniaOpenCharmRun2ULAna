@@ -135,12 +135,6 @@ class EventSelectorProcessor(processor.ProcessorABC):
       Dimu = Dimu[mass_cut]
       output['cutflow']['Upsilon mass'] += Dimu.counts.sum()
 
-      ndimu_cut = Dimu.counts > 0
-      Dimu = Dimu[ndimu_cut]
-      Muon = Muon[ndimu_cut]
-      D0 = D0[ndimu_cut]
-      Dstar = Dstar[ndimu_cut]
-
       ############### Get the Muons from Dimu, for cuts in their params
 
       # For Muon 1:
