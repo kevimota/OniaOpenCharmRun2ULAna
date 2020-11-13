@@ -12,7 +12,8 @@ def create_plot1d(hist, save_name):
    import mplhep as hep
    plt.style.use(hep.style.CMS)
    # plot 
-   ax = hep.histplot(hist)
+   ax = plt.gca()
+   hep.histplot(hist, ax=ax)
 
    ax.set_xlabel(hist.axes[0].metadata, loc='right')
    ax.set_ylabel("Counts", loc='top')
