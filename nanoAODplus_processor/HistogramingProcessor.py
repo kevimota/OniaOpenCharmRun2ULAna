@@ -58,11 +58,11 @@ class HistogramingProcessor(processor.ProcessorABC):
                                        bh.axis.Regular(60, -3.0, 3.0, metadata=r"$\eta_{\mu}$"),
                                        bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu}$"),)
 
-      hist_dimuon = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\mu^+\mu^-}$ [GeV]"),
+      hist_dimu = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\mu^+\mu^-}$ [GeV]"),
                                  bh.axis.Regular(80, -4.0, 4.0, metadata=r"$\eta_{\mu^+\mu^-}$"),
                                  bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu^+\mu^-}$"),)
 
-      hist_dimuon_mass = bh.Histogram(bh.axis.Regular(100, 8, 12, metadata=r"$m_{\mu^+\mu^-}$ [GeV]"))
+      hist_dimu_mass = bh.Histogram(bh.axis.Regular(100, 8, 12, metadata=r"$m_{\mu^+\mu^-}$ [GeV]"))
 
       hist_D0 = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D^0}$ [GeV]"),
                               bh.axis.Regular(80, -4.0, 4.0, metadata=r"$\eta_{D^0}$"),
@@ -85,11 +85,11 @@ class HistogramingProcessor(processor.ProcessorABC):
                            acc["Muon_trail"]["__fast_eta"].value, 
                            acc["Muon_trail"]["__fast_phi"].value)
 
-      hist_dimuon.fill(acc["Dimuon"]["__fast_pt"].value,
-                        acc["Dimuon"]["__fast_eta"].value, 
-                        acc["Dimuon"]["__fast_phi"].value)
+      hist_dimu.fill(acc["Dimu"]["__fast_pt"].value,
+                        acc["Dimu"]["__fast_eta"].value, 
+                        acc["Dimu"]["__fast_phi"].value)
 
-      hist_dimuon_mass.fill(acc["Dimuon"]["__fast_mass"].value) 
+      hist_dimu_mass.fill(acc["Dimu"]["__fast_mass"].value) 
 
       hist_D0.fill(acc["D0"]["__fast_pt"].value,
                      acc["D0"]["__fast_eta"].value, 
@@ -101,13 +101,13 @@ class HistogramingProcessor(processor.ProcessorABC):
                         acc["Dstar"]["__fast_eta"].value, 
                         acc["Dstar"]["__fast_phi"].value)
 
-      hist_Dstar_mass.fill(acc["D0"]["__fast_mass"].value)
+      hist_Dstar_mass.fill(acc["Dstar"]["__fast_mass"].value)
 
       # Saving histograms
       save(hist_muon_lead, "output/" + ds['analyzer_name'] + "/hist/hist_muon_lead.hist")
       save(hist_muon_trail, "output/" + ds['analyzer_name'] + "/hist/hist_muon_trail.hist")
-      save(hist_dimuon, "output/" + ds['analyzer_name'] + "/hist/hist_dimuon.hist")
-      save(hist_dimuon_mass, "output/" + ds['analyzer_name'] + "/hist/hist_dimuon_mass.hist")
+      save(hist_dimu, "output/" + ds['analyzer_name'] + "/hist/hist_dimu.hist")
+      save(hist_dimu_mass, "output/" + ds['analyzer_name'] + "/hist/hist_dimu_mass.hist")
       save(hist_D0, "output/" + ds['analyzer_name'] + "/hist/hist_D0.hist")
       save(hist_D0_mass, "output/" + ds['analyzer_name'] + "/hist/hist_D0_mass.hist")
       save(hist_Dstar, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar.hist")
@@ -123,10 +123,10 @@ class HistogramingProcessor(processor.ProcessorABC):
       create_plot1d(hist_muon_trail[sum, :, sum], plots_path + "muon_trail_eta.png")
       create_plot1d(hist_muon_trail[sum, sum, :], plots_path + "muon_trail_phi.png")
 
-      create_plot1d(hist_dimuon[:, sum, sum], plots_path + "dimuon_pt.png")
-      create_plot1d(hist_dimuon[sum, :, sum], plots_path + "dimuon_eta.png")
-      create_plot1d(hist_dimuon[sum, sum, :], plots_path + "dimuon_phi.png")
-      create_plot1d(hist_dimuon_mass, plots_path + "dimuon_mass.png")
+      create_plot1d(hist_dimu[:, sum, sum], plots_path + "dimu_pt.png")
+      create_plot1d(hist_dimu[sum, :, sum], plots_path + "dimu_eta.png")
+      create_plot1d(hist_dimu[sum, sum, :], plots_path + "dimu_phi.png")
+      create_plot1d(hist_dimu_mass, plots_path + "dimu_mass.png")
 
       create_plot1d(hist_D0[:, sum, sum], plots_path + "D0_pt.png")
       create_plot1d(hist_D0[sum, :, sum], plots_path + "D0_eta.png")

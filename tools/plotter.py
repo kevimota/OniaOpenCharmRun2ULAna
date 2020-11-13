@@ -4,7 +4,6 @@ import time
 import os, sys, subprocess
 
 import coffea.processor as processor
-from awkward import JaggedArray
 import numpy as np
 
 from nanoAODplus_processor.HistogramingProcessor import HistogramingProcessor
