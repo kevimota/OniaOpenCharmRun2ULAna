@@ -26,7 +26,7 @@ After installation, reload the session.
 ```
 conda deactivate ; conda deactivate 
 
-conda env create
+conda env create -f environment.yml
 
 # for jupyterlab w/ ipython widgets
 jupyter labextension install @jupyter-widgets/jupyterlab-manager

@@ -4,7 +4,6 @@ from tqdm import tqdm
 
 from coffea.util import save, load
 import coffea.processor as processor
-from awkward import JaggedArray
 import numpy as np
 
 def merger(name):
