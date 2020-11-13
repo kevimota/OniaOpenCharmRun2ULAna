@@ -1,8 +1,8 @@
 from coffea.analysis_objects import JaggedCandidateArray
 import coffea.processor as processor
-from awkward import JaggedArray, Table
+from awkward import JaggedArray
 import numpy as np
-from coffea.util import save, load
+from coffea.util import save
 import random
 
 class EventSelectorProcessor(processor.ProcessorABC):
@@ -127,6 +127,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
       output['cutflow']['all D0']      += D0.counts.sum()
       output['cutflow']['all Dstar']   += Dstar.counts.sum()
 
+      ############### Cuts
       # Dimu cuts: charge = 0...
       Dimu = Dimu[Dimu.charge == 0]
       output['cutflow']['Dimu 0 charge'] += Dimu.counts.sum()
@@ -144,54 +145,30 @@ class EventSelectorProcessor(processor.ProcessorABC):
       Muon2 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[mu2Idx])
 
       # SoftId and Global Muon cuts
-      soft_id1 = (Muon1.softId > 0)
-      Dimu = Dimu[soft_id1]
-      Muon1 = Muon1[soft_id1]
-      Muon2 = Muon2[soft_id1]
-      output['cutflow']['Dimu muon1 softId'] += Dimu.counts.sum()
+      soft_id = (Muon1.softId > 0) & (Muon2.softId > 0)
+      Dimu = Dimu[soft_id]
+      Muon1 = Muon1[soft_id]
+      Muon2 = Muon2[soft_id]
+      output['cutflow']['Dimu muon softId'] += Dimu.counts.sum()
 
-      soft_id2 = (Muon2.softId > 0)
-      Dimu = Dimu[soft_id2]
-      Muon1 = Muon1[soft_id2]
-      Muon2 = Muon2[soft_id2]
-      output['cutflow']['Dimu muon2 softId'] += Dimu.counts.sum()
-
-      global_muon1 = (Muon1.isGlobal > 0)
-      Dimu = Dimu[global_muon1]
-      Muon1 = Muon1[global_muon1]
-      Muon2 = Muon2[global_muon1]
-      output['cutflow']['Dimu muon1 global'] += Dimu.counts.sum()
-
-      global_muon2 = (Muon2.isGlobal > 0)
-      Dimu = Dimu[global_muon2]
-      Muon1 = Muon1[global_muon2]
-      Muon2 = Muon2[global_muon2]
-      output['cutflow']['Dimu muon2 global'] += Dimu.counts.sum()
+      global_muon = (Muon1.isGlobal > 0) & (Muon2.isGlobal > 0)
+      Dimu = Dimu[global_muon]
+      Muon1 = Muon1[global_muon]
+      Muon2 = Muon2[global_muon]
+      output['cutflow']['Dimu muon global'] += Dimu.counts.sum()
 
       # pt and eta cuts
-      pt_cut1 = (Muon1.pt > 3)
-      Dimu = Dimu[pt_cut1]
-      Muon1 = Muon1[pt_cut1]
-      Muon2 = Muon2[pt_cut1]
-      output['cutflow']['Muon1 pt cut'] += Dimu.counts.sum()
+      pt_cut = (Muon1.pt > 3) & (Muon2.pt > 3)
+      Dimu = Dimu[pt_cut]
+      Muon1 = Muon1[pt_cut]
+      Muon2 = Muon2[pt_cut]
+      output['cutflow']['Dimu muon pt cut'] += Dimu.counts.sum()
 
-      pt_cut2 = (Muon2.pt > 3)
-      Dimu = Dimu[pt_cut2]
-      Muon1 = Muon1[pt_cut2]
-      Muon2 = Muon2[pt_cut2]
-      output['cutflow']['Muon2 pt cut'] += Dimu.counts.sum()
-
-      eta_cut1 = (np.absolute(Muon1.eta) <= 2.4)
-      Dimu = Dimu[eta_cut1]
-      Muon1 = Muon1[eta_cut1]
-      Muon2 = Muon2[eta_cut1]
-      output['cutflow']['Muon1 eta cut'] += Dimu.counts.sum()
-
-      eta_cut2 = (np.absolute(Muon2.eta) <= 2.4)
-      Dimu = Dimu[eta_cut2]
-      Muon1 = Muon1[eta_cut2]
-      Muon2 = Muon2[eta_cut2]
-      output['cutflow']['Muon2 eta cut'] += Dimu.counts.sum()
+      eta_cut = (np.absolute(Muon1.eta) <= 2.4) & (np.absolute(Muon2.eta) <= 2.4)
+      Dimu = Dimu[eta_cut]
+      Muon1 = Muon1[eta_cut]
+      Muon2 = Muon2[eta_cut]
+      output['cutflow']['Dimu muon eta cut'] += Dimu.counts.sum()
 
       # Cuts into events with at least 1 Dimu
       ndimu_cut = Dimu.counts > 0

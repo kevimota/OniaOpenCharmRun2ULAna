@@ -1,10 +1,9 @@
 # coding: utf-8
 
 import time
-import os, sys, subprocess
+import os
 
 import coffea.processor as processor
-import numpy as np
 
 from nanoAODplus_processor.EventSelectorProcessor import EventSelectorProcessor
 from data.fileset import filesets
@@ -21,26 +20,33 @@ parser.add_argument("-a","--analyze", help="Do the full analysis chain", action=
 args = parser.parse_args()
 
 if (args.select or args.analyze):
-    config_yaml = yaml.load(open("config/local.yaml", "r"), Loader=yaml.FullLoader)
-
-    if config_yaml['executor'] == 'futures_executor': 
-        executor = processor.futures_executor
+    config_yaml = yaml.load(open("config/onecore.yaml", "r"), Loader=yaml.FullLoader)
 
     tstart = time.time()
 
-    files = {'MuOnia2017MINIAOD': filesets['MuOnia2017MINIAOD'][0:3]}
+    files = {'MuOniatestAOD': filesets['MuOniatestAOD']}
 
     # creating necessary folders into dir output data
     os.system("mkdir -p output/" + args.name)
     os.system("rm -rf output/" + args.name + "/*")          
 
-    output = processor.run_uproot_job(files,
-                                    treename='Events',
-                                    processor_instance=EventSelectorProcessor(args.name),
-                                    executor=executor,
-                                    executor_args={'workers': config_yaml['n_cores'], 'flatten': True},
-                                    chunksize=config_yaml['chunksize'],
-                                    )
+    if config_yaml['executor'] == 'futures_executor': 
+        output = processor.run_uproot_job(files,
+                                        treename='Events',
+                                        processor_instance=EventSelectorProcessor(args.name),
+                                        executor=processor.futures_executor,
+                                        executor_args={'workers': config_yaml['n_cores'], 'flatten': True},
+                                        chunksize=config_yaml['chunksize'],
+                                        )
+
+    elif config_yaml['executor'] == 'iterative_executor':
+        output = processor.run_uproot_job(files,
+                                        treename='Events',
+                                        processor_instance=EventSelectorProcessor(args.name),
+                                        executor=processor.iterative_executor,
+                                        executor_args={'flatten': True},
+                                        chunksize=config_yaml['chunksize'],
+                                        )
 
     elapsed = round(time.time() - tstart, 2)
     print(f"Process finished in: {elapsed} s")
