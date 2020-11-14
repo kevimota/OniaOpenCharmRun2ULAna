@@ -78,10 +78,23 @@ class EventSelectorProcessor(processor.ProcessorABC):
                eta=df['D0_eta'],
                phi=df['D0_phi'],
                mass=df['D0_mass12'],
+               mass12=df['D0_mass12'],
+               mass21=df['D0_mass21'],
                vtxIdx=df['D0_vtxIdx'],
-               x=df['D0_x'],
-               y=df['D0_y'],
-               z=df['D0_z'],
+               cosphi=df['D0_cosphi'],
+               dlSig=df['D0_dlSig'],
+               t1_pt=df['D0t1_pt'],
+               t1_chindof=df['D0t1_chindof'],
+               t1_nValid=df['D0t1_nValid'],
+               t1_nPix=df['D0t1_nPix'],
+               t1_dz=df['D0t1_dz'],
+               t1_dxy=df['D0t1_dxy'],
+               t2_pt=df['D0t2_pt'],
+               t2_chindof=df['D0t2_chindof'],
+               t2_nValid=df['D0t2_nValid'],
+               t2_nPix=df['D0t2_nPix'],
+               t2_dz=df['D0t2_dz'],
+               t2_dxy=df['D0t2_dxy'],
                )
       else:  
          D0 = JaggedCandidateArray.candidatesfromcounts(
@@ -90,10 +103,21 @@ class EventSelectorProcessor(processor.ProcessorABC):
                eta=np.array([]),
                phi=np.array([]),
                mass=np.array([]),
+               mass12=np.array([]),
+               mass21=np.array([]),
                vtxIdx=np.array([]),
-               x=np.array([]),
-               y=np.array([]),
-               z=np.array([]),
+               cosphi=np.array([]),
+               dlSig=np.array([]),
+               t1_chindof=np.array([]),
+               t1_nValid=np.array([]),
+               t1_nPix=np.array([]),
+               t1_dz=np.array([]),
+               t1_dxy=np.array([]),
+               t2_chindof=np.array([]),
+               t2_nValid=np.array([]),
+               t2_nPix=np.array([]),
+               t2_dz=np.array([]),
+               t2_dxy=np.array([]),
                )
 
       # Dstar candidates
@@ -128,12 +152,12 @@ class EventSelectorProcessor(processor.ProcessorABC):
       output['cutflow']['all Dstar']   += Dstar.counts.sum()
 
       ############### Cuts
-      # Dimu cuts: charge = 0...
+      # Dimu cuts: charge = 0, mass cuts and chi2...
       Dimu = Dimu[Dimu.charge == 0]
       output['cutflow']['Dimu 0 charge'] += Dimu.counts.sum()
 
-      mass_cut = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
-      Dimu = Dimu[mass_cut]
+      dimu_mass_cut = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
+      Dimu = Dimu[dimu_mass_cut]
       output['cutflow']['Upsilon mass'] += Dimu.counts.sum()
 
       ############### Get the Muons from Dimu, for cuts in their params
@@ -158,16 +182,16 @@ class EventSelectorProcessor(processor.ProcessorABC):
       output['cutflow']['Dimu muon global'] += Dimu.counts.sum()
 
       # pt and eta cuts
-      pt_cut = (Muon1.pt > 3) & (Muon2.pt > 3)
-      Dimu = Dimu[pt_cut]
-      Muon1 = Muon1[pt_cut]
-      Muon2 = Muon2[pt_cut]
+      muon_pt_cut = (Muon1.pt > 3) & (Muon2.pt > 3)
+      Dimu = Dimu[muon_pt_cut]
+      Muon1 = Muon1[muon_pt_cut]
+      Muon2 = Muon2[muon_pt_cut]
       output['cutflow']['Dimu muon pt cut'] += Dimu.counts.sum()
 
-      eta_cut = (np.absolute(Muon1.eta) <= 2.4) & (np.absolute(Muon2.eta) <= 2.4)
-      Dimu = Dimu[eta_cut]
-      Muon1 = Muon1[eta_cut]
-      Muon2 = Muon2[eta_cut]
+      muon_eta_cut = (np.absolute(Muon1.eta) <= 2.4) & (np.absolute(Muon2.eta) <= 2.4)
+      Dimu = Dimu[muon_eta_cut]
+      Muon1 = Muon1[muon_eta_cut]
+      Muon2 = Muon2[muon_eta_cut]
       output['cutflow']['Dimu muon eta cut'] += Dimu.counts.sum()
 
       # Cuts into events with at least 1 Dimu
@@ -178,10 +202,51 @@ class EventSelectorProcessor(processor.ProcessorABC):
       D0 = D0[ndimu_cut]
       Dstar = Dstar[ndimu_cut]
 
+      ############### Cuts for D mesons
+
+      # trk pt
+      trk_pt_cut = (D0.t1_pt > 0.8) & (D0.t2_pt > 0.8)
+      D0 = D0[trk_pt_cut]
+      output['cutflow']['D0 trk pt cut'] += D0.counts.sum()
+      
+      # trk chi2/ndof
+      trk_chi2_cut = (D0.t1_chindof < 2.5) & (D0.t2_chindof < 2.5)
+      D0 = D0[trk_chi2_cut]
+      output['cutflow']['D0 trk chi2 cut'] += D0.counts.sum()
+
+      # trk Valid hits on tracker and pixel
+      trk_hits_cut = (D0.t1_nValid > 4) & (D0.t2_nValid > 4) & (D0.t1_nPix > 1) & (D0.t2_nPix > 1)
+      D0 = D0[trk_hits_cut]
+      output['cutflow']['D0 trk hits cut'] += D0.counts.sum()
+
+      # trk Impact parameter dxy and dz
+      trk_dxy_cut = (D0.t1_dxy < 0.1) & (D0.t2_dxy < 0.1)
+      D0 = D0[trk_dxy_cut]
+      output['cutflow']['D0 trk dxy cut'] += D0.counts.sum()
+
+      trk_dz_cut = (D0.t1_dz < 1) & (D0.t2_dz < 1)
+      D0 = D0[trk_dz_cut]
+      output['cutflow']['D0 trk dz cut'] += D0.counts.sum()
+
+      # D0 cosphi
+      cosphi_cut = (D0.cosphi > 0.99)
+      D0 = D0[cosphi_cut]
+      output['cutflow']['D0 cosphi cut'] += D0.counts.sum()
+
+      # D0 dl Significance
+      dlSig_cut = (D0.dlSig > 5)
+      D0 = D0[dlSig_cut]
+      output['cutflow']['D0 dlSig cut'] += D0.counts.sum()
+
+      # D0 pt
+      D0_pt_cut = (D0.pt > 3)
+      D0 = D0[D0_pt_cut]
+      output['cutflow']['D0 pt cut'] += D0.counts.sum()
+
       output['cutflow']['Dimu final']    += Dimu.counts.sum()
       output['cutflow']['D0 final']      += D0.counts.sum()
       output['cutflow']['Dstar final']   += Dstar.counts.sum()
-      
+
       ############### Leading and Trailing muon separation
       leading_mu = (Muon1.pt.content > Muon2.pt.content)
       Muon_lead = JaggedCandidateArray.candidatesfromoffsets(Dimu.offsets, 
