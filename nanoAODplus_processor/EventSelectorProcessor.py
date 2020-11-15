@@ -129,9 +129,26 @@ class EventSelectorProcessor(processor.ProcessorABC):
                phi=df['Dstar_phi'],
                mass=df['Dstar_deltam'] + df['DstarD0_mass'],
                vtxIdx=df['Dstar_vtxIdx'],
-               D0x=df['DstarD0_x'],
-               D0y=df['DstarD0_y'],
-               D0z=df['DstarD0_z'],
+               K_pt=df['DstarK_pt'],
+               K_chindof=df['DstarK_chindof'],
+               K_nValid=df['DstarK_nValid'],
+               K_nPix=df['DstarK_nPix'],
+               K_dxy=df['DstarK_dxy'],
+               K_dz=df['DstarK_dz'],
+               pi_pt=df['Dstarpi_pt'],
+               pi_chindof=df['Dstarpi_chindof'],
+               pi_nValid=df['Dstarpi_nValid'],
+               pi_nPix=df['Dstarpi_nPix'],
+               pi_dxy=df['Dstarpi_dxy'],
+               pi_dz=df['Dstarpi_dz'],
+               pis_pt=df['Dstarpis_pt'],
+               pis_chindof=df['Dstarpis_chindof'],
+               pis_nValid=df['Dstarpis_nValid'],
+               pis_dxy=df['Dstarpis_dxy'],
+               pis_dz=df['Dstarpis_dz'],
+               D0_cosphi=df['DstarD0_cosphi'],
+               D0_pt=df['DstarD0_pt'],
+               D0_dlSig=df['DstarD0_dlSig'],
                )
       else:  
          Dstar = JaggedCandidateArray.candidatesfromcounts(
@@ -141,9 +158,23 @@ class EventSelectorProcessor(processor.ProcessorABC):
                phi=np.array([]),
                mass=np.array([]),
                vtxIdx=np.array([]),
-               D0x=np.array([]),
-               D0y=np.array([]),
-               D0z=np.array([]),
+               K_pt=np.array([]),
+               K_chindof=np.array([]),
+               K_nValid=np.array([]),
+               K_nPix=np.array([]),
+               K_dxy=np.array([]),
+               K_dz=np.array([]),
+               pi_pt=np.array([]),
+               pi_chindof=np.array([]),
+               pi_nValid=np.array([]),
+               pi_nPix=np.array([]),
+               pi_dxy=np.array([]),
+               pi_dz=np.array([]),
+               pis_pt=np.array([]),
+               pis_chindof=np.array([]),
+               pis_nValid=np.array([]),
+               pis_dxy=np.array([]),
+               pis_dz=np.array([]),
                )
 
       output['cutflow']['all events']  += Muon.size
@@ -202,40 +233,37 @@ class EventSelectorProcessor(processor.ProcessorABC):
       D0 = D0[ndimu_cut]
       Dstar = Dstar[ndimu_cut]
 
-      ############### Cuts for D mesons
+      ############### Cuts for D0
 
-      # trk pt
-      trk_pt_cut = (D0.t1_pt > 0.8) & (D0.t2_pt > 0.8)
-      D0 = D0[trk_pt_cut]
+      # trk cuts
+      D0_trk_pt_cut = (D0.t1_pt > 0.8) & (D0.t2_pt > 0.8)
+      D0 = D0[D0_trk_pt_cut]
       output['cutflow']['D0 trk pt cut'] += D0.counts.sum()
       
-      # trk chi2/ndof
-      trk_chi2_cut = (D0.t1_chindof < 2.5) & (D0.t2_chindof < 2.5)
-      D0 = D0[trk_chi2_cut]
+      D0_trk_chi2_cut = (D0.t1_chindof < 2.5) & (D0.t2_chindof < 2.5)
+      D0 = D0[D0_trk_chi2_cut]
       output['cutflow']['D0 trk chi2 cut'] += D0.counts.sum()
 
-      # trk Valid hits on tracker and pixel
-      trk_hits_cut = (D0.t1_nValid > 4) & (D0.t2_nValid > 4) & (D0.t1_nPix > 1) & (D0.t2_nPix > 1)
-      D0 = D0[trk_hits_cut]
+      D0_trk_hits_cut = (D0.t1_nValid > 4) & (D0.t2_nValid > 4) & (D0.t1_nPix > 1) & (D0.t2_nPix > 1)
+      D0 = D0[D0_trk_hits_cut]
       output['cutflow']['D0 trk hits cut'] += D0.counts.sum()
 
-      # trk Impact parameter dxy and dz
-      trk_dxy_cut = (D0.t1_dxy < 0.1) & (D0.t2_dxy < 0.1)
-      D0 = D0[trk_dxy_cut]
+      D0_trk_dxy_cut = (D0.t1_dxy < 0.1) & (D0.t2_dxy < 0.1)
+      D0 = D0[D0_trk_dxy_cut]
       output['cutflow']['D0 trk dxy cut'] += D0.counts.sum()
 
-      trk_dz_cut = (D0.t1_dz < 1) & (D0.t2_dz < 1)
-      D0 = D0[trk_dz_cut]
+      D0_trk_dz_cut = (D0.t1_dz < 1) & (D0.t2_dz < 1)
+      D0 = D0[D0_trk_dz_cut]
       output['cutflow']['D0 trk dz cut'] += D0.counts.sum()
 
       # D0 cosphi
-      cosphi_cut = (D0.cosphi > 0.99)
-      D0 = D0[cosphi_cut]
+      D0_cosphi_cut = (D0.cosphi > 0.99)
+      D0 = D0[D0_cosphi_cut]
       output['cutflow']['D0 cosphi cut'] += D0.counts.sum()
 
       # D0 dl Significance
-      dlSig_cut = (D0.dlSig > 5)
-      D0 = D0[dlSig_cut]
+      D0_dlSig_cut = (D0.dlSig > 5)
+      D0 = D0[D0_dlSig_cut]
       output['cutflow']['D0 dlSig cut'] += D0.counts.sum()
 
       # D0 pt
@@ -243,6 +271,56 @@ class EventSelectorProcessor(processor.ProcessorABC):
       D0 = D0[D0_pt_cut]
       output['cutflow']['D0 pt cut'] += D0.counts.sum()
 
+      ############### Cuts for Dstar
+
+      # trks cuts
+      Dstar_trk_pt_cut = (Dstar.K_pt > 0.5) & (Dstar.pi_pt > 0.5)
+      Dstar = Dstar[Dstar_trk_pt_cut]
+      output['cutflow']['Dstar trk pt cut'] += Dstar.counts.sum()
+      
+      Dstar_trk_chi2_cut = (Dstar.K_chindof < 2.5) & (Dstar.pi_chindof < 2.5)
+      Dstar = Dstar[Dstar_trk_chi2_cut]
+      output['cutflow']['Dstar trk pt cut'] += Dstar.counts.sum()
+
+      Dstar_trk_hits_cut = (Dstar.K_nValid > 4) & (Dstar.pi_nValid > 4) & (Dstar.K_nValid > 1) & (Dstar.pi_nValid > 1)
+      Dstar = Dstar[Dstar_trk_hits_cut]
+      output['cutflow']['Dstar trk hits cut'] += Dstar.counts.sum()
+
+      Dstar_trk_dxy_cut = (Dstar.K_dxy < 0.1) & (Dstar.pi_dxy < 0.1)
+      Dstar = Dstar[Dstar_trk_dxy_cut]
+      output['cutflow']['Dstar trk pt cut'] += Dstar.counts.sum()
+
+      Dstar_trk_dz_cut = (Dstar.K_dz < 1) & (Dstar.pi_dz < 1)
+      Dstar = Dstar[Dstar_trk_dz_cut]
+      output['cutflow']['Dstar trk pt cut'] += Dstar.counts.sum()
+
+      # pis cuts
+      Dstar_pis_pt_cut = (Dstar.pis_pt > 0.3)
+      Dstar = Dstar[Dstar_pis_pt_cut]
+      output['cutflow']['Dstar pis pt cut'] += Dstar.counts.sum()
+
+      Dstar_pis_chi2_cut = (Dstar.pis_chindof < 3)
+      Dstar = Dstar[Dstar_pis_chi2_cut]
+      output['cutflow']['Dstar pis chi2 cut'] += Dstar.counts.sum()
+
+      Dstar_pis_hits_cut = (Dstar.pis_nValid > 2)
+      Dstar = Dstar[Dstar_pis_hits_cut]
+      output['cutflow']['Dstar pis hits cut'] += Dstar.counts.sum()
+
+      # D0 of Dstar cuts
+      DstarD0_cosphi_cut = (Dstar.D0_cosphi > 0.99)
+      Dstar = Dstar[DstarD0_cosphi_cut]
+      output['cutflow']['Dstar D0 cosphi cut'] += Dstar.counts.sum()
+
+      DstarD0_pt_cut = (Dstar.D0_pt > 3)
+      Dstar = Dstar[DstarD0_pt_cut]
+      output['cutflow']['Dstar D0 pt cut'] += Dstar.counts.sum()
+
+      DstarD0_dlSig_cut = (Dstar.D0_dlSig > 3)
+      Dstar = Dstar[DstarD0_dlSig_cut]
+      output['cutflow']['Dstar D0 dlSig cut'] += Dstar.counts.sum() 
+
+      ############### Final computation of number of objects
       output['cutflow']['Dimu final']    += Dimu.counts.sum()
       output['cutflow']['D0 final']      += D0.counts.sum()
       output['cutflow']['Dstar final']   += Dstar.counts.sum()
