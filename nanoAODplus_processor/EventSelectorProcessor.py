@@ -110,11 +110,13 @@ class EventSelectorProcessor(processor.ProcessorABC):
                vtxIdx=np.array([]),
                cosphi=np.array([]),
                dlSig=np.array([]),
+               t1_pt=np.array([]),
                t1_chindof=np.array([]),
                t1_nValid=np.array([]),
                t1_nPix=np.array([]),
                t1_dz=np.array([]),
                t1_dxy=np.array([]),
+               t2_pt=np.array([]),
                t2_chindof=np.array([]),
                t2_nValid=np.array([]),
                t2_nPix=np.array([]),
@@ -177,6 +179,9 @@ class EventSelectorProcessor(processor.ProcessorABC):
                pis_nValid=np.array([]),
                pis_dxy=np.array([]),
                pis_dz=np.array([]),
+               D0_cosphi=np.array([]),
+               D0_pt=np.array([]),
+               D0_dlSig=np.array([]),
                )
 
       output['cutflow']['all events']  += Muon.size
@@ -200,22 +205,8 @@ class EventSelectorProcessor(processor.ProcessorABC):
          Muon1 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[mu1Idx])
          Muon2 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[mu2Idx])
       else:
-         Muon1 = JaggedCandidateArray.fromoffsets(Dimu.offsets, 
-               pt=np.array([]),
-               eta=np.array([]),
-               phi=np.array([]),
-               mass=np.array([]),
-               charge=np.array([]),
-               isGlobal=np.array([]),
-               softId=np.array([]),)
-         Muon2 = JaggedCandidateArray.fromoffsets(Dimu.offsets, 
-               pt=np.array([]),
-               eta=np.array([]),
-               phi=np.array([]),
-               mass=np.array([]),
-               charge=np.array([]),
-               isGlobal=np.array([]),
-               softId=np.array([]),)
+         Muon1 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[np.array([], dtype='int64')])
+         Muon2 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[np.array([], dtype='int64')])
 
       # SoftId and Global Muon cuts
       soft_id = (Muon1.softId > 0) & (Muon2.softId > 0)
