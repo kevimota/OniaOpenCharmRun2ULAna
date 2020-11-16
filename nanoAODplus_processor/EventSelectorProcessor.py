@@ -43,6 +43,8 @@ class EventSelectorProcessor(processor.ProcessorABC):
                phi=np.array([]),
                mass=np.array([]),
                charge=np.array([]),
+               t1Idx=np.array([]),
+               t2Idx=np.array([]),
                )
 
 
