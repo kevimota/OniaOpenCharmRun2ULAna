@@ -185,13 +185,14 @@ class EventSelectorProcessor(processor.ProcessorABC):
       output['cutflow']['all Dstar']   += Dstar.counts.sum()
 
       ############### Cuts
-      # Dimu cuts: charge = 0, mass cuts and chi2...
-      Dimu = Dimu[Dimu.charge == 0]
-      output['cutflow']['Dimu 0 charge'] += Dimu.counts.sum()
+      if df['nDimu'].size != 0:
+         # Dimu cuts: charge = 0, mass cuts and chi2...
+         Dimu = Dimu[Dimu.charge == 0]
+         output['cutflow']['Dimu 0 charge'] += Dimu.counts.sum()
 
-      dimu_mass_cut = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
-      Dimu = Dimu[dimu_mass_cut]
-      output['cutflow']['Upsilon mass'] += Dimu.counts.sum()
+         dimu_mass_cut = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
+         Dimu = Dimu[dimu_mass_cut]
+         output['cutflow']['Upsilon mass'] += Dimu.counts.sum()
 
       ############### Get the Muons from Dimu, for cuts in their params
 
