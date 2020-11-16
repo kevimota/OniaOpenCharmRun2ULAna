@@ -185,22 +185,37 @@ class EventSelectorProcessor(processor.ProcessorABC):
       output['cutflow']['all Dstar']   += Dstar.counts.sum()
 
       ############### Cuts
-      if df['nDimu'].size != 0:
-         # Dimu cuts: charge = 0, mass cuts and chi2...
-         Dimu = Dimu[Dimu.charge == 0]
-         output['cutflow']['Dimu 0 charge'] += Dimu.counts.sum()
+      # Dimu cuts: charge = 0, mass cuts and chi2...
+      Dimu = Dimu[Dimu.charge == 0]
+      output['cutflow']['Dimu 0 charge'] += Dimu.counts.sum()
 
-         dimu_mass_cut = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
-         Dimu = Dimu[dimu_mass_cut]
-         output['cutflow']['Upsilon mass'] += Dimu.counts.sum()
+      dimu_mass_cut = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
+      Dimu = Dimu[dimu_mass_cut]
+      output['cutflow']['Upsilon mass'] += Dimu.counts.sum()
 
       ############### Get the Muons from Dimu, for cuts in their params
-
-      # For Muon 1:
-      mu1Idx = (Dimu.t1Idx + Muon.starts).content
-      mu2Idx = (Dimu.t2Idx + Muon.starts).content
-      Muon1 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[mu1Idx])
-      Muon2 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[mu2Idx])
+      if df['nDimu'].size != 0:
+         mu1Idx = (Dimu.t1Idx + Muon.starts).content
+         mu2Idx = (Dimu.t2Idx + Muon.starts).content
+         Muon1 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[mu1Idx])
+         Muon2 = JaggedCandidateArray.fromoffsets(Dimu.offsets, Muon.content[mu2Idx])
+      else:
+         Muon1 = JaggedCandidateArray.fromoffsets(Dimu.offsets, 
+               pt=np.array([]),
+               eta=np.array([]),
+               phi=np.array([]),
+               mass=np.array([]),
+               charge=np.array([]),
+               isGlobal=np.array([]),
+               softId=np.array([]),)
+         Muon2 = JaggedCandidateArray.fromoffsets(Dimu.offsets, 
+               pt=np.array([]),
+               eta=np.array([]),
+               phi=np.array([]),
+               mass=np.array([]),
+               charge=np.array([]),
+               isGlobal=np.array([]),
+               softId=np.array([]),)
 
       # SoftId and Global Muon cuts
       soft_id = (Muon1.softId > 0) & (Muon2.softId > 0)
