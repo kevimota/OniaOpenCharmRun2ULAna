@@ -230,17 +230,16 @@ class EventSelectorProcessor(processor.ProcessorABC):
         ############### Leading and Trailing muon separation
         leading_mu = (Muon1.pt.content > Muon2.pt.content)
         Muon_lead = JaggedCandidateArray.candidatesfromoffsets(Dimu.offsets,
-                                                                         pt=np.where(leading_mu, Muon1.pt.content, Muon2.pt.content),
-                                                                         eta=np.where(leading_mu, Muon1.eta.content, Muon2.eta.content),
-                                                                         phi=np.where(leading_mu, Muon1.phi.content, Muon2.phi.content),
-                                                                         mass=np.where(leading_mu, Muon1.mass.content, Muon2.mass.content),)
+                                                               pt=np.where(leading_mu, Muon1.pt.content, Muon2.pt.content),
+                                                               eta=np.where(leading_mu, Muon1.eta.content, Muon2.eta.content),
+                                                               phi=np.where(leading_mu, Muon1.phi.content, Muon2.phi.content),
+                                                               mass=np.where(leading_mu, Muon1.mass.content, Muon2.mass.content),)
 
         Muon_trail = JaggedCandidateArray.candidatesfromoffsets(Dimu.offsets,
-                                                                         pt=np.where(~leading_mu, Muon1.pt.content, Muon2.pt.content),
-                                                                         eta=np.where(~leading_mu, Muon1.eta.content, Muon2.eta.content),
-                                                                         phi=np.where(~leading_mu, Muon1.phi.content, Muon2.phi.content),
-                                                                         mass=np.where(~leading_mu, Muon1.mass.content, Muon2.mass.content),)
-
+                                                                pt=np.where(~leading_mu, Muon1.pt.content, Muon2.pt.content),
+                                                                eta=np.where(~leading_mu, Muon1.eta.content, Muon2.eta.content),
+                                                                phi=np.where(~leading_mu, Muon1.phi.content, Muon2.phi.content),
+                                                                mass=np.where(~leading_mu, Muon1.mass.content, Muon2.mass.content),)
 
         ############### D0 tracks object creation
 
@@ -249,33 +248,37 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
 
         ############### Create the accumulators to save output
-        columns = ['__fast_pt', '__fast_phi', '__fast_eta', '__fast_mass']
         muon_lead_acc = processor.dict_accumulator({})
-        for var in columns:
+        for var in Muon_lead.columns:
+            if var == 'p4': continue
             muon_lead_acc[var] = processor.column_accumulator(np.array(Muon_lead[var].flatten()))
         muon_lead_acc["nMuon"] = processor.column_accumulator(Muon_lead.counts)
         output["Muon_lead"] = muon_lead_acc
 
         muon_trail_acc = processor.dict_accumulator({})
-        for var in columns:
+        for var in Muon_trail.columns:
+            if var == 'p4': continue
             muon_trail_acc[var] = processor.column_accumulator(np.array(Muon_trail[var].flatten()))
         muon_trail_acc["nMuon"] = processor.column_accumulator(Muon_trail.counts)
         output["Muon_trail"] = muon_trail_acc
 
         dimu_acc = processor.dict_accumulator({})
-        for var in columns:
+        for var in Dimu.columns:
+            if var == 'p4': continue
             dimu_acc[var] = processor.column_accumulator(np.array(Dimu[var].flatten()))
         dimu_acc["nDimu"] = processor.column_accumulator(Dimu.counts)
         output["Dimu"] = dimu_acc
 
         D0_acc = processor.dict_accumulator({})
-        for var in columns:
+        for var in D0.columns:
+            if var == 'p4': continue
             D0_acc[var] = processor.column_accumulator(np.array(D0[var].flatten()))
         D0_acc["nD0"] = processor.column_accumulator(D0.counts)
         output["D0"] = D0_acc
 
         Dstar_acc = processor.dict_accumulator({})
-        for var in columns:
+        for var in Dstar.columns:
+            if var == 'p4': continue
             Dstar_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
         Dstar_acc["nDstar"] = processor.column_accumulator(Dstar.counts)
         output["Dstar"] = Dstar_acc
