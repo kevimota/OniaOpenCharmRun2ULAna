@@ -38,7 +38,7 @@ def create_plot1d(hist, save_name, log=False):
     fig = ax.get_figure()
     fig.savefig(save_name)
     ax.clear()
-
+    fig.clear()
 
 def create_plot2d(hist, save_name):
     import matplotlib.pyplot as plt
@@ -46,16 +46,15 @@ def create_plot2d(hist, save_name):
     plt.style.use(hep.style.CMS)
     # plot
     ax = plt.gca()
-    hep.hist2dplot(hist, ax=ax)
 
+    hep.hist2dplot(hist, ax=ax)
     ax.set_xlabel(hist.axes[0].metadata, loc='right')
     ax.set_ylabel(hist.axes[1].metadata, loc='top')
 
     fig = ax.get_figure()
     fig.savefig(save_name)
     ax.clear()
-
-
+    fig.clear()
 
 class HistogramingProcessor(processor.ProcessorABC):
     def __init__(self):
@@ -92,11 +91,17 @@ class HistogramingProcessor(processor.ProcessorABC):
 
         hist_D0_mass = bh.Histogram(bh.axis.Regular(100, 1.7, 2.0, metadata=r"$m_{D^0}$ [GeV]"))
 
+        hist_D0_eta_mass = bh.Histogram(bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{D^0}$"),
+                                        bh.axis.Regular(100, 1.7, 2.0, metadata=r"$m_{D^0}$ [GeV]"))
+
         hist_Dstar = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D*}$ [GeV]"),
                                   bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D*}$"),
                                   bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D*}$"),)
 
         hist_Dstar_mass = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D*}$ [GeV]"))
+
+        hist_Dstar_deltamr = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162), metadata=r"\Delta(m)_{refit} [GeV]")
+        hist_Dstar_deltam = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162), metadata=r"\Delta(m) [GeV]")
 
         # Filling histograms
         hist_muon_lead.fill(acc["Muon_lead"]["__fast_pt"].value,
@@ -119,36 +124,44 @@ class HistogramingProcessor(processor.ProcessorABC):
 
         hist_D0_mass.fill(acc["D0"]["__fast_mass"].value)
 
+        hist_D0_eta_mass.fill(acc["D0"]["__fast_eta"].value,
+                              acc["D0"]["__fast_mass"].value)
+
         hist_Dstar.fill(acc["Dstar"]["__fast_pt"].value,
                         acc["Dstar"]["__fast_eta"].value, 
                         acc["Dstar"]["__fast_phi"].value)
 
         hist_Dstar_mass.fill(acc["Dstar"]["__fast_mass"].value)
 
+        hist_Dstar_deltamr.fill(acc["Dstar"]["deltamr"].value)
+        hist_Dstar_deltam.fill(acc["Dstar"]["deltam"].value)
+
         # Saving histograms
-        save(hist_muon_lead, "output/" + ds['analyzer_name'] + "/hist/hist_muon_lead.hist")
-        save(hist_muon_trail, "output/" + ds['analyzer_name'] + "/hist/hist_muon_trail.hist")
-        save(hist_dimu, "output/" + ds['analyzer_name'] + "/hist/hist_dimu.hist")
-        save(hist_dimu_mass, "output/" + ds['analyzer_name'] + "/hist/hist_dimu_mass.hist")
+        save(hist_muon_lead, "output/" + ds['analyzer_name'] + "/hist/hist_Muon_lead.hist")
+        save(hist_muon_trail, "output/" + ds['analyzer_name'] + "/hist/hist_Muon_trail.hist")
+        save(hist_dimu, "output/" + ds['analyzer_name'] + "/hist/hist_Dimu.hist")
+        save(hist_dimu_mass, "output/" + ds['analyzer_name'] + "/hist/hist_Dimu_mass.hist")
         save(hist_D0, "output/" + ds['analyzer_name'] + "/hist/hist_D0.hist")
         save(hist_D0_mass, "output/" + ds['analyzer_name'] + "/hist/hist_D0_mass.hist")
         save(hist_Dstar, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar.hist")
         save(hist_Dstar_mass, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_mass.hist")
+        save(hist_Dstar_deltamr, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_deltamr.hist")
+        save(hist_Dstar_deltam, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_deltam.hist")
 
-        # Creating plots
+        # Creating plots 1D
         plots_path = "plots/" + ds['analyzer_name'] + "/" 
-        create_plot1d(hist_muon_lead[:, sum, sum], plots_path + "muon_lead_pt.png", log=True)
-        create_plot1d(hist_muon_lead[sum, :, sum], plots_path + "muon_lead_eta.png")
-        create_plot1d(hist_muon_lead[sum, sum, :], plots_path + "muon_lead_phi.png")
+        create_plot1d(hist_muon_lead[:, sum, sum], plots_path + "Muon_lead_pt.png", log=True)
+        create_plot1d(hist_muon_lead[sum, :, sum], plots_path + "Muon_lead_eta.png")
+        create_plot1d(hist_muon_lead[sum, sum, :], plots_path + "Muon_lead_phi.png")
 
-        create_plot1d(hist_muon_trail[:, sum, sum], plots_path + "muon_trail_pt.png", log=True)
-        create_plot1d(hist_muon_trail[sum, :, sum], plots_path + "muon_trail_eta.png")
-        create_plot1d(hist_muon_trail[sum, sum, :], plots_path + "muon_trail_phi.png")
+        create_plot1d(hist_muon_trail[:, sum, sum], plots_path + "Muon_trail_pt.png", log=True)
+        create_plot1d(hist_muon_trail[sum, :, sum], plots_path + "Muon_trail_eta.png")
+        create_plot1d(hist_muon_trail[sum, sum, :], plots_path + "Muon_trail_phi.png")
 
-        create_plot1d(hist_dimu[:, sum, sum], plots_path + "dimu_pt.png", log=True)
-        create_plot1d(hist_dimu[sum, :, sum], plots_path + "dimu_eta.png")
-        create_plot1d(hist_dimu[sum, sum, :], plots_path + "dimu_phi.png")
-        create_plot1d(hist_dimu_mass, plots_path + "dimu_mass.png")
+        create_plot1d(hist_dimu[:, sum, sum], plots_path + "Dimu_pt.png", log=True)
+        create_plot1d(hist_dimu[sum, :, sum], plots_path + "Dimu_eta.png")
+        create_plot1d(hist_dimu[sum, sum, :], plots_path + "Dimu_phi.png")
+        create_plot1d(hist_dimu_mass, plots_path + "Dimu_mass.png")
 
         create_plot1d(hist_D0[:, sum, sum], plots_path + "D0_pt.png", log=True)
         create_plot1d(hist_D0[sum, :, sum], plots_path + "D0_eta.png")
@@ -159,6 +172,16 @@ class HistogramingProcessor(processor.ProcessorABC):
         create_plot1d(hist_Dstar[sum, :, sum], plots_path + "Dstar_eta.png")
         create_plot1d(hist_Dstar[sum, sum, :], plots_path + "Dstar_phi.png")
         create_plot1d(hist_Dstar_mass, plots_path + "Dstar_mass.png")
+        create_plot1d(hist_Dstar_deltamr, plots_path + "Dstar_deltamr.png")
+        create_plot1d(hist_Dstar_deltam, plots_path + "Dstar_deltam.png")
+
+        # Creating plots 2D
+        create_plot2d(hist_muon_lead[bh.loc(3):bh.loc(20),sum,:], plots_path + "Muon_lead_ptXphi")
+        create_plot2d(hist_muon_trail[bh.loc(3):bh.loc(20),sum,:], plots_path + "Muon_trail_ptXphi")
+
+        create_plot2d(hist_D0[:,:,sum], plots_path + "D0_ptXeta.png")
+        create_plot2d(hist_D0[sum,:,:], plots_path + "D0_etaXphi.png")
+        create_plot2d(hist_D0_eta_mass, plots_path + "D0_etaXmass.png")
 
         # return dummy accumulator
         return output
