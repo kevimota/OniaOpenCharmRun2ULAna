@@ -70,7 +70,8 @@ class HistogramingProcessor(processor.ProcessorABC):
         output = self.accumulator.identity()
         acc = load(ds["file"])
         
-        # Histogram definition
+        ############ Histogram definition
+        # Muons
         hist_muon_lead = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\mu}$ [GeV]"),
                                       bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{\mu}$"),
                                       bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu}$"),)
@@ -79,12 +80,14 @@ class HistogramingProcessor(processor.ProcessorABC):
                                        bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{\mu}$"),
                                        bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu}$"),)
 
+        #Dimu
         hist_dimu = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\mu^+\mu^-}$ [GeV]"),
                                  bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{\mu^+\mu^-}$"),
                                  bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu^+\mu^-}$"),)
 
         hist_dimu_mass = bh.Histogram(bh.axis.Regular(100, 8.6, 11, metadata=r"$m_{\mu^+\mu^-}$ [GeV]"))
 
+        # D0
         hist_D0 = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D^0}$ [GeV]"),
                                bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{D^0}$"),
                                bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D^0}$"),)
@@ -94,12 +97,28 @@ class HistogramingProcessor(processor.ProcessorABC):
         hist_D0_eta_mass = bh.Histogram(bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{D^0}$"),
                                         bh.axis.Regular(100, 1.7, 2.0, metadata=r"$m_{D^0}$ [GeV]"))
 
+        hist_D0_trk = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D^0 trks}$ [GeV]"),
+                                   bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{D^0 trks}$"),
+                                   bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D^0 trks}$"),)
+
+        # Dstar
         hist_Dstar = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D*}$ [GeV]"),
                                   bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D*}$"),
                                   bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D*}$"),)
 
-        hist_Dstar_mass = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D*}$ [GeV]"))
+        hist_Dstar_K = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D* K}$ [GeV]"),
+                                    bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D* K}$"),
+                                    bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D* K}$"),)
 
+        hist_Dstar_pi = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D* \pi}$ [GeV]"),
+                                     bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D* \pi}$"),
+                                     bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D* \pi}$"),)
+                                  
+        hist_Dstar_pis = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\pi_s}$ [GeV]"),
+                                      bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{\pi_s}$"),
+                                      bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\pi_s}$"),)
+
+        hist_Dstar_mass = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D*}$ [GeV]"))
         hist_Dstar_deltamr = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162), metadata=r"\Delta(m)_{refit} [GeV]")
         hist_Dstar_deltam = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162), metadata=r"\Delta(m) [GeV]")
 
@@ -127,9 +146,29 @@ class HistogramingProcessor(processor.ProcessorABC):
         hist_D0_eta_mass.fill(acc["D0"]["__fast_eta"].value,
                               acc["D0"]["__fast_mass"].value)
 
+        hist_D0_trk.fill(acc["D0_trk"]["t1_pt"].value,
+                         acc["D0_trk"]["t1_eta"].value, 
+                         acc["D0_trk"]["t1_phi"].value)
+
+        hist_D0_trk.fill(acc["D0_trk"]["t2_pt"].value,
+                         acc["D0_trk"]["t2_eta"].value, 
+                         acc["D0_trk"]["t2_phi"].value)
+
         hist_Dstar.fill(acc["Dstar"]["__fast_pt"].value,
                         acc["Dstar"]["__fast_eta"].value, 
                         acc["Dstar"]["__fast_phi"].value)
+
+        hist_Dstar_K.fill(acc["Dstar_trk"]["K_pt"].value,
+                          acc["Dstar_trk"]["K_eta"].value, 
+                          acc["Dstar_trk"]["K_phi"].value)
+
+        hist_Dstar_pi.fill(acc["Dstar_trk"]["pi_pt"].value,
+                           acc["Dstar_trk"]["pi_eta"].value, 
+                           acc["Dstar_trk"]["pi_phi"].value)
+
+        hist_Dstar_pis.fill(acc["Dstar_trk"]["pis_pt"].value,
+                            acc["Dstar_trk"]["pis_eta"].value, 
+                            acc["Dstar_trk"]["pis_phi"].value)
 
         hist_Dstar_mass.fill(acc["Dstar"]["__fast_mass"].value)
 
@@ -167,6 +206,10 @@ class HistogramingProcessor(processor.ProcessorABC):
         create_plot1d(hist_D0[sum, :, sum], plots_path + "D0_eta.png")
         create_plot1d(hist_D0[sum, sum, :], plots_path + "D0_phi.png")
         create_plot1d(hist_D0_mass, plots_path + "D0_mass.png")
+        
+        create_plot1d(hist_D0_trk[:, sum, sum], plots_path + "D0_trk_pt.png", log=True)
+        create_plot1d(hist_D0_trk[sum, :, sum], plots_path + "D0_trk_eta.png")
+        create_plot1d(hist_D0_trk[sum, sum, :], plots_path + "D0_trk_phi.png")
 
         create_plot1d(hist_Dstar[:, sum, sum], plots_path + "Dstar_pt.png", log=True)
         create_plot1d(hist_Dstar[sum, :, sum], plots_path + "Dstar_eta.png")
@@ -175,9 +218,21 @@ class HistogramingProcessor(processor.ProcessorABC):
         create_plot1d(hist_Dstar_deltamr, plots_path + "Dstar_deltamr.png")
         create_plot1d(hist_Dstar_deltam, plots_path + "Dstar_deltam.png")
 
+        create_plot1d(hist_Dstar_K[:, sum, sum], plots_path + "Dstar_K_pt.png", log=True)
+        create_plot1d(hist_Dstar_K[sum, :, sum], plots_path + "Dstar_K_eta.png")
+        create_plot1d(hist_Dstar_K[sum, sum, :], plots_path + "Dstar_K_phi.png")
+
+        create_plot1d(hist_Dstar_pi[:, sum, sum], plots_path + "Dstar_pi_pt.png", log=True)
+        create_plot1d(hist_Dstar_pi[sum, :, sum], plots_path + "Dstar_pi_eta.png")
+        create_plot1d(hist_Dstar_pi[sum, sum, :], plots_path + "Dstar_pi_phi.png")
+
+        create_plot1d(hist_Dstar_pis[:, sum, sum], plots_path + "Dstar_pis_pt.png", log=True)
+        create_plot1d(hist_Dstar_pis[sum, :, sum], plots_path + "Dstar_pis_eta.png")
+        create_plot1d(hist_Dstar_pis[sum, sum, :], plots_path + "Dstar_pis_phi.png")
+        
         # Creating plots 2D
-        create_plot2d(hist_muon_lead[bh.loc(3):bh.loc(20),sum,:], plots_path + "Muon_lead_ptXphi")
-        create_plot2d(hist_muon_trail[bh.loc(3):bh.loc(20),sum,:], plots_path + "Muon_trail_ptXphi")
+        create_plot2d(hist_muon_lead[:,sum,:], plots_path + "Muon_lead_ptXphi")
+        create_plot2d(hist_muon_trail[:,sum,:], plots_path + "Muon_trail_ptXphi")
 
         create_plot2d(hist_D0[:,:,sum], plots_path + "D0_ptXeta.png")
         create_plot2d(hist_D0[sum,:,:], plots_path + "D0_etaXphi.png")
