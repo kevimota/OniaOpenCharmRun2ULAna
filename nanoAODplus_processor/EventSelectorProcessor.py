@@ -261,35 +261,32 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output["Dimu"] = dimu_acc
 
         D0_acc = processor.dict_accumulator({})
-        for var in D0.columns:
-            if (var == 'p4' or var.startswith('t')): continue
-            D0_acc[var] = processor.column_accumulator(np.array(D0[var].flatten()))
-        D0_acc["nD0"] = processor.column_accumulator(D0.counts)
-        output["D0"] = D0_acc
-
         D0_trk_acc = processor.dict_accumulator({})
         for var in D0.columns:
-            if var.startswith('t'):
+            if (var == 'p4'): continue
+            elif ( var.startswith('t')):
                 D0_trk_acc[var] = processor.column_accumulator(np.array(D0[var].flatten()))
+            else:
+                D0_acc[var] = processor.column_accumulator(np.array(D0[var].flatten()))
+        D0_acc["nD0"] = processor.column_accumulator(D0.counts)
+        output["D0"] = D0_acc
         output["D0_trk"] = D0_trk_acc
+        
 
         Dstar_acc = processor.dict_accumulator({})
-        for var in Dstar.columns:
-            if (var == 'p4' or var.startswith('D0') or var.startswith('K') or var.startswith('pi')): continue
-            Dstar_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
-        Dstar_acc["nDstar"] = processor.column_accumulator(Dstar.counts)
-        output["Dstar"] = Dstar_acc
-
         Dstar_D0_acc = processor.dict_accumulator({})
-        for var in Dstar.columns:
-            if var.startswith('D0'):
-                Dstar_D0_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
-        output["Dstar_D0"] = Dstar_D0_acc
-
         Dstar_trk_acc = processor.dict_accumulator({})
         for var in Dstar.columns:
-            if (var.startswith('K') or var.startswith('pi')):
+            if (var == 'p4' ): continue
+            elif var.startswith('D0'):
+                Dstar_D0_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
+            elif (var.startswith('K') or var.startswith('pi')):
                 Dstar_trk_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
+            else:
+                Dstar_acc[var] = processor.column_accumulator(np.array(Dstar[var].flatten()))
+        Dstar_acc["nDstar"] = processor.column_accumulator(Dstar.counts)
+        output["Dstar"] = Dstar_acc
+        output["Dstar_D0"] = Dstar_D0_acc
         output["Dstar_trk"] = Dstar_trk_acc
 
         file_hash = str(random.getrandbits(128)) + str(df.size)
