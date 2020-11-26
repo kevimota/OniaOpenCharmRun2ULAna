@@ -127,8 +127,9 @@ class HistogramingProcessor(processor.ProcessorABC):
                                       bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\pi_s}$"),)
 
         hist_Dstar_mass = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D*}$ [GeV]"))
-        hist_Dstar_deltamr = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162), metadata=r"\Delta(m)_{refit} [GeV]")
-        hist_Dstar_deltam = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162), metadata=r"\Delta(m) [GeV]")
+        hist_Dstar_mass_refit = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D* refit}$ [GeV]"))
+        hist_Dstar_deltamr = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162, metadata=r"$\Delta m_{refit}$ [GeV]"))
+        hist_Dstar_deltam = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162, metadata=r"$\Delta m$ [GeV]"))
 
         # Filling histograms
         hist_muon_lead.fill(acc["Muon_lead"]["__fast_pt"].value,
@@ -166,6 +167,10 @@ class HistogramingProcessor(processor.ProcessorABC):
                         acc["Dstar"]["__fast_eta"].value, 
                         acc["Dstar"]["__fast_phi"].value)
 
+        hist_Dstar_mass.fill(acc["Dstar"]["__fast_mass"].value)
+
+        hist_Dstar_mass_refit.fill(acc["Dstar"]["deltamr"].value + acc["Dstar_D0"]["D0_mass"].value)
+
         hist_Dstar_K.fill(acc["Dstar_trk"]["K_pt"].value,
                           acc["Dstar_trk"]["K_eta"].value, 
                           acc["Dstar_trk"]["K_phi"].value)
@@ -178,7 +183,6 @@ class HistogramingProcessor(processor.ProcessorABC):
                             acc["Dstar_trk"]["pis_eta"].value, 
                             acc["Dstar_trk"]["pis_phi"].value)
 
-        hist_Dstar_mass.fill(acc["Dstar"]["__fast_mass"].value)
 
         hist_Dstar_deltamr.fill(acc["Dstar"]["deltamr"].value)
         hist_Dstar_deltam.fill(acc["Dstar"]["deltam"].value)
@@ -192,6 +196,7 @@ class HistogramingProcessor(processor.ProcessorABC):
         save(hist_D0_mass, "output/" + ds['analyzer_name'] + "/hist/hist_D0_mass.hist")
         save(hist_Dstar, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar.hist")
         save(hist_Dstar_mass, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_mass.hist")
+        save(hist_Dstar_mass_refit, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_mass_refit.hist")
         save(hist_Dstar_deltamr, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_deltamr.hist")
         save(hist_Dstar_deltam, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_deltam.hist")
 
@@ -223,6 +228,7 @@ class HistogramingProcessor(processor.ProcessorABC):
         create_plot1d(hist_Dstar[sum, :, sum], plots_path + "Dstar_eta.png")
         create_plot1d(hist_Dstar[sum, sum, :], plots_path + "Dstar_phi.png")
         create_plot1d(hist_Dstar_mass, plots_path + "Dstar_mass.png")
+        create_plot1d(hist_Dstar_mass_refit, plots_path + "Dstar_mass_refit.png")
         create_plot1d(hist_Dstar_deltamr, plots_path + "Dstar_deltamr.png")
         create_plot1d(hist_Dstar_deltam, plots_path + "Dstar_deltam.png")
 
