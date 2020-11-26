@@ -114,11 +114,11 @@ class HistogramingProcessor(processor.ProcessorABC):
                                   bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D*}$"),
                                   bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D*}$"),)
 
-        hist_Dstar_K = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D* K}$ [GeV]"),
+        hist_Dstar_K = bh.Histogram(bh.axis.Regular(100, 0, 30, metadata=r"$p_{T,D* K}$ [GeV]"),
                                     bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D* K}$"),
                                     bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D* K}$"),)
 
-        hist_Dstar_pi = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D* \pi}$ [GeV]"),
+        hist_Dstar_pi = bh.Histogram(bh.axis.Regular(100, 0, 30, metadata=r"$p_{T,D* \pi}$ [GeV]"),
                                      bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D* \pi}$"),
                                      bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D* \pi}$"),)
                                   
