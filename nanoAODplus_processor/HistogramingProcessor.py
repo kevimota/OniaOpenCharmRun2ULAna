@@ -13,7 +13,14 @@ def create_plot1d(hist, save_name, log=False):
     plt.style.use(hep.style.CMS)
     # plot
     ax = plt.gca()
-    hep.histplot(hist, ax=ax)
+
+    plt.errorbar(hist.axes[0].centers,
+             hist.view(),
+             np.sqrt(hist.view()),
+             fmt='.',
+             color='blue',)
+
+    hep.histplot(hist, ax=ax, color='blue')
 
     if log:
         ax.set_yscale('log')
@@ -35,6 +42,7 @@ def create_plot1d(hist, save_name, log=False):
                     ha='center', annotation_clip=False, bbox=dict(boxstyle='round', fc='None'))
 
     ax.set_xlim(hist.axes[0].edges[0], hist.axes[0].edges[-1] + hist.axes[0].widths[-1])
+    
     fig = ax.get_figure()
     fig.savefig(save_name)
     ax.clear()
