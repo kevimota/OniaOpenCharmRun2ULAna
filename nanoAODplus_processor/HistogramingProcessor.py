@@ -122,7 +122,7 @@ class HistogramingProcessor(processor.ProcessorABC):
                                      bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D* \pi}$"),
                                      bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D* \pi}$"),)
                                   
-        hist_Dstar_pis = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\pi_s}$ [GeV]"),
+        hist_Dstar_pis = bh.Histogram(bh.axis.Regular(100, 0, 20, metadata=r"$p_{T,\pi_s}$ [GeV]"),
                                       bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{\pi_s}$"),
                                       bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\pi_s}$"),)
 
