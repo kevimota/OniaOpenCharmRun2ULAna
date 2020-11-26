@@ -59,7 +59,7 @@ local_test:
 
 MC:
   - primary_dataset: "UpsilonToMuMu"
-  - datatier: "AOD"
-  - year: "test"
-  - path:
+    datatier: "AOD"
+    year: "test"
+    path:
     - data/path/MC/UpsilonToMuMu_path.txt
