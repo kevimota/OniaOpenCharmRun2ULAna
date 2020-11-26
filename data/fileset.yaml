@@ -56,3 +56,10 @@ local_test:
     year: "test"
     path:
       - data/path/local_test/Charmonium_path.txt 
+
+MC:
+  - primary_dataset: "UpsilonToMuMu"
+  - datatier: "AOD"
+  - year: "test"
+  - path:
+    - data/path/MC/UpsilonToMuMu_path.txt
