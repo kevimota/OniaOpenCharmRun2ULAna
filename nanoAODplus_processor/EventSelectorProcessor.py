@@ -7,6 +7,8 @@ import random
 
 from tools.collections import *
 
+D0_PDG_MASS = 1.864
+
 class EventSelectorProcessor(processor.ProcessorABC):
     def __init__(self, analyzer_name):
         self.analyzer_name = analyzer_name
@@ -210,6 +212,10 @@ class EventSelectorProcessor(processor.ProcessorABC):
         DstarD0_cosphi_cut = (Dstar.D0_cosphi > 0.99)
         Dstar = Dstar[DstarD0_cosphi_cut]
         output['cutflow']['Dstar D0 cosphi cut'] += Dstar.counts.sum()
+
+        DstarD0_mass_cut = (Dstar.D0_mass < D0_PDG_MASS + 0.025) & (Dstar.D0_mass > D0_PDG_MASS - 0.025)
+        Dstar = Dstar[DstarD0_mass_cut]
+        output['cutflow']['Dstar D0 mass cut'] += Dstar.counts.sum()
 
         DstarD0_pt_cut = (Dstar.D0_pt > 3)
         Dstar = Dstar[DstarD0_pt_cut]
