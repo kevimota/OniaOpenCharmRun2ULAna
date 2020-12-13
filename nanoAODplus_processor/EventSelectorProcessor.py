@@ -23,6 +23,11 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
     def process(self, df):
         output = self.accumulator.identity()
+        if df.size == 0:
+            return processor.dict_accumulator({
+                'foo': processor.defaultdict_accumulator(int),
+                'cutflow': output['cutflow']
+          })
 
         # Dimu candidates
         if df['nDimu'].size != 0:
