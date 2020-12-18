@@ -2,7 +2,9 @@
 plots/
 output/
 sandbox/
+data/path/*
 test.txt
+.DS_store
 
 #Image files:
 # JPEG

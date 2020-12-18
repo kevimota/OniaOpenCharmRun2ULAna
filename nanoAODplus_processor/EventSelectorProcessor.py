@@ -95,6 +95,10 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dimu = Dimu[dimu_mass_cut]
         output['cutflow']['Upsilon mass'] += Dimu.counts.sum()
 
+        dimu_chi2_cut = (Dimu.chi2 < 5.)
+        Dimu = Dimu[dimu_chi2_cut]
+        output['cutflow']['chi2 cut'] = Dimu.counts.sum()
+
         ############### Get the Muons from Dimu, for cuts in their params
         if df['nDimu'].size != 0:
             mu1Idx = (Dimu.t1_muIdx + Muon.starts).content
@@ -132,16 +136,20 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Dimu muon eta cut'] += Dimu.counts.sum()
 
         # Cuts into events with at least 1 Dimu
-        ndimu_cut = Dimu.counts > 0
+        """ ndimu_cut = Dimu.counts > 0
         Dimu = Dimu[ndimu_cut]
         Muon1 = Muon1[ndimu_cut]
         Muon2 = Muon2[ndimu_cut]
         D0 = D0[ndimu_cut]
-        Dstar = Dstar[ndimu_cut]
+        Dstar = Dstar[ndimu_cut] """
 
         ############### Cuts for D0
 
         # trk cuts
+        D0_trk_muon_cut = ~D0.hasMuon
+        D0 = D0[D0_trk_muon_cut]
+        output['cutflow']['D0 trk muon cut'] += D0.counts.sum()
+
         D0_trk_pt_cut = (D0.t1_pt > 0.8) & (D0.t2_pt > 0.8)
         D0 = D0[D0_trk_pt_cut]
         output['cutflow']['D0 trk pt cut'] += D0.counts.sum()
@@ -158,7 +166,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         D0 = D0[D0_trk_dxy_cut]
         output['cutflow']['D0 trk dxy cut'] += D0.counts.sum()
 
-        D0_trk_dz_cut = (D0.t1_dz < 1) & (D0.t2_dz < 1)
+        D0_trk_dz_cut = (D0.t1_dz < 1.) & (D0.t2_dz < 1.)
         D0 = D0[D0_trk_dz_cut]
         output['cutflow']['D0 trk dz cut'] += D0.counts.sum()
 
@@ -168,18 +176,22 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['D0 cosphi cut'] += D0.counts.sum()
 
         # D0 dl Significance
-        D0_dlSig_cut = (D0.dlSig > 5)
+        D0_dlSig_cut = (D0.dlSig > 5.)
         D0 = D0[D0_dlSig_cut]
         output['cutflow']['D0 dlSig cut'] += D0.counts.sum()
 
         # D0 pt
-        D0_pt_cut = (D0.pt > 3)
+        D0_pt_cut = (D0.pt > 3.)
         D0 = D0[D0_pt_cut]
         output['cutflow']['D0 pt cut'] += D0.counts.sum()
 
         ############### Cuts for Dstar
 
         # trks cuts
+        Dstar_trk_muon_cut = ~Dstar.hasMuon
+        Dstar = Dstar[Dstar_trk_muon_cut]
+        output['cutflow']['Dstar trk muon cut'] += Dstar.counts.sum()
+
         Dstar_trk_pt_cut = (Dstar.K_pt > 0.5) & (Dstar.pi_pt > 0.5)
         Dstar = Dstar[Dstar_trk_pt_cut]
         output['cutflow']['Dstar trk pt cut'] += Dstar.counts.sum()
@@ -229,6 +241,10 @@ class EventSelectorProcessor(processor.ProcessorABC):
         DstarD0_dlSig_cut = (Dstar.D0_dlSig > 3)
         Dstar = Dstar[DstarD0_dlSig_cut]
         output['cutflow']['Dstar D0 dlSig cut'] += Dstar.counts.sum()
+
+        """ Dstar_wrong_charge_cut = (Dstar.K_chg != Dstar.pi_chg)
+        Dstar = Dstar[Dstar_wrong_charge_cut]
+        output['cutflow']['Dstar wrong charge cut'] += Dstar.counts.sum() """
 
         ############### Final computation of number of objects
         output['cutflow']['Dimu final']    += Dimu.counts.sum()
