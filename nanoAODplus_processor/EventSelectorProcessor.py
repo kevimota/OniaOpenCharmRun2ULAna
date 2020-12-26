@@ -135,14 +135,6 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Muon2 = Muon2[muon_eta_cut]
         output['cutflow']['Dimu muon eta cut'] += Dimu.counts.sum()
 
-        # Cuts into events with at least 1 Dimu
-        """ ndimu_cut = Dimu.counts > 0
-        Dimu = Dimu[ndimu_cut]
-        Muon1 = Muon1[ndimu_cut]
-        Muon2 = Muon2[ndimu_cut]
-        D0 = D0[ndimu_cut]
-        Dstar = Dstar[ndimu_cut] """
-
         ############### Cuts for D0
 
         # trk cuts
@@ -246,6 +238,8 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dstar = Dstar[Dstar_wrong_charge_cut]
         output['cutflow']['Dstar wrong charge cut'] += Dstar.counts.sum() """
 
+        ############### Upsilon + Dstar association
+
         ############### Final computation of number of objects
         output['cutflow']['Dimu final']    += Dimu.counts.sum()
         output['cutflow']['D0 final']      += D0.counts.sum()
@@ -264,6 +258,8 @@ class EventSelectorProcessor(processor.ProcessorABC):
                                                                 eta=np.where(~leading_mu, Muon1.eta.content, Muon2.eta.content),
                                                                 phi=np.where(~leading_mu, Muon1.phi.content, Muon2.phi.content),
                                                                 mass=np.where(~leading_mu, Muon1.mass.content, Muon2.mass.content),)
+
+
 
         ############### Create the accumulators to save output
         muon_lead_acc = processor.dict_accumulator({})
@@ -298,7 +294,6 @@ class EventSelectorProcessor(processor.ProcessorABC):
         D0_acc["nD0"] = processor.column_accumulator(D0.counts)
         output["D0"] = D0_acc
         output["D0_trk"] = D0_trk_acc
-        
 
         Dstar_acc = processor.dict_accumulator({})
         Dstar_D0_acc = processor.dict_accumulator({})
