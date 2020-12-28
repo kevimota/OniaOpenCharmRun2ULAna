@@ -22,7 +22,7 @@ dstar_cols = ['Dstar_pt', 'Dstar_eta', 'Dstar_phi', 'Dstar_rap', 'Dstar_deltam',
               'Dstarpis_dxy', 'Dstarpis_dz',]
 
 
-def get_vars_dict(dataframe, col_list):
+def get_vars_dict(events, col_list):
     dict = {}
     col = ''
     for c in col_list:
@@ -40,8 +40,8 @@ def get_vars_dict(dataframe, col_list):
         else:
             Exception('Not good!')
 
-        if dataframe[c].size == 0:
+        if len(events[c]) == 0:
             dict[col] = np.array([])
         else:
-            dict[col] = dataframe[c]
+            dict[col] = events[c]
     return dict

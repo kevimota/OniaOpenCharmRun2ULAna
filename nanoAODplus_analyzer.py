@@ -4,6 +4,7 @@ import time
 import os
 
 import coffea.processor as processor
+from coffea.nanoevents import BaseSchema
 
 from nanoAODplus_processor.EventSelectorProcessor import EventSelectorProcessor
 from data.fileset import filesets
@@ -35,7 +36,7 @@ if (args.select or args.analyze):
                                         treename='Events',
                                         processor_instance=EventSelectorProcessor(args.name),
                                         executor=processor.futures_executor,
-                                        executor_args={'workers': config_yaml['n_cores'], 'flatten': True},
+                                        executor_args={"schema": BaseSchema, 'workers': config_yaml['n_cores'], 'flatten': True},
                                         chunksize=config_yaml['chunksize'],
                                         )
 
@@ -44,7 +45,7 @@ if (args.select or args.analyze):
                                         treename='Events',
                                         processor_instance=EventSelectorProcessor(args.name),
                                         executor=processor.iterative_executor,
-                                        executor_args={'flatten': True},
+                                        executor_args={'schema': BaseSchema, 'flatten': True},
                                         chunksize=config_yaml['chunksize'],
                                         )
 
