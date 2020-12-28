@@ -132,28 +132,28 @@ class HistogramingProcessor(processor.ProcessorABC):
         hist_Dstar_deltam = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162, metadata=r"$\Delta m$ [GeV]"))
 
         # Filling histograms
-        hist_muon_lead.fill(acc["Muon_lead"]["__fast_pt"].value,
-                            acc["Muon_lead"]["__fast_eta"].value, 
-                            acc["Muon_lead"]["__fast_phi"].value)
+        hist_muon_lead.fill(acc["Muon_lead"]["pt"].value,
+                            acc["Muon_lead"]["eta"].value, 
+                            acc["Muon_lead"]["phi"].value)
 
-        hist_muon_trail.fill(acc["Muon_trail"]["__fast_pt"].value,
-                             acc["Muon_trail"]["__fast_eta"].value, 
-                             acc["Muon_trail"]["__fast_phi"].value)
+        hist_muon_trail.fill(acc["Muon_trail"]["pt"].value,
+                             acc["Muon_trail"]["eta"].value, 
+                             acc["Muon_trail"]["phi"].value)
 
-        hist_dimu.fill(acc["Dimu"]["__fast_pt"].value,
-                       acc["Dimu"]["__fast_eta"].value, 
-                       acc["Dimu"]["__fast_phi"].value)
+        hist_dimu.fill(acc["Dimu"]["pt"].value,
+                       acc["Dimu"]["eta"].value, 
+                       acc["Dimu"]["phi"].value)
 
-        hist_dimu_mass.fill(acc["Dimu"]["__fast_mass"].value) 
+        hist_dimu_mass.fill(acc["Dimu"]["mass"].value) 
 
-        hist_D0.fill(acc["D0"]["__fast_pt"].value,
-                     acc["D0"]["__fast_eta"].value, 
-                     acc["D0"]["__fast_phi"].value)
+        hist_D0.fill(acc["D0"]["pt"].value,
+                     acc["D0"]["eta"].value, 
+                     acc["D0"]["phi"].value)
 
-        hist_D0_mass.fill(acc["D0"]["__fast_mass"].value)
+        hist_D0_mass.fill(acc["D0"]["mass"].value)
 
-        hist_D0_eta_mass.fill(acc["D0"]["__fast_eta"].value,
-                              acc["D0"]["__fast_mass"].value)
+        hist_D0_eta_mass.fill(acc["D0"]["eta"].value,
+                              acc["D0"]["mass"].value)
 
         hist_D0_trk.fill(acc["D0_trk"]["t1_pt"].value,
                          acc["D0_trk"]["t1_eta"].value, 
@@ -163,11 +163,11 @@ class HistogramingProcessor(processor.ProcessorABC):
                          acc["D0_trk"]["t2_eta"].value, 
                          acc["D0_trk"]["t2_phi"].value)
 
-        hist_Dstar.fill(acc["Dstar"]["__fast_pt"].value,
-                        acc["Dstar"]["__fast_eta"].value, 
-                        acc["Dstar"]["__fast_phi"].value)
+        hist_Dstar.fill(acc["Dstar"]["pt"].value,
+                        acc["Dstar"]["eta"].value, 
+                        acc["Dstar"]["phi"].value)
 
-        hist_Dstar_mass.fill(acc["Dstar"]["__fast_mass"].value)
+        hist_Dstar_mass.fill(acc["Dstar"]["mass"].value)
 
         hist_Dstar_mass_refit.fill(acc["Dstar"]["deltamr"].value + acc["Dstar_D0"]["D0_mass"].value)
 
