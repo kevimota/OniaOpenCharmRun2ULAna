@@ -8,6 +8,27 @@ from tools.collections import *
 
 D0_PDG_MASS = 1.864
 
+def association(cand1, cand2):
+    asso = ak.cartesian([cand1, cand2])
+    asso = asso[asso['0'].vtxIdx == asso['1'].vtxIdx]
+    asso = asso[ak.num(asso) > 0]
+    cand1 = ak.zip({
+            "pt": asso['0'].pt,
+            "eta": asso['0'].eta,
+            "phi": asso['0'].phi,
+            "mass": asso['0'].mass,}, with_name='PtEtaPhiMCandidate')
+
+    cand2 = ak.zip({
+            "pt": asso['1'].pt,
+            "eta": asso['1'].eta,
+            "phi": asso['1'].phi,
+            "mass": asso['1'].mass,}, with_name='PtEtaPhiMCandidate')
+
+    asso['deltarap'] = asso['0'].rap - asso['1'].rap
+    asso['p4'] = cand1 + cand2
+    
+    return asso
+
 class EventSelectorProcessor(processor.ProcessorABC):
     def __init__(self, analyzer_name):
         self.analyzer_name = analyzer_name
@@ -150,7 +171,11 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Dstar wrong charge cut'] += ak.sum(ak.num(Dstar)) 
         """
 
-        ############### Upsilon + Dstar association
+        Dstar['wrg_chg'] = (Dstar.K_chg == Dstar.pi_chg)
+
+        ############### Dimu + OpenCharm associations
+
+        DimuDstar = association(Dimu, Dstar)
 
         ############### Final computation of number of objects
         output['cutflow']['Dimu final']    += ak.sum(ak.num(Dimu))
@@ -207,6 +232,26 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output["Dstar"] = Dstar_acc
         output["Dstar_D0"] = Dstar_D0_acc
         output["Dstar_trk"] = Dstar_trk_acc
+
+        DimuDstar_acc = processor.dict_accumulator({})
+        DimuDstar_acc['Dimu'] = processor.dict_accumulator({})
+        DimuDstar_acc['Dstar'] = processor.dict_accumulator({})
+        for var in DimuDstar.fields:
+            if (var == '0') or (var =='1'):
+                continue
+            elif var == 'p4':
+                for i0 in DimuDstar[var].fields:
+                    DimuDstar_acc[i0] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar[var][i0])))
+            else:
+                DimuDstar_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar[var])))
+
+        for var in DimuDstar['0'].fields:
+            DimuDstar_acc['Dimu'][var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar['0'][var])))
+
+        for var in DimuDstar['1'].fields:
+            DimuDstar_acc['Dstar'][var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar['1'][var])))
+        DimuDstar_acc['nDimuDstar'] = processor.column_accumulator(ak.to_numpy(ak.num(DimuDstar)))
+        output['DimuDstar'] = DimuDstar_acc
 
         file_hash = str(random.getrandbits(128)) + str(len(events))
         save(output, "output/" + self.analyzer_name + "/" + self.analyzer_name + "_" + file_hash + ".coffea")
