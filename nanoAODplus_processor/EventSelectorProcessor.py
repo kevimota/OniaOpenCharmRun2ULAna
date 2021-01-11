@@ -2,30 +2,39 @@ import awkward1 as ak
 import coffea.processor as processor
 from coffea.util import save
 
+from coffea.nanoevents.methods import candidate
+ak.behavior.update(candidate.behavior)
+
 import random
 
 from tools.collections import *
 
 D0_PDG_MASS = 1.864
 
+
 def association(cand1, cand2):
+    ''' Function for association of the particles. The cuts that operates on all of them and 
+    computation of quantities can go here. individual cuts can go on the main processing'''
+
     asso = ak.cartesian([cand1, cand2])
-    asso = asso[asso['0'].vtxIdx == asso['1'].vtxIdx]
+    asso = asso[asso.slot0.vtxIdx == asso.slot1.vtxIdx]
     asso = asso[ak.num(asso) > 0]
     cand1 = ak.zip({
-            "pt": asso['0'].pt,
-            "eta": asso['0'].eta,
-            "phi": asso['0'].phi,
-            "mass": asso['0'].mass,}, with_name='PtEtaPhiMCandidate')
+            'pt': asso.slot0.pt,
+            'eta': asso.slot0.eta,
+            'phi': asso.slot0.phi,
+            'mass': asso.slot0.mass,
+            'charge': asso.slot0.charge}, with_name="PtEtaPhiMCandidate")
 
     cand2 = ak.zip({
-            "pt": asso['1'].pt,
-            "eta": asso['1'].eta,
-            "phi": asso['1'].phi,
-            "mass": asso['1'].mass,}, with_name='PtEtaPhiMCandidate')
+            'pt': asso.slot1.pt,
+            'eta': asso.slot1.eta,
+            'phi': asso.slot1.phi,
+            'mass': asso.slot1.mass,
+            'charge': asso.slot1.charge}, with_name="PtEtaPhiMCandidate")
 
-    asso['deltarap'] = asso['0'].rap - asso['1'].rap
-    asso['p4'] = cand1 + cand2
+    asso['deltarap'] = asso.slot0.rap - asso.slot1.rap
+    asso['cand'] = cand1 + cand2
     
     return asso
 
@@ -48,7 +57,8 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dimu = ak.zip({**get_vars_dict(events, dimu_cols)}, with_name="PtEtaPhiMCandidate")
         Muon = ak.zip({**get_vars_dict(events, muon_cols)}, with_name="PtEtaPhiMCandidate")
         D0 = ak.zip({'mass': events.D0_mass12, **get_vars_dict(events, d0_cols)}, with_name="PtEtaPhiMCandidate")
-        Dstar = ak.zip({'mass': (events.DstarD0_mass + events.Dstar_deltamr), 
+        Dstar = ak.zip({'mass': (events.DstarD0_mass + events.Dstar_deltamr),
+                        'charge': events.Dstarpis_chg,
                         **get_vars_dict(events, dstar_cols)}, 
                         with_name="PtEtaPhiMCandidate")
 
@@ -68,26 +78,26 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Dimu chi2 cut'] += ak.sum(ak.num(Dimu))
 
         ############### Get the Muons from Dimu, for cuts in their params
-        Muon = ak.zip({'i0': Muon[Dimu.t1_muIdx], 'i1': Muon[Dimu.t2_muIdx]})
+        Muon = ak.zip({'0': Muon[Dimu.t1_muIdx], '1': Muon[Dimu.t2_muIdx]}, with_name="PtEtaPhiMCandidate")
 
         # SoftId and Global Muon cuts
-        soft_id = (Muon.i0.softId > 0) & (Muon.i1.softId > 0)
+        soft_id = (Muon.slot0.softId > 0) & (Muon.slot1.softId > 0)
         Dimu = Dimu[soft_id]
         Muon = Muon[soft_id]
         output['cutflow']['Dimu muon softId'] += ak.sum(ak.num(Dimu))
 
-        global_muon = (Muon.i0.isGlobal > 0) & (Muon.i1.isGlobal > 0)
+        global_muon = (Muon.slot0.isGlobal > 0) & (Muon.slot1.isGlobal > 0)
         Dimu = Dimu[global_muon]
         Muon = Muon[global_muon]
         output['cutflow']['Dimu muon global'] += ak.sum(ak.num(Dimu))
 
         # pt and eta cuts
-        muon_pt_cut = (Muon.i0.pt > 3) & (Muon.i1.pt > 3)
+        muon_pt_cut = (Muon.slot0.pt > 3) & (Muon.slot1.pt > 3)
         Dimu = Dimu[muon_pt_cut]
         Muon = Muon[muon_pt_cut]
         output['cutflow']['Dimu muon pt cut'] += ak.sum(ak.num(Dimu))
 
-        muon_eta_cut = (np.absolute(Muon.i0.eta) <= 2.4) & (np.absolute(Muon.i1.eta) <= 2.4)
+        muon_eta_cut = (np.absolute(Muon.slot0.eta) <= 2.4) & (np.absolute(Muon.slot1.eta) <= 2.4)
         Dimu = Dimu[muon_eta_cut]
         Muon = Muon[muon_eta_cut]
         output['cutflow']['Dimu muon eta cut'] += ak.sum(ak.num(Dimu))
@@ -181,11 +191,12 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Dimu final']    += ak.sum(ak.num(Dimu))
         output['cutflow']['D0 final']      += ak.sum(ak.num(D0))
         output['cutflow']['Dstar final']   += ak.sum(ak.num(Dstar))
+        output['cutflow']['Dimu Dstar Associated'] += ak.sum(ak.num(DimuDstar))
 
         ############### Leading and Trailing muon separation
-        leading_mu = (Muon.i0.pt > Muon.i1.pt)
-        Muon_lead = ak.where(leading_mu, Muon.i0, Muon.i1)
-        Muon_trail = ak.where(~leading_mu, Muon.i0, Muon.i1)
+        leading_mu = (Muon.slot0.pt > Muon.slot1.pt)
+        Muon_lead = ak.where(leading_mu, Muon.slot0, Muon.slot1)
+        Muon_trail = ak.where(~leading_mu, Muon.slot0, Muon.slot1)
 
         ############### Create the accumulators to save output
         muon_lead_acc = processor.dict_accumulator({})
@@ -239,17 +250,17 @@ class EventSelectorProcessor(processor.ProcessorABC):
         for var in DimuDstar.fields:
             if (var == '0') or (var =='1'):
                 continue
-            elif var == 'p4':
+            elif var == 'cand':
                 for i0 in DimuDstar[var].fields:
                     DimuDstar_acc[i0] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar[var][i0])))
             else:
                 DimuDstar_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar[var])))
 
-        for var in DimuDstar['0'].fields:
-            DimuDstar_acc['Dimu'][var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar['0'][var])))
+        for var in DimuDstar.slot0.fields:
+            DimuDstar_acc['Dimu'][var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar.slot0[var])))
 
-        for var in DimuDstar['1'].fields:
-            DimuDstar_acc['Dstar'][var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar['1'][var])))
+        for var in DimuDstar.slot1.fields:
+            DimuDstar_acc['Dstar'][var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar.slot1[var])))
         DimuDstar_acc['nDimuDstar'] = processor.column_accumulator(ak.to_numpy(ak.num(DimuDstar)))
         output['DimuDstar'] = DimuDstar_acc
 

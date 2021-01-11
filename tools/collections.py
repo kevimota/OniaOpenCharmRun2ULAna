@@ -40,6 +40,9 @@ def get_vars_dict(events, col_list):
         else:
             Exception('Not good!')
 
+        if col == 'x' or col == 'y' or col == 'z':
+            col = 'vtx_' + col
+
         if len(events[c]) == 0:
             dict[col] = np.array([])
         else:
