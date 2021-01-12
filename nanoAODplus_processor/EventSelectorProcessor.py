@@ -78,7 +78,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Dimu chi2 cut'] += ak.sum(ak.num(Dimu))
 
         ############### Get the Muons from Dimu, for cuts in their params
-        Muon = ak.zip({'0': Muon[Dimu.t1_muIdx], '1': Muon[Dimu.t2_muIdx]}, with_name="PtEtaPhiMCandidate")
+        Muon = ak.zip({'0': Muon[Dimu.t1_muIdx], '1': Muon[Dimu.t2_muIdx]})
 
         # SoftId and Global Muon cuts
         soft_id = (Muon.slot0.softId > 0) & (Muon.slot1.softId > 0)

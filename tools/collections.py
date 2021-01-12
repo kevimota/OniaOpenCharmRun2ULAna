@@ -8,8 +8,8 @@ dimu_cols = ['Dimu_pt', 'Dimu_eta', 'Dimu_phi', 'Dimu_rap', 'Dimu_mass', 'Dimu_c
 
 d0_cols = ['D0_pt', 'D0_eta', 'D0_phi', 'D0_rap', 'D0_mass12', 'D0_mass21', 'D0_vtxIdx', 'D0_chi2', 'D0_dl', 'D0_dlErr', 'D0_dlSig',
            'D0_cosphi', 'D0_x', 'D0_y', 'D0_z', 'D0_hasMuon',
-           'D0t1_pt', 'D0t1_eta', 'D0t1_phi', 'D0t1_chindof', 'D0t1_nValid', 'D0t1_nPix', 'D0t1_dxy', 'D0t1_dz', 
-           'D0t2_pt', 'D0t2_eta', 'D0t2_phi', 'D0t2_chindof', 'D0t2_nValid', 'D0t2_nPix', 'D0t2_dxy', 'D0t2_dz',]
+           'D0t1_pt', 'D0t1_eta', 'D0t1_phi', 'D0t1_chindof', 'D0t1_nValid', 'D0t1_nPix', 'D0t1_dxy', 'D0t1_dz', 'D0t1_chg', 
+           'D0t2_pt', 'D0t2_eta', 'D0t2_phi', 'D0t2_chindof', 'D0t2_nValid', 'D0t2_nPix', 'D0t2_dxy', 'D0t2_dz', 'D0t2_chg',]
 
 dstar_cols = ['Dstar_pt', 'Dstar_eta', 'Dstar_phi', 'Dstar_rap', 'Dstar_deltam', 'Dstar_deltamr', 'Dstar_vtxIdx', 'Dstar_hasMuon',
               'DstarD0_pt', 'DstarD0_eta', 'DstarD0_phi', 'DstarD0_mass', 'DstarD0_chi2', 'DstarD0_dl', 'DstarD0_dlErr',
