@@ -87,14 +87,9 @@ class HistogramingProcessor(processor.ProcessorABC):
                                    hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 100, 0, 50),
                                    hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
                                    hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
-            'Jpsi_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 100, 8.6, 11)), #mudar
+            'Jpsi_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 100, 2.95, 3.25)),
             'Jpsi_p': hist.Hist("Events", 
                                    hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 100, 0, 50),
-                                   hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
-                                   hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
-            'Dimu_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 3000, 0, 100)),
-            'Dimu_p': hist.Hist("Events", 
-                                   hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 200, 0, 100),
                                    hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
                                    hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
             'D0_mass12': hist.Hist("Events", hist.Bin("mass", "$m_{D^0, 12}$ [GeV]", 100, 1.7, 2.0)),
@@ -134,6 +129,31 @@ class HistogramingProcessor(processor.ProcessorABC):
                                      hist.Bin("pt", "$p_{T,D* \pi_s}$ [GeV]", 100, 0, 20),
                                      hist.Bin("eta", "$\eta_{D* \pi_s}$", 60, -2.5, 2.5),
                                      hist.Bin("phi", "$\phi_{D* \pi_s}$", 70, -3.5, 3.5)),
+            'DimuDstar': processor.dict_accumulator({
+                'Upsilon_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 100, 8.6, 11)),
+                'Upsilon_p': hist.Hist("Events", 
+                                    hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 100, 0, 50),
+                                    hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
+                                    hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
+                'Jpsi_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 100, 2.95, 3.25)), 
+                'Jpsi_p': hist.Hist("Events", 
+                                    hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 100, 0, 50),
+                                    hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
+                                    hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
+                'Dstar_p': hist.Hist("Events", 
+                                 hist.Bin("pt", "$p_{T,D*}$ [GeV]", 100, 0, 50),
+                                 hist.Bin("eta", "$\eta_{D*}$", 80, -2.5, 2.5),
+                                 hist.Bin("phi", "$\phi_{D*}$", 70, -3.5, 3.5)),
+                'Dstar_deltam': hist.Hist("Events", hist.Bin("deltam", "$\Delta m$ [GeV]", 50, 0.138, 0.162)),
+                'Dstar_deltamr': hist.Hist("Events", hist.Bin("deltamr", "$\Delta m_{refit}$ [GeV]", 50, 0.138, 0.162)),
+                'Dstar_pw': hist.Hist("Events", 
+                                    hist.Bin("pt", "$p_{T,D*}$ [GeV]", 100, 0, 50),
+                                    hist.Bin("eta", "$\eta_{D*}$", 80, -2.5, 2.5),
+                                    hist.Bin("phi", "$\phi_{D*}$", 70, -3.5, 3.5)),
+                'Dstar_deltamw': hist.Hist("Events", hist.Bin("deltam", "$\Delta m$ [GeV]", 50, 0.138, 0.162)),
+                'Dstar_deltamrw': hist.Hist("Events", hist.Bin("deltamr", "$\Delta m_{refit}$ [GeV]", 50, 0.138, 0.162)),
+                'Dstar_deltarap': hist.Hist("Events", hist.Bin("deltarap", "$\Delta y$", 50, -5, 5)),
+            }),
         })
      
     @property
@@ -164,23 +184,17 @@ class HistogramingProcessor(processor.ProcessorABC):
                                     eta=Muon_trail_acc['eta'].value,
                                     phi=Muon_trail_acc['phi'].value)
 
-        output['Upsilon_mass'].fill(mass=Dimu_acc['mass'].value)
+        output['Upsilon_mass'].fill(mass=Dimu_acc['mass'].value[(Dimu_acc['mass'].value > 8.5) & (Dimu_acc['mass'].value < 11.5)])
 
-        output['Upsilon_p'].fill(pt=Dimu_acc['pt'].value,
-                                 eta=Dimu_acc['eta'].value,
-                                 phi=Dimu_acc['phi'].value)
+        output['Upsilon_p'].fill(pt=Dimu_acc['pt'].value[(Dimu_acc['mass'].value > 8.5) & (Dimu_acc['mass'].value < 11.5)],
+                                 eta=Dimu_acc['eta'].value[(Dimu_acc['mass'].value > 8.5) & (Dimu_acc['mass'].value < 11.5)],
+                                 phi=Dimu_acc['phi'].value[(Dimu_acc['mass'].value > 8.5) & (Dimu_acc['mass'].value < 11.5)])
 
-        output['Jpsi_mass'].fill(mass=Dimu_acc['mass'].value)
+        output['Jpsi_mass'].fill(mass=Dimu_acc['mass'].value[(Dimu_acc['mass'].value > 2.95) & (Dimu_acc['mass'].value < 3.25)])
 
-        output['Jpsi_p'].fill(pt=Dimu_acc['pt'].value,
-                              eta=Dimu_acc['eta'].value,
-                              phi=Dimu_acc['phi'].value)
-
-        output['Dimu_mass'].fill(mass=Dimu_acc['mass'].value)
-
-        output['Dimu_p'].fill(pt=Dimu_acc['pt'].value,
-                              eta=Dimu_acc['eta'].value,
-                              phi=Dimu_acc['phi'].value)
+        output['Jpsi_p'].fill(pt=Dimu_acc['pt'].value[(Dimu_acc['mass'].value > 2.95) & (Dimu_acc['mass'].value < 3.25)],
+                              eta=Dimu_acc['eta'].value[(Dimu_acc['mass'].value > 2.95) & (Dimu_acc['mass'].value < 3.25)],
+                              phi=Dimu_acc['phi'].value[(Dimu_acc['mass'].value > 2.95) & (Dimu_acc['mass'].value < 3.25)])
 
         output['D0_mass12'].fill(mass=D0_acc['mass12'].value)
         output['D0_mass21'].fill(mass=D0_acc['mass21'].value)
@@ -226,7 +240,33 @@ class HistogramingProcessor(processor.ProcessorABC):
                                    eta=Dstar_trk_acc['pis_eta'].value,
                                    phi=Dstar_trk_acc['pis_phi'].value)
 
+        ############# DimuDstar
 
+        output['DimuDstar']['Upsilon_mass'].fill(mass=DimuDstar_acc['Dimu']['mass'].value[(DimuDstar_acc['Dimu']['mass'].value > 8.5) & (DimuDstar_acc['Dimu']['mass'].value < 11.5)])
+
+        output['DimuDstar']['Upsilon_p'].fill(pt=DimuDstar_acc['Dimu']['pt'].value[(DimuDstar_acc['Dimu']['mass'].value > 8.5) & (DimuDstar_acc['Dimu']['mass'].value < 11.5)],
+                                              eta=DimuDstar_acc['Dimu']['eta'].value[(DimuDstar_acc['Dimu']['mass'].value > 8.5) & (DimuDstar_acc['Dimu']['mass'].value < 11.5)],
+                                              phi=DimuDstar_acc['Dimu']['phi'].value[(DimuDstar_acc['Dimu']['mass'].value > 8.5) & (DimuDstar_acc['Dimu']['mass'].value < 11.5)])
+
+        output['DimuDstar']['Jpsi_mass'].fill(mass=DimuDstar_acc['Dimu']['mass'].value[(DimuDstar_acc['Dimu']['mass'].value > 2.95) & (DimuDstar_acc['Dimu']['mass'].value < 3.25)])
+
+        output['DimuDstar']['Jpsi_p'].fill(pt=DimuDstar_acc['Dimu']['pt'].value[(DimuDstar_acc['Dimu']['mass'].value > 2.95) & (DimuDstar_acc['Dimu']['mass'].value < 3.25)],
+                                           eta=DimuDstar_acc['Dimu']['eta'].value[(DimuDstar_acc['Dimu']['mass'].value > 2.95) & (DimuDstar_acc['Dimu']['mass'].value < 3.25)],
+                                           phi=DimuDstar_acc['Dimu']['phi'].value[(DimuDstar_acc['Dimu']['mass'].value > 2.95) & (DimuDstar_acc['Dimu']['mass'].value < 3.25)])
+
+        output['DimuDstar']['Dstar_deltamr'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value)
+        output['DimuDstar']['Dstar_deltam'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value)
+
+        output['DimuDstar']['Dstar_p'].fill(pt=DimuDstar_acc['Dstar']['pt'].value,
+                                            eta=DimuDstar_acc['Dstar']['eta'].value,
+                                            phi=DimuDstar_acc['Dstar']['phi'].value)
+
+        output['DimuDstar']['Dstar_deltamrw'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value[DimuDstar_acc['Dstar']['wrg_chg'].value])
+        output['DimuDstar']['Dstar_deltamw'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value[DimuDstar_acc['Dstar']['wrg_chg'].value])
+
+        output['DimuDstar']['Dstar_pw'].fill(pt=DimuDstar_acc['Dstar']['pt'].value[DimuDstar_acc['Dstar']['wrg_chg'].value],
+                                             eta=DimuDstar_acc['Dstar']['eta'].value[DimuDstar_acc['Dstar']['wrg_chg'].value],
+                                             phi=DimuDstar_acc['Dstar']['phi'].value[DimuDstar_acc['Dstar']['wrg_chg'].value])
         return output
 
     def postprocess(self, accumulator):
