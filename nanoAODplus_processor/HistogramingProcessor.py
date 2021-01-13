@@ -11,6 +11,7 @@ def create_plot1d(hist, save_name, log=False):
 
     ax = plt.gca()
 
+
     plt.errorbar(hist.axes[0].centers,
              hist.view(),
              np.sqrt(hist.view()),
