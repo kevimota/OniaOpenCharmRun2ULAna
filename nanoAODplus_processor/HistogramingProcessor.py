@@ -1,17 +1,14 @@
-import coffea.processor as processor
-import boost_histogram as bh
+from coffea import processor, hist
 
-import numpy as np
-from coffea.util import save, load
+import awkward1 as ak
+from coffea.util import load
 
-import matplotlib
-matplotlib.use('Agg')
-
+'''
 def create_plot1d(hist, save_name, log=False):
     import matplotlib.pyplot as plt
     import mplhep as hep
     plt.style.use(hep.style.CMS)
-    # plot
+
     ax = plt.gca()
 
     plt.errorbar(hist.axes[0].centers,
@@ -52,7 +49,7 @@ def create_plot2d(hist, save_name):
     import matplotlib.pyplot as plt
     import mplhep as hep
     plt.style.use(hep.style.CMS)
-    # plot
+    
     ax = plt.gca()
 
     hep.hist2dplot(hist, ax=ax)
@@ -63,196 +60,173 @@ def create_plot2d(hist, save_name):
     fig.savefig(save_name)
     ax.clear()
     fig.clear()
+'''
+def build_p4(acc):
+    p4 = ak.zip({'x': acc['x'].value, 
+                 'y': acc['y'].value,
+                 'z': acc['z'].value,
+                 't': acc['t'].value}, with_name="LorentzVector")
+
+    return p4
 
 class HistogramingProcessor(processor.ProcessorABC):
-    def __init__(self):
+    def __init__(self, analyzer_name):
+        self.analyzer_name = analyzer_name
+        
         self._accumulator = processor.dict_accumulator({
-            'foo': processor.defaultdict_accumulator(int)
+            'Muon_lead_p': hist.Hist("Events", 
+                                   hist.Bin("pt", "$p_{T,\mu}$ [GeV]", 100, 0, 50),
+                                   hist.Bin("eta", "$\eta_{\mu}$", 60, -2.5, 2.5),
+                                   hist.Bin("phi", "$\phi_{\mu}$", 70, -3.5, 3.5)),
+            'Muon_trail_p': hist.Hist("Events", 
+                                       hist.Bin("pt", "$p_{T,\mu}$ [GeV]", 100, 0, 50),
+                                       hist.Bin("eta", "$\eta_{\mu}$", 60, -2.5, 2.5),
+                                       hist.Bin("phi", "$\phi_{\mu}$", 70, -3.5, 3.5)),
+            'Upsilon_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 100, 8.6, 11)),
+            'Upsilon_p': hist.Hist("Events", 
+                                   hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 100, 0, 50),
+                                   hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
+                                   hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
+            'Jpsi_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 100, 8.6, 11)), #mudar
+            'Jpsi_p': hist.Hist("Events", 
+                                   hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 100, 0, 50),
+                                   hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
+                                   hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
+            'Dimu_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 3000, 0, 100)),
+            'Dimu_p': hist.Hist("Events", 
+                                   hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 200, 0, 100),
+                                   hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
+                                   hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
+            'D0_mass12': hist.Hist("Events", hist.Bin("mass", "$m_{D^0, 12}$ [GeV]", 100, 1.7, 2.0)),
+            'D0_mass21': hist.Hist("Events", hist.Bin("mass", "$m_{D^0, 21}$ [GeV]", 100, 1.7, 2.0)),
+            'D0_p': hist.Hist("Events", 
+                              hist.Bin("pt", "$p_{T,D^0}$ [GeV]", 100, 0, 50),
+                              hist.Bin("eta", "$\eta_{D^0}$", 80, -2.5, 2.5),
+                              hist.Bin("phi", "$\phi_{D^0}$", 70, -3.5, 3.5)),
+            'D0_eta_mass': hist.Hist("Events",
+                                     hist.Bin("eta", "$\eta_{D^0}$", 80, -2.5, 2.5),
+                                     hist.Bin("mass", "$m_{D^0}$ [GeV]", 100, 1.7, 2.0)),
+            'D0_trk_p': hist.Hist("Events", 
+                                  hist.Bin("pt", "$p_{T,D^0 trks}$ [GeV]", 100, 0, 50),
+                                  hist.Bin("eta", "$\eta_{D^0 trks}$", 80, -2.5, 2.5),
+                                  hist.Bin("phi", "$\phi_{D^0 trks}$", 70, -3.5, 3.5)),
+            'Dstar_p': hist.Hist("Events", 
+                                 hist.Bin("pt", "$p_{T,D*}$ [GeV]", 100, 0, 50),
+                                 hist.Bin("eta", "$\eta_{D*}$", 80, -2.5, 2.5),
+                                 hist.Bin("phi", "$\phi_{D*}$", 70, -3.5, 3.5)),
+            'Dstar_deltam': hist.Hist("Events", hist.Bin("deltam", "$\Delta m$ [GeV]", 50, 0.138, 0.162)),
+            'Dstar_deltamr': hist.Hist("Events", hist.Bin("deltamr", "$\Delta m_{refit}$ [GeV]", 50, 0.138, 0.162)),
+            'Dstar_pw': hist.Hist("Events", 
+                                 hist.Bin("pt", "$p_{T,D*}$ [GeV]", 100, 0, 50),
+                                 hist.Bin("eta", "$\eta_{D*}$", 80, -2.5, 2.5),
+                                 hist.Bin("phi", "$\phi_{D*}$", 70, -3.5, 3.5)),
+            'Dstar_deltamw': hist.Hist("Events", hist.Bin("deltam", "$\Delta m$ [GeV]", 50, 0.138, 0.162)),
+            'Dstar_deltamrw': hist.Hist("Events", hist.Bin("deltamr", "$\Delta m_{refit}$ [GeV]", 50, 0.138, 0.162)),
+            'Dstar_K_p': hist.Hist("Events", 
+                                   hist.Bin("pt", "$p_{T,D* K}$ [GeV]", 100, 0, 30),
+                                   hist.Bin("eta", "$\eta_{D* K}$", 60, -2.5, 2.5),
+                                   hist.Bin("phi", "$\phi_{D* K}$", 70, -3.5, 3.5)),
+            'Dstar_pi_p': hist.Hist("Events", 
+                                    hist.Bin("pt", "$p_{T,D* \pi}$ [GeV]", 100, 0, 30),
+                                    hist.Bin("eta", "$\eta_{D* \pi}$", 60, -2.5, 2.5),
+                                    hist.Bin("phi", "$\phi_{D* \pi}$", 70, -3.5, 3.5)),
+            'Dstar_pis_p': hist.Hist("Events", 
+                                     hist.Bin("pt", "$p_{T,D* \pi_s}$ [GeV]", 100, 0, 20),
+                                     hist.Bin("eta", "$\eta_{D* \pi_s}$", 60, -2.5, 2.5),
+                                     hist.Bin("phi", "$\phi_{D* \pi_s}$", 70, -3.5, 3.5)),
         })
      
     @property
     def accumulator(self):
         return self._accumulator
      
-    def process(self, ds):
+    def process(self, file):
         output = self.accumulator.identity()
-        acc = load(ds["file"])
-        
-        ############ Histogram definition
-        # Muons
-        hist_muon_lead = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\mu}$ [GeV]"),
-                                      bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{\mu}$"),
-                                      bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu}$"),)
+        acc = load(file)
 
-        hist_muon_trail = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\mu}$ [GeV]"),
-                                       bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{\mu}$"),
-                                       bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu}$"),)
+        Muon_lead_acc = acc['Muon_lead']
+        Muon_trail_acc = acc['Muon_trail']
+        Dimu_acc = acc['Dimu']
+        D0_acc = acc['D0']
+        D0_trk_acc = acc['D0_trk']
+        Dstar_acc = acc['Dstar']
+        Dstar_trk_acc = acc['Dstar_trk']
+        DimuDstar_acc = acc['DimuDstar']
 
-        #Dimu
-        hist_dimu = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,\mu^+\mu^-}$ [GeV]"),
-                                 bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{\mu^+\mu^-}$"),
-                                 bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\mu^+\mu^-}$"),)
-
-        hist_dimu_mass = bh.Histogram(bh.axis.Regular(100, 8.6, 11, metadata=r"$m_{\mu^+\mu^-}$ [GeV]"))
-
-        # D0
-        hist_D0 = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D^0}$ [GeV]"),
-                               bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{D^0}$"),
-                               bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D^0}$"),)
-
-        hist_D0_mass = bh.Histogram(bh.axis.Regular(100, 1.7, 2.0, metadata=r"$m_{D^0}$ [GeV]"))
-
-        hist_D0_eta_mass = bh.Histogram(bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{D^0}$"),
-                                        bh.axis.Regular(100, 1.7, 2.0, metadata=r"$m_{D^0}$ [GeV]"))
-
-        hist_D0_trk = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D^0 trks}$ [GeV]"),
-                                   bh.axis.Regular(80, -2.5, 2.5, metadata=r"$\eta_{D^0 trks}$"),
-                                   bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D^0 trks}$"),)
-
-        # Dstar
-        hist_Dstar = bh.Histogram(bh.axis.Regular(100, 0, 50, metadata=r"$p_{T,D*}$ [GeV]"),
-                                  bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D*}$"),
-                                  bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D*}$"),)
-
-        hist_Dstar_K = bh.Histogram(bh.axis.Regular(100, 0, 30, metadata=r"$p_{T,D* K}$ [GeV]"),
-                                    bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D* K}$"),
-                                    bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D* K}$"),)
-
-        hist_Dstar_pi = bh.Histogram(bh.axis.Regular(100, 0, 30, metadata=r"$p_{T,D* \pi}$ [GeV]"),
-                                     bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{D* \pi}$"),
-                                     bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{D* \pi}$"),)
-                                  
-        hist_Dstar_pis = bh.Histogram(bh.axis.Regular(100, 0, 20, metadata=r"$p_{T,\pi_s}$ [GeV]"),
-                                      bh.axis.Regular(60, -2.5, 2.5, metadata=r"$\eta_{\pi_s}$"),
-                                      bh.axis.Regular(70, -3.5, 3.5, metadata=r"$\phi_{\pi_s}$"),)
-
-        hist_Dstar_mass = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D*}$ [GeV]"))
-        hist_Dstar_mass_refit = bh.Histogram(bh.axis.Regular(100, 1.8, 2.2, metadata=r"$m_{D* refit}$ [GeV]"))
-        hist_Dstar_deltamr = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162, metadata=r"$\Delta m_{refit}$ [GeV]"))
-        hist_Dstar_deltam = bh.Histogram(bh.axis.Regular(50, 0.138, 0.162, metadata=r"$\Delta m$ [GeV]"))
+        DimuDstar_p4 = build_p4(DimuDstar_acc)
 
         # Filling histograms
-        hist_muon_lead.fill(acc["Muon_lead"]["pt"].value,
-                            acc["Muon_lead"]["eta"].value, 
-                            acc["Muon_lead"]["phi"].value)
+        output['Muon_lead_p'].fill(pt=Muon_lead_acc['pt'].value,
+                                   eta=Muon_lead_acc['eta'].value,
+                                   phi=Muon_lead_acc['phi'].value)
 
-        hist_muon_trail.fill(acc["Muon_trail"]["pt"].value,
-                             acc["Muon_trail"]["eta"].value, 
-                             acc["Muon_trail"]["phi"].value)
+        output['Muon_trail_p'].fill(pt=Muon_trail_acc['pt'].value,
+                                    eta=Muon_trail_acc['eta'].value,
+                                    phi=Muon_trail_acc['phi'].value)
 
-        hist_dimu.fill(acc["Dimu"]["pt"].value,
-                       acc["Dimu"]["eta"].value, 
-                       acc["Dimu"]["phi"].value)
+        output['Upsilon_mass'].fill(mass=Dimu_acc['mass'].value)
 
-        hist_dimu_mass.fill(acc["Dimu"]["mass"].value) 
+        output['Upsilon_p'].fill(pt=Dimu_acc['pt'].value,
+                                 eta=Dimu_acc['eta'].value,
+                                 phi=Dimu_acc['phi'].value)
 
-        hist_D0.fill(acc["D0"]["pt"].value,
-                     acc["D0"]["eta"].value, 
-                     acc["D0"]["phi"].value)
+        output['Jpsi_mass'].fill(mass=Dimu_acc['mass'].value)
 
-        hist_D0_mass.fill(acc["D0"]["mass"].value)
+        output['Jpsi_p'].fill(pt=Dimu_acc['pt'].value,
+                              eta=Dimu_acc['eta'].value,
+                              phi=Dimu_acc['phi'].value)
 
-        hist_D0_eta_mass.fill(acc["D0"]["eta"].value,
-                              acc["D0"]["mass"].value)
+        output['Dimu_mass'].fill(mass=Dimu_acc['mass'].value)
 
-        hist_D0_trk.fill(acc["D0_trk"]["t1_pt"].value,
-                         acc["D0_trk"]["t1_eta"].value, 
-                         acc["D0_trk"]["t1_phi"].value)
+        output['Dimu_p'].fill(pt=Dimu_acc['pt'].value,
+                              eta=Dimu_acc['eta'].value,
+                              phi=Dimu_acc['phi'].value)
 
-        hist_D0_trk.fill(acc["D0_trk"]["t2_pt"].value,
-                         acc["D0_trk"]["t2_eta"].value, 
-                         acc["D0_trk"]["t2_phi"].value)
+        output['D0_mass12'].fill(mass=D0_acc['mass12'].value)
+        output['D0_mass21'].fill(mass=D0_acc['mass21'].value)
 
-        hist_Dstar.fill(acc["Dstar"]["pt"].value,
-                        acc["Dstar"]["eta"].value, 
-                        acc["Dstar"]["phi"].value)
+        output['D0_p'].fill(pt=D0_acc['pt'].value,
+                            eta=D0_acc['eta'].value,
+                            phi=D0_acc['phi'].value)
 
-        hist_Dstar_mass.fill(acc["Dstar"]["mass"].value)
+        output['D0_eta_mass'].fill(eta=D0_acc['eta'].value,
+                                   mass=D0_acc['mass'].value)
 
-        hist_Dstar_mass_refit.fill(acc["Dstar"]["deltamr"].value + acc["Dstar_D0"]["D0_mass"].value)
+        output['D0_trk_p'].fill(pt=D0_trk_acc['t1_pt'].value,
+                                eta=D0_trk_acc['t1_eta'].value,
+                                phi=D0_trk_acc['t1_phi'].value)
 
-        hist_Dstar_K.fill(acc["Dstar_trk"]["K_pt"].value,
-                          acc["Dstar_trk"]["K_eta"].value, 
-                          acc["Dstar_trk"]["K_phi"].value)
-
-        hist_Dstar_pi.fill(acc["Dstar_trk"]["pi_pt"].value,
-                           acc["Dstar_trk"]["pi_eta"].value, 
-                           acc["Dstar_trk"]["pi_phi"].value)
-
-        hist_Dstar_pis.fill(acc["Dstar_trk"]["pis_pt"].value,
-                            acc["Dstar_trk"]["pis_eta"].value, 
-                            acc["Dstar_trk"]["pis_phi"].value)
-
-
-        hist_Dstar_deltamr.fill(acc["Dstar"]["deltamr"].value)
-        hist_Dstar_deltam.fill(acc["Dstar"]["deltam"].value)
-
-        # Saving histograms
-        save(hist_muon_lead, "output/" + ds['analyzer_name'] + "/hist/hist_Muon_lead.hist")
-        save(hist_muon_trail, "output/" + ds['analyzer_name'] + "/hist/hist_Muon_trail.hist")
-        save(hist_dimu, "output/" + ds['analyzer_name'] + "/hist/hist_Dimu.hist")
-        save(hist_dimu_mass, "output/" + ds['analyzer_name'] + "/hist/hist_Dimu_mass.hist")
-        save(hist_D0, "output/" + ds['analyzer_name'] + "/hist/hist_D0.hist")
-        save(hist_D0_mass, "output/" + ds['analyzer_name'] + "/hist/hist_D0_mass.hist")
-        save(hist_Dstar, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar.hist")
-        save(hist_Dstar_mass, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_mass.hist")
-        save(hist_Dstar_mass_refit, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_mass_refit.hist")
-        save(hist_Dstar_deltamr, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_deltamr.hist")
-        save(hist_Dstar_deltam, "output/" + ds['analyzer_name'] + "/hist/hist_Dstar_deltam.hist")
-
-        # Creating plots 1D
-        plots_path = "plots/" + ds['analyzer_name'] + "/" 
-        create_plot1d(hist_muon_lead[:, sum, sum], plots_path + "Muon_lead_pt.png", log=True)
-        create_plot1d(hist_muon_lead[sum, :, sum], plots_path + "Muon_lead_eta.png")
-        create_plot1d(hist_muon_lead[sum, sum, :], plots_path + "Muon_lead_phi.png")
-
-        create_plot1d(hist_muon_trail[:, sum, sum], plots_path + "Muon_trail_pt.png", log=True)
-        create_plot1d(hist_muon_trail[sum, :, sum], plots_path + "Muon_trail_eta.png")
-        create_plot1d(hist_muon_trail[sum, sum, :], plots_path + "Muon_trail_phi.png")
-
-        create_plot1d(hist_dimu[:, sum, sum], plots_path + "Dimu_pt.png", log=True)
-        create_plot1d(hist_dimu[sum, :, sum], plots_path + "Dimu_eta.png")
-        create_plot1d(hist_dimu[sum, sum, :], plots_path + "Dimu_phi.png")
-        create_plot1d(hist_dimu_mass, plots_path + "Dimu_mass.png")
-
-        create_plot1d(hist_D0[:, sum, sum], plots_path + "D0_pt.png", log=True)
-        create_plot1d(hist_D0[sum, :, sum], plots_path + "D0_eta.png")
-        create_plot1d(hist_D0[sum, sum, :], plots_path + "D0_phi.png")
-        create_plot1d(hist_D0_mass, plots_path + "D0_mass.png")
+        output['D0_trk_p'].fill(pt=D0_trk_acc['t2_pt'].value,
+                                eta=D0_trk_acc['t2_eta'].value,
+                                phi=D0_trk_acc['t2_phi'].value)
         
-        create_plot1d(hist_D0_trk[:, sum, sum], plots_path + "D0_trk_pt.png", log=True)
-        create_plot1d(hist_D0_trk[sum, :, sum], plots_path + "D0_trk_eta.png")
-        create_plot1d(hist_D0_trk[sum, sum, :], plots_path + "D0_trk_phi.png")
+        output['Dstar_deltamr'].fill(deltamr=Dstar_acc['deltamr'].value)
+        output['Dstar_deltam'].fill(deltam=Dstar_acc['deltam'].value)
 
-        create_plot1d(hist_Dstar[:, sum, sum], plots_path + "Dstar_pt.png", log=True)
-        create_plot1d(hist_Dstar[sum, :, sum], plots_path + "Dstar_eta.png")
-        create_plot1d(hist_Dstar[sum, sum, :], plots_path + "Dstar_phi.png")
-        create_plot1d(hist_Dstar_mass, plots_path + "Dstar_mass.png")
-        create_plot1d(hist_Dstar_mass_refit, plots_path + "Dstar_mass_refit.png")
-        create_plot1d(hist_Dstar_deltamr, plots_path + "Dstar_deltamr.png")
-        create_plot1d(hist_Dstar_deltam, plots_path + "Dstar_deltam.png")
+        output['Dstar_p'].fill(pt=Dstar_acc['pt'].value,
+                               eta=Dstar_acc['eta'].value,
+                               phi=Dstar_acc['phi'].value)
 
-        create_plot1d(hist_Dstar_K[:, sum, sum], plots_path + "Dstar_K_pt.png", log=True)
-        create_plot1d(hist_Dstar_K[sum, :, sum], plots_path + "Dstar_K_eta.png")
-        create_plot1d(hist_Dstar_K[sum, sum, :], plots_path + "Dstar_K_phi.png")
+        output['Dstar_deltamrw'].fill(deltamr=Dstar_acc['deltamr'].value[Dstar_acc['wrg_chg'].value])
+        output['Dstar_deltamw'].fill(deltam=Dstar_acc['deltam'].value[Dstar_acc['wrg_chg'].value])
 
-        create_plot1d(hist_Dstar_pi[:, sum, sum], plots_path + "Dstar_pi_pt.png", log=True)
-        create_plot1d(hist_Dstar_pi[sum, :, sum], plots_path + "Dstar_pi_eta.png")
-        create_plot1d(hist_Dstar_pi[sum, sum, :], plots_path + "Dstar_pi_phi.png")
+        output['Dstar_pw'].fill(pt=Dstar_acc['pt'].value[Dstar_acc['wrg_chg'].value],
+                                eta=Dstar_acc['eta'].value[Dstar_acc['wrg_chg'].value],
+                                phi=Dstar_acc['phi'].value[Dstar_acc['wrg_chg'].value])
 
-        create_plot1d(hist_Dstar_pis[:, sum, sum], plots_path + "Dstar_pis_pt.png", log=True)
-        create_plot1d(hist_Dstar_pis[sum, :, sum], plots_path + "Dstar_pis_eta.png")
-        create_plot1d(hist_Dstar_pis[sum, sum, :], plots_path + "Dstar_pis_phi.png")
-        
-        # Creating plots 2D
-        create_plot2d(hist_muon_lead[:,sum,:], plots_path + "Muon_lead_ptXphi")
-        create_plot2d(hist_muon_trail[:,sum,:], plots_path + "Muon_trail_ptXphi")
+        output['Dstar_K_p'].fill(pt=Dstar_trk_acc['K_pt'].value,
+                                 eta=Dstar_trk_acc['K_eta'].value,
+                                 phi=Dstar_trk_acc['K_phi'].value)
 
-        create_plot2d(hist_D0[:,:,sum], plots_path + "D0_ptXeta.png")
-        create_plot2d(hist_D0[sum,:,:], plots_path + "D0_etaXphi.png")
-        create_plot2d(hist_D0_eta_mass, plots_path + "D0_etaXmass.png")
+        output['Dstar_pi_p'].fill(pt=Dstar_trk_acc['pi_pt'].value,
+                                  eta=Dstar_trk_acc['pi_eta'].value,
+                                  phi=Dstar_trk_acc['pi_phi'].value)
 
-        # return dummy accumulator
+        output['Dstar_pis_p'].fill(pt=Dstar_trk_acc['pis_pt'].value,
+                                   eta=Dstar_trk_acc['pis_eta'].value,
+                                   phi=Dstar_trk_acc['pis_phi'].value)
+
+
         return output
 
     def postprocess(self, accumulator):

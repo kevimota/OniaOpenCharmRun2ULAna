@@ -1,29 +1,26 @@
 # coding: utf-8
 
 import time
-import os, sys, subprocess
+import os
+from tqdm import tqdm
 
-import coffea.processor as processor
-import numpy as np
-
+from coffea.util import save
 from nanoAODplus_processor.HistogramingProcessor import HistogramingProcessor
+
 def plotter(name):
     print("Starting plots creation")
 
-    print("Saving histograms in output/" + name + "/hist")
-    os.system("mkdir -p output/" + name + "/hist")
-
-    print("Saving plots in plots/" + name)
-    os.system("mkdir -p plots/" + name)
-    os.system("rm -rf output/" + name + "/hist/*")
-    os.system("rm -rf plots/" + name + "/*")
+    print("Saving histograms in output/" + name )
 
     tstart = time.time()
 
-    _processor = HistogramingProcessor()
-    _dummy_accumulator = _processor.accumulator.identity()
-    ds = [{"file": "output/" + name + "/merged/" + name + "_merged.coffea", "analyzer_name": name}]
-    processor.iterative_executor(ds, _processor.process, _dummy_accumulator)
+    p = HistogramingProcessor(name)
+    files = ["output/" + name + "/" + name +".coffea"]
+    out = p.accumulator.identity()
+    for f in tqdm(files, desc="Processing", unit=" files", total=len(files)):
+        out += p.process(f)
+
+    save(out, "output/" + name + "/" + name + "_hists.coffea")
 
     elapsed = round(time.time() - tstart, 2)
 
