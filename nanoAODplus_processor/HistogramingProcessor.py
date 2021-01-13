@@ -4,6 +4,7 @@ import awkward1 as ak
 from coffea.util import load
 
 '''
+
 def create_plot1d(hist, save_name, log=False):
     import matplotlib.pyplot as plt
     import mplhep as hep
@@ -137,12 +138,14 @@ class HistogramingProcessor(processor.ProcessorABC):
                                     hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
                                     hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
                 'Upsilon_deltarap': hist.Hist("Events", hist.Bin("deltarap", "$\Delta y$", 50, -5, 5)),
+                'UpsilonDstar_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\Upsilon D*}$ [GeV]", 1000, 0, 20)),
                 'Jpsi_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 100, 2.95, 3.25)), 
                 'Jpsi_p': hist.Hist("Events", 
                                     hist.Bin("pt", "$p_{T,\mu^+\mu^-}$ [GeV]", 100, 0, 50),
                                     hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
                                     hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
                 'Jpsi_deltarap': hist.Hist("Events", hist.Bin("deltarap", "$\Delta y$", 50, -5, 5)),
+                'JpsiDstar_mass': hist.Hist("Events", hist.Bin("mass", "$m_{J/\psi D*}$ [GeV]", 1000, 0, 20)),
                 'Dstar_p': hist.Hist("Events", 
                                  hist.Bin("pt", "$p_{T,D*}$ [GeV]", 100, 0, 50),
                                  hist.Bin("eta", "$\eta_{D*}$", 80, -2.5, 2.5),
@@ -177,6 +180,9 @@ class HistogramingProcessor(processor.ProcessorABC):
 
         DimuDstar_p4 = build_p4(DimuDstar_acc)
 
+        ups_range = (DimuDstar_acc['Dimu']['mass'].value > 8.5) & (DimuDstar_acc['Dimu']['mass'].value < 11.5)
+        jpsi_range = (DimuDstar_acc['Dimu']['mass'].value > 2.95) & (DimuDstar_acc['Dimu']['mass'].value < 3.25)
+
         # Filling histograms
         output['Muon_lead_p'].fill(pt=Muon_lead_acc['pt'].value,
                                    eta=Muon_lead_acc['eta'].value,
@@ -186,17 +192,17 @@ class HistogramingProcessor(processor.ProcessorABC):
                                     eta=Muon_trail_acc['eta'].value,
                                     phi=Muon_trail_acc['phi'].value)
 
-        output['Upsilon_mass'].fill(mass=Dimu_acc['mass'].value[(Dimu_acc['mass'].value > 8.5) & (Dimu_acc['mass'].value < 11.5)])
+        output['Upsilon_mass'].fill(mass=Dimu_acc['mass'].value[ups_range])
 
-        output['Upsilon_p'].fill(pt=Dimu_acc['pt'].value[(Dimu_acc['mass'].value > 8.5) & (Dimu_acc['mass'].value < 11.5)],
-                                 eta=Dimu_acc['eta'].value[(Dimu_acc['mass'].value > 8.5) & (Dimu_acc['mass'].value < 11.5)],
-                                 phi=Dimu_acc['phi'].value[(Dimu_acc['mass'].value > 8.5) & (Dimu_acc['mass'].value < 11.5)])
+        output['Upsilon_p'].fill(pt=Dimu_acc['pt'].value[ups_range],
+                                 eta=Dimu_acc['eta'].value[ups_range],
+                                 phi=Dimu_acc['phi'].value[ups_range])
 
-        output['Jpsi_mass'].fill(mass=Dimu_acc['mass'].value[(Dimu_acc['mass'].value > 2.95) & (Dimu_acc['mass'].value < 3.25)])
+        output['Jpsi_mass'].fill(mass=Dimu_acc['mass'].value[jpsi_range])
 
-        output['Jpsi_p'].fill(pt=Dimu_acc['pt'].value[(Dimu_acc['mass'].value > 2.95) & (Dimu_acc['mass'].value < 3.25)],
-                              eta=Dimu_acc['eta'].value[(Dimu_acc['mass'].value > 2.95) & (Dimu_acc['mass'].value < 3.25)],
-                              phi=Dimu_acc['phi'].value[(Dimu_acc['mass'].value > 2.95) & (Dimu_acc['mass'].value < 3.25)])
+        output['Jpsi_p'].fill(pt=Dimu_acc['pt'].value[jpsi_range],
+                              eta=Dimu_acc['eta'].value[jpsi_range],
+                              phi=Dimu_acc['phi'].value[jpsi_range])
 
         output['D0_mass12'].fill(mass=D0_acc['mass12'].value)
         output['D0_mass21'].fill(mass=D0_acc['mass21'].value)
@@ -243,10 +249,7 @@ class HistogramingProcessor(processor.ProcessorABC):
                                    phi=Dstar_trk_acc['pis_phi'].value)
 
         ############# DimuDstar
-
-        ups_range = (DimuDstar_acc['Dimu']['mass'].value > 8.5) & (DimuDstar_acc['Dimu']['mass'].value < 11.5)
-        jpsi_range = (DimuDstar_acc['Dimu']['mass'].value > 2.95) & (DimuDstar_acc['Dimu']['mass'].value < 3.25)
-        
+                
         output['DimuDstar']['Upsilon_mass'].fill(mass=DimuDstar_acc['Dimu']['mass'].value[ups_range])
 
         output['DimuDstar']['Upsilon_p'].fill(pt=DimuDstar_acc['Dimu']['pt'].value[ups_range],
