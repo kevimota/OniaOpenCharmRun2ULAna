@@ -102,6 +102,9 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Muon = Muon[muon_eta_cut]
         output['cutflow']['Dimu muon eta cut'] += ak.sum(ak.num(Dimu))
 
+        Dimu['is_ups'] = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
+        Dimu['is_jpsi'] = (Dimu.mass > 2.95) & (Dimu.mass < 3.25)
+
         ############### Cuts for D0
         D0 = D0[~D0.hasMuon]
         output['cutflow']['D0 trk muon cut'] += ak.sum(ak.num(D0))
