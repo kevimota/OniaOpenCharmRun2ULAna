@@ -138,7 +138,7 @@ class HistogramingProcessor(processor.ProcessorABC):
                                     hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
                                     hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
                 'Upsilon_deltarap': hist.Hist("Events", hist.Bin("deltarap", "$\Delta y$", 50, -5, 5)),
-                'UpsilonDstar_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\Upsilon D*}$ [GeV]", 1000, 0, 20)),
+                'UpsilonDstar_mass': hist.Hist("Events", hist.Bin("mass", r"$m_{\Upsilon D*}$ [GeV]", 1000, 0, 20)),
                 'Dstar_p': hist.Hist("Events", 
                                  hist.Bin("pt", "$p_{T,D*}$ [GeV]", 100, 0, 50),
                                  hist.Bin("eta", "$\eta_{D*}$", 80, -2.5, 2.5),
@@ -151,6 +151,7 @@ class HistogramingProcessor(processor.ProcessorABC):
                                     hist.Bin("phi", "$\phi_{D*}$", 70, -3.5, 3.5)),
                 'Dstar_deltamw': hist.Hist("Events", hist.Bin("deltam", "$\Delta m$ [GeV]", 50, 0.138, 0.162)),
                 'Dstar_deltamrw': hist.Hist("Events", hist.Bin("deltamr", "$\Delta m_{refit}$ [GeV]", 50, 0.138, 0.162)),
+            }),
             'JpsiDstar': processor.dict_accumulator({
                 'Jpsi_mass': hist.Hist("Events", hist.Bin("mass", "$m_{\mu^+\mu^-}$ [GeV]", 100, 2.95, 3.25)), 
                 'Jpsi_p': hist.Hist("Events", 
@@ -171,7 +172,6 @@ class HistogramingProcessor(processor.ProcessorABC):
                                     hist.Bin("phi", "$\phi_{D*}$", 70, -3.5, 3.5)),
                 'Dstar_deltamw': hist.Hist("Events", hist.Bin("deltam", "$\Delta m$ [GeV]", 50, 0.138, 0.162)),
                 'Dstar_deltamrw': hist.Hist("Events", hist.Bin("deltamr", "$\Delta m_{refit}$ [GeV]", 50, 0.138, 0.162)),
-            }),
             }),
         })
      
