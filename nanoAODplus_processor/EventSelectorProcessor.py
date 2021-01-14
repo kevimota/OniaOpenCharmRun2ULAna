@@ -52,6 +52,10 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
     def process(self, events):
         output = self.accumulator.identity()
+
+        # test if there is any events in the file
+        if len(events) == 0:
+            return output
         
         ############### Get All the interesting candidates from NTuples
         Dimu = ak.zip({**get_vars_dict(events, dimu_cols)}, with_name="PtEtaPhiMCandidate")
