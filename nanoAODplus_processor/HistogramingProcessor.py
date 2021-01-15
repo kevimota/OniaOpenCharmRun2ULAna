@@ -3,66 +3,6 @@ from coffea import processor, hist
 import awkward1 as ak
 from coffea.util import load
 
-'''
-
-def create_plot1d(hist, save_name, log=False):
-    import matplotlib.pyplot as plt
-    import mplhep as hep
-    plt.style.use(hep.style.CMS)
-
-    ax = plt.gca()
-
-
-    plt.errorbar(hist.axes[0].centers,
-             hist.view(),
-             np.sqrt(hist.view()),
-             fmt='.',
-             color='blue',)
-
-    hep.histplot(hist, ax=ax, color='blue')
-
-    if log:
-        ax.set_yscale('log')
-    else:
-        ax.ticklabel_format(axis='y', style='sci', scilimits=(0,3), useMathText=True)
-
-    ax.set_xlabel(hist.axes[0].metadata, loc='right')
-    ax.set_ylabel("Counts", loc='top')
-
-    # compute mean and std:
-    mean = (hist.view() * hist.axes[0].centers).sum()/hist.sum()
-    std = np.sqrt((hist.view()*((hist.axes[0].centers - mean)**2)).sum()/hist.sum())
-
-    annotation = f"Total {hist.sum()}" \
-                    + "\n" + f"Mean: {round(mean,2)}" \
-                    + "\n" + f"Std: {round(std,2)}"
-    
-    ax.annotate(annotation, xy=(0.85, 0.85), xycoords='axes fraction', fontsize = "small",
-                    ha='center', annotation_clip=False, bbox=dict(boxstyle='round', fc='None'))
-
-    ax.set_xlim(hist.axes[0].edges[0], hist.axes[0].edges[-1] + hist.axes[0].widths[-1])
-    
-    fig = ax.get_figure()
-    fig.savefig(save_name)
-    ax.clear()
-    fig.clear()
-
-def create_plot2d(hist, save_name):
-    import matplotlib.pyplot as plt
-    import mplhep as hep
-    plt.style.use(hep.style.CMS)
-    
-    ax = plt.gca()
-
-    hep.hist2dplot(hist, ax=ax)
-    ax.set_xlabel(hist.axes[0].metadata, loc='right')
-    ax.set_ylabel(hist.axes[1].metadata, loc='top')
-
-    fig = ax.get_figure()
-    fig.savefig(save_name)
-    ax.clear()
-    fig.clear()
-'''
 def build_p4(acc):
     p4 = ak.zip({'x': acc['x'].value, 
                  'y': acc['y'].value,

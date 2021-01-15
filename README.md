@@ -29,6 +29,7 @@ conda deactivate ; conda deactivate
 conda env create -f environment.yml
 
 # for jupyterlab w/ ipython widgets
+conda activate OniaOpenCharmRun2ULenv
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 #only if CMSSW needed:
