@@ -173,12 +173,12 @@ class HistogramingProcessor(processor.ProcessorABC):
                                 eta=D0_trk_acc['t2_eta'].value,
                                 phi=D0_trk_acc['t2_phi'].value)
         
-        output['Dstar_deltamr'].fill(deltamr=Dstar_acc['deltamr'].value)
-        output['Dstar_deltam'].fill(deltam=Dstar_acc['deltam'].value)
+        output['Dstar_deltamr'].fill(deltamr=Dstar_acc['deltamr'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_deltam'].fill(deltam=Dstar_acc['deltam'].value[~Dstar_acc['wrg_chg'].value])
 
-        output['Dstar_p'].fill(pt=Dstar_acc['pt'].value,
-                               eta=Dstar_acc['eta'].value,
-                               phi=Dstar_acc['phi'].value)
+        output['Dstar_p'].fill(pt=Dstar_acc['pt'].value[~Dstar_acc['wrg_chg'].value],
+                               eta=Dstar_acc['eta'].value[~Dstar_acc['wrg_chg'].value],
+                               phi=Dstar_acc['phi'].value[~Dstar_acc['wrg_chg'].value])
 
         output['Dstar_deltamrw'].fill(deltamr=Dstar_acc['deltamr'].value[Dstar_acc['wrg_chg'].value])
         output['Dstar_deltamw'].fill(deltam=Dstar_acc['deltam'].value[Dstar_acc['wrg_chg'].value])
