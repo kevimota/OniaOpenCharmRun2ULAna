@@ -78,7 +78,7 @@ class HistogramingProcessor(processor.ProcessorABC):
                                     hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
                                     hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
                 'Upsilon_deltarap': hist.Hist("Events", hist.Bin("deltarap", "$\Delta y$", 50, -5, 5)),
-                'UpsilonDstar_mass': hist.Hist("Events", hist.Bin("mass", r"$m_{\Upsilon D*}$ [GeV]", 1000, 0, 20)),
+                'UpsilonDstar_mass': hist.Hist("Events", hist.Bin("mass", r"$m_{\Upsilon D*}$ [GeV]", 100, 0, 50)),
                 'Dstar_p': hist.Hist("Events", 
                                  hist.Bin("pt", "$p_{T,D*}$ [GeV]", 100, 0, 50),
                                  hist.Bin("eta", "$\eta_{D*}$", 80, -2.5, 2.5),
@@ -99,7 +99,7 @@ class HistogramingProcessor(processor.ProcessorABC):
                                     hist.Bin("eta", "$\eta_{\mu^+\mu^-}$", 60, -2.5, 2.5),
                                     hist.Bin("phi", "$\phi_{\mu^+\mu^-}$", 70, -3.5, 3.5)),
                 'Jpsi_deltarap': hist.Hist("Events", hist.Bin("deltarap", "$\Delta y$", 50, -5, 5)),
-                'JpsiDstar_mass': hist.Hist("Events", hist.Bin("mass", "$m_{J/\psi D*}$ [GeV]", 1000, 0, 20)),
+                'JpsiDstar_mass': hist.Hist("Events", hist.Bin("mass", "$m_{J/\psi D*}$ [GeV]", 100, 0, 20)),
                 'Dstar_p': hist.Hist("Events", 
                                  hist.Bin("pt", "$p_{T,D*}$ [GeV]", 100, 0, 50),
                                  hist.Bin("eta", "$\eta_{D*}$", 80, -2.5, 2.5),
@@ -205,18 +205,18 @@ class HistogramingProcessor(processor.ProcessorABC):
         dimudstar_wrg_chg = DimuDstar_acc['Dstar']['wrg_chg'].value
 
         # Upsilon
-        output['UpsilonDstar']['Upsilon_mass'].fill(mass=DimuDstar_acc['Dimu']['mass'].value[is_ups_dstar])
+        output['UpsilonDstar']['Upsilon_mass'].fill(mass=DimuDstar_acc['Dimu']['mass'].value[is_ups_dstar & ~dimudstar_wrg_chg])
 
-        output['UpsilonDstar']['Upsilon_p'].fill(pt=DimuDstar_acc['Dimu']['pt'].value[is_ups_dstar],
-                                                 eta=DimuDstar_acc['Dimu']['eta'].value[is_ups_dstar],
-                                                 phi=DimuDstar_acc['Dimu']['phi'].value[is_ups_dstar])
+        output['UpsilonDstar']['Upsilon_p'].fill(pt=DimuDstar_acc['Dimu']['pt'].value[is_ups_dstar & ~dimudstar_wrg_chg],
+                                                 eta=DimuDstar_acc['Dimu']['eta'].value[is_ups_dstar & ~dimudstar_wrg_chg],
+                                                 phi=DimuDstar_acc['Dimu']['phi'].value[is_ups_dstar & ~dimudstar_wrg_chg])
 
-        output['UpsilonDstar']['Dstar_deltamr'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value[is_ups_dstar])
-        output['UpsilonDstar']['Dstar_deltam'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value[is_ups_dstar])
+        output['UpsilonDstar']['Dstar_deltamr'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value[is_ups_dstar & ~dimudstar_wrg_chg])
+        output['UpsilonDstar']['Dstar_deltam'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value[is_ups_dstar & ~dimudstar_wrg_chg])
 
-        output['UpsilonDstar']['Dstar_p'].fill(pt=DimuDstar_acc['Dstar']['pt'].value[is_ups_dstar],
-                                               eta=DimuDstar_acc['Dstar']['eta'].value[is_ups_dstar],
-                                               phi=DimuDstar_acc['Dstar']['phi'].value[is_ups_dstar])
+        output['UpsilonDstar']['Dstar_p'].fill(pt=DimuDstar_acc['Dstar']['pt'].value[is_ups_dstar & ~dimudstar_wrg_chg],
+                                               eta=DimuDstar_acc['Dstar']['eta'].value[is_ups_dstar & ~dimudstar_wrg_chg],
+                                               phi=DimuDstar_acc['Dstar']['phi'].value[is_ups_dstar & ~dimudstar_wrg_chg])
 
         output['UpsilonDstar']['Dstar_deltamrw'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value[is_ups_dstar & dimudstar_wrg_chg])
         output['UpsilonDstar']['Dstar_deltamw'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value[is_ups_dstar & dimudstar_wrg_chg])
@@ -225,30 +225,32 @@ class HistogramingProcessor(processor.ProcessorABC):
                                              eta=DimuDstar_acc['Dstar']['eta'].value[is_ups_dstar & dimudstar_wrg_chg],
                                              phi=DimuDstar_acc['Dstar']['phi'].value[is_ups_dstar & dimudstar_wrg_chg])
 
-        output['UpsilonDstar']['Upsilon_deltarap'].fill(deltarap=DimuDstar_acc['deltarap'].value[is_ups_dstar])
+        output['UpsilonDstar']['Upsilon_deltarap'].fill(deltarap=DimuDstar_acc['deltarap'].value[is_ups_dstar & ~dimudstar_wrg_chg])
+        output['UpsilonDstar']['UpsilonDstar_mass'].fill(mass=DimuDstar_p4.mass[is_ups_dstar & ~dimudstar_wrg_chg])
 
         # Jpsi
-        output['JpsiDstar']['Jpsi_mass'].fill(mass=DimuDstar_acc['Dimu']['mass'].value[is_jpsi_dstar])
+        output['JpsiDstar']['Jpsi_mass'].fill(mass=DimuDstar_acc['Dimu']['mass'].value[is_jpsi_dstar & ~dimudstar_wrg_chg])
 
-        output['JpsiDstar']['Jpsi_p'].fill(pt=DimuDstar_acc['Dimu']['pt'].value[is_jpsi_dstar],
-                                                 eta=DimuDstar_acc['Dimu']['eta'].value[is_jpsi_dstar],
-                                                 phi=DimuDstar_acc['Dimu']['phi'].value[is_jpsi_dstar])
+        output['JpsiDstar']['Jpsi_p'].fill(pt=DimuDstar_acc['Dimu']['pt'].value[is_jpsi_dstar & ~dimudstar_wrg_chg],
+                                                 eta=DimuDstar_acc['Dimu']['eta'].value[is_jpsi_dstar & ~dimudstar_wrg_chg],
+                                                 phi=DimuDstar_acc['Dimu']['phi'].value[is_jpsi_dstar & ~dimudstar_wrg_chg])
 
-        output['JpsiDstar']['Dstar_deltamr'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value[is_jpsi_dstar])
-        output['JpsiDstar']['Dstar_deltam'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value[is_jpsi_dstar])
+        output['JpsiDstar']['Dstar_deltamr'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value[is_jpsi_dstar & ~dimudstar_wrg_chg])
+        output['JpsiDstar']['Dstar_deltam'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value[is_jpsi_dstar & ~dimudstar_wrg_chg])
 
-        output['JpsiDstar']['Dstar_p'].fill(pt=DimuDstar_acc['Dstar']['pt'].value[is_jpsi_dstar],
-                                               eta=DimuDstar_acc['Dstar']['eta'].value[is_jpsi_dstar],
-                                               phi=DimuDstar_acc['Dstar']['phi'].value[is_jpsi_dstar])
+        output['JpsiDstar']['Dstar_p'].fill(pt=DimuDstar_acc['Dstar']['pt'].value[is_jpsi_dstar & ~dimudstar_wrg_chg],
+                                               eta=DimuDstar_acc['Dstar']['eta'].value[is_jpsi_dstar & ~dimudstar_wrg_chg],
+                                               phi=DimuDstar_acc['Dstar']['phi'].value[is_jpsi_dstar & ~dimudstar_wrg_chg])
 
-        output['JpsiDstar']['Dstar_deltamrw'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value[is_jpsi_dstar & dimudstar_wrg_chg])
-        output['JpsiDstar']['Dstar_deltamw'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value[is_jpsi_dstar & dimudstar_wrg_chg])
+        output['JpsiDstar']['Dstar_deltamrw'].fill(deltamr=DimuDstar_acc['Dstar']['deltamr'].value[is_jpsi_dstar & dimudstar_wrg_chg & ~dimudstar_wrg_chg])
+        output['JpsiDstar']['Dstar_deltamw'].fill(deltam=DimuDstar_acc['Dstar']['deltam'].value[is_jpsi_dstar & dimudstar_wrg_chg & ~dimudstar_wrg_chg])
 
-        output['JpsiDstar']['Dstar_pw'].fill(pt=DimuDstar_acc['Dstar']['pt'].value[is_jpsi_dstar & dimudstar_wrg_chg],
-                                             eta=DimuDstar_acc['Dstar']['eta'].value[is_jpsi_dstar & dimudstar_wrg_chg],
-                                             phi=DimuDstar_acc['Dstar']['phi'].value[is_jpsi_dstar & dimudstar_wrg_chg])
+        output['JpsiDstar']['Dstar_pw'].fill(pt=DimuDstar_acc['Dstar']['pt'].value[is_jpsi_dstar & dimudstar_wrg_chg & ~dimudstar_wrg_chg],
+                                             eta=DimuDstar_acc['Dstar']['eta'].value[is_jpsi_dstar & dimudstar_wrg_chg & ~dimudstar_wrg_chg],
+                                             phi=DimuDstar_acc['Dstar']['phi'].value[is_jpsi_dstar & dimudstar_wrg_chg & ~dimudstar_wrg_chg])
 
-        output['JpsiDstar']['Jpsi_deltarap'].fill(deltarap=DimuDstar_acc['deltarap'].value[is_jpsi_dstar])
+        output['JpsiDstar']['Jpsi_deltarap'].fill(deltarap=DimuDstar_acc['deltarap'].value[is_jpsi_dstar & ~dimudstar_wrg_chg])
+        output['JpsiDstar']['JpsiDstar_mass'].fill(mass=DimuDstar_p4.mass[is_jpsi_dstar & ~dimudstar_wrg_chg])
 
         return output
 
