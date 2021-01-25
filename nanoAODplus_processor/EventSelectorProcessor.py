@@ -152,7 +152,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dstar = Dstar[(Dstar.K_chindof < 2.5) & (Dstar.pi_chindof < 2.5)]
         output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.K_nValid > 4) & (Dstar.pi_nValid > 4) & (Dstar.K_nValid > 1) & (Dstar.pi_nValid > 1)]
+        Dstar = Dstar[(Dstar.K_nValid > 4) & (Dstar.pi_nPix > 4) & (Dstar.K_nPix > 1) & (Dstar.pi_nPix > 1)]
         output['cutflow']['Dstar trk hits cut'] += ak.sum(ak.num(Dstar))
 
         Dstar = Dstar[(Dstar.K_dxy < 0.1) & (Dstar.pi_dxy < 0.1)]
