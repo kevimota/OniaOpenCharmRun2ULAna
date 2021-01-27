@@ -184,10 +184,6 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dstar = Dstar[Dstar.D0_dlSig > 3]
         output['cutflow']['Dstar D0 dlSig cut'] += ak.sum(ak.num(Dstar))
 
-        """ Dstar = Dstar[Dstar.K_chg != Dstar.pi_chg]
-        output['cutflow']['Dstar wrong charge cut'] += ak.sum(ak.num(Dstar)) 
-        """
-
         Dstar['wrg_chg'] = (Dstar.K_chg == Dstar.pi_chg)
 
         ############### Dimu + OpenCharm associations
