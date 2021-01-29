@@ -284,6 +284,8 @@ class HistogramingProcessor(processor.ProcessorABC):
         output['Dstar_K_nPix'].fill(nPix=Dstar_trk_acc['K_nPix'].value[~Dstar_acc['wrg_chg'].value])
         output['Dstar_K_dxy'].fill(dxy=Dstar_trk_acc['K_dxy'].value[~Dstar_acc['wrg_chg'].value])
         output['Dstar_K_dz'].fill(dz=Dstar_trk_acc['K_dz'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_K_pt_eta'].fill(pt=Dstar_trk_acc['K_pt'].value[~Dstar_acc['wrg_chg'].value],
+                                      eta=Dstar_trk_acc['K_eta'].value[~Dstar_acc['wrg_chg'].value])
 
         output['Dstar_pi_p'].fill(pt=Dstar_trk_acc['pi_pt'].value[~Dstar_acc['wrg_chg'].value],
                                   eta=Dstar_trk_acc['pi_eta'].value[~Dstar_acc['wrg_chg'].value],
@@ -293,6 +295,8 @@ class HistogramingProcessor(processor.ProcessorABC):
         output['Dstar_pi_nPix'].fill(nPix=Dstar_trk_acc['pi_nPix'].value[~Dstar_acc['wrg_chg'].value])
         output['Dstar_pi_dxy'].fill(dxy=Dstar_trk_acc['pi_dxy'].value[~Dstar_acc['wrg_chg'].value])
         output['Dstar_pi_dz'].fill(dz=Dstar_trk_acc['pi_dz'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pi_pt_eta'].fill(pt=Dstar_trk_acc['pi_pt'].value[~Dstar_acc['wrg_chg'].value],
+                                       eta=Dstar_trk_acc['pi_eta'].value[~Dstar_acc['wrg_chg'].value])
 
         output['Dstar_pis_p'].fill(pt=Dstar_trk_acc['pis_pt'].value[~Dstar_acc['wrg_chg'].value],
                                    eta=Dstar_trk_acc['pis_eta'].value[~Dstar_acc['wrg_chg'].value],
