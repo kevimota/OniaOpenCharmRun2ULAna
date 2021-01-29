@@ -78,9 +78,6 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dimu = Dimu[((Dimu.mass > 8.5) & (Dimu.mass < 11.5)) | ((Dimu.mass > 2.95) & (Dimu.mass < 3.25))]
         output['cutflow']['Quarkonia mass'] += ak.sum(ak.num(Dimu))
 
-        Dimu = Dimu[Dimu.chi2 < 5.]
-        output['cutflow']['Dimu chi2 cut'] += ak.sum(ak.num(Dimu))
-
         ############### Get the Muons from Dimu, for cuts in their params
         Muon = ak.zip({'0': Muon[Dimu.t1_muIdx], '1': Muon[Dimu.t2_muIdx]})
 
