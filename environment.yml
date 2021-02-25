@@ -6,13 +6,12 @@ dependencies:
   - xrootd
   - pip
   - matplotlib
-  - boost-histogram >=0.10.0
   - jupyterlab >=2
   - uncertainties
   - nodejs
+  - root
   - pip:
     - coffea
     - mplhep >=0.1.27
     - pyyaml
-#    - git+https://github.com/zfit/zfit
     
