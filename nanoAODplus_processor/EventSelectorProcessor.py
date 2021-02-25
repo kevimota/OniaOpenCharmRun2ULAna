@@ -34,6 +34,9 @@ def association(cand1, cand2):
             'charge': asso.slot1.charge}, with_name="PtEtaPhiMCandidate")
 
     asso['deltarap'] = asso.slot0.rap - asso.slot1.rap
+    asso['deltapt'] = asso.slot0.pt - asso.slot1.pt
+    asso['deltaeta'] = asso.slot0.eta - asso.slot1.eta
+    asso['deltaphi'] = asso.slot0.phi - asso.slot1.phi
     asso['cand'] = cand1 + cand2
     
     return asso
@@ -98,7 +101,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Muon = Muon[muon_pt_cut]
         output['cutflow']['Dimu muon pt cut'] += ak.sum(ak.num(Dimu))
 
-        muon_eta_cut = (np.absolute(Muon.slot0.eta) <= 2.4) & (np.absolute(Muon.slot1.eta) <= 2.4)
+        muon_eta_cut = (ak.absolute(Muon.slot0.eta) <= 2.4) & (ak.absolute(Muon.slot1.eta) <= 2.4)
         Dimu = Dimu[muon_eta_cut]
         Muon = Muon[muon_eta_cut]
         output['cutflow']['Dimu muon eta cut'] += ak.sum(ak.num(Dimu))
