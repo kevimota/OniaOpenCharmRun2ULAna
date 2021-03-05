@@ -26,7 +26,7 @@ if (args.select or args.analyze):
     tstart = time.time()
 
 
-    files = {'MuOnia2017MINIAOD': filesets['MuOnia2017MINIAOD'][0:1]}
+    files = {'MuOniatestAOD': filesets['MuOniatestAOD'][0:1]}
 
     # creating necessary folders into dir output data
     os.system("mkdir -p output/" + args.name)
@@ -37,7 +37,7 @@ if (args.select or args.analyze):
                                         treename='Events',
                                         processor_instance=EventSelectorProcessor(args.name),
                                         executor=processor.futures_executor,
-                                        executor_args={"schema": BaseSchema, 'workers': config_yaml['n_cores'], 'flatten': True},
+                                        executor_args={"schema": BaseSchema, 'workers': config_yaml['n_cores']},
                                         chunksize=config_yaml['chunksize'],
                                         )
 
@@ -46,7 +46,7 @@ if (args.select or args.analyze):
                                         treename='Events',
                                         processor_instance=EventSelectorProcessor(args.name),
                                         executor=processor.iterative_executor,
-                                        executor_args={'schema': BaseSchema, 'flatten': True},
+                                        executor_args={'schema': BaseSchema},
                                         chunksize=config_yaml['chunksize'],
                                         )
 

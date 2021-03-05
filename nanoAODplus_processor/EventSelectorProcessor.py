@@ -1,4 +1,5 @@
-import awkward1 as ak
+import awkward as ak
+import numpy as np
 import coffea.processor as processor
 from coffea.util import save
 
@@ -15,7 +16,6 @@ D0_PDG_MASS = 1.864
 def association(cand1, cand2):
     ''' Function for association of the particles. The cuts that operates on all of them and 
     computation of quantities can go here. individual cuts can go on the main processing'''
-
     asso = ak.cartesian([cand1, cand2])
     asso = asso[asso.slot0.vtxIdx == asso.slot1.vtxIdx]
     asso = asso[ak.num(asso) > 0]
@@ -55,7 +55,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
     def process(self, events):
         output = self.accumulator.identity()
-
+        
         # test if there is any events in the file
         if len(events) == 0:
             return output
@@ -101,7 +101,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Muon = Muon[muon_pt_cut]
         output['cutflow']['Dimu muon pt cut'] += ak.sum(ak.num(Dimu))
 
-        muon_eta_cut = (ak.absolute(Muon.slot0.eta) <= 2.4) & (ak.absolute(Muon.slot1.eta) <= 2.4)
+        muon_eta_cut = (np.absolute(Muon.slot0.eta) <= 2.4) & (np.absolute(Muon.slot1.eta) <= 2.4)
         Dimu = Dimu[muon_eta_cut]
         Muon = Muon[muon_eta_cut]
         output['cutflow']['Dimu muon eta cut'] += ak.sum(ak.num(Dimu))

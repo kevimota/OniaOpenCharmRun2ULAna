@@ -1,6 +1,6 @@
 from coffea import processor, hist
 
-import awkward1 as ak
+import awkward as ak
 from coffea.util import load
 
 def build_p4(acc):
