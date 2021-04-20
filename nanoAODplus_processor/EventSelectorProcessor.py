@@ -64,8 +64,8 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dimu = ak.zip({**get_vars_dict(events, dimu_cols)}, with_name="PtEtaPhiMCandidate")
         Muon = ak.zip({**get_vars_dict(events, muon_cols)}, with_name="PtEtaPhiMCandidate")
         D0 = ak.zip({'mass': events.D0_mass12, **get_vars_dict(events, d0_cols)}, with_name="PtEtaPhiMCandidate")
-        Dstar = ak.zip({'mass': (events.DstarD0_mass + events.Dstar_deltamr),
-                        'charge': events.Dstarpis_chg,
+        Dstar = ak.zip({'mass': (events.Dstar_D0mass + events.Dstar_deltamr),
+                        'charge': events.Dstar_pischg,
                         **get_vars_dict(events, dstar_cols)}, 
                         with_name="PtEtaPhiMCandidate")
 
@@ -82,7 +82,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Quarkonia mass'] += ak.sum(ak.num(Dimu))
 
         ############### Get the Muons from Dimu, for cuts in their params
-        Muon = ak.zip({'0': Muon[Dimu.t1_muIdx], '1': Muon[Dimu.t2_muIdx]})
+        Muon = ak.zip({'0': Muon[Dimu.t1muIdx], '1': Muon[Dimu.t2muIdx]})
 
         # SoftId and Global Muon cuts
         soft_id = (Muon.slot0.softId > 0) & (Muon.slot1.softId > 0)
@@ -113,19 +113,19 @@ class EventSelectorProcessor(processor.ProcessorABC):
         D0 = D0[~D0.hasMuon]
         output['cutflow']['D0 trk muon cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1_pt > 0.8) & (D0.t2_pt > 0.8)]
+        D0 = D0[(D0.t1pt > 0.8) & (D0.t2pt > 0.8)]
         output['cutflow']['D0 trk pt cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1_chindof < 2.5) & (D0.t2_chindof < 2.5)]
+        D0 = D0[(D0.t1chindof < 2.5) & (D0.t2chindof < 2.5)]
         output['cutflow']['D0 trk chi2 cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1_nValid > 4) & (D0.t2_nValid > 4) & (D0.t1_nPix > 1) & (D0.t2_nPix > 1)]
+        D0 = D0[(D0.t1nValid > 4) & (D0.t2nValid > 4) & (D0.t1nPix > 1) & (D0.t2nPix > 1)]
         output['cutflow']['D0 trk hits cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1_dxy < 0.1) & (D0.t2_dxy < 0.1)]
+        D0 = D0[(D0.t1dxy < 0.1) & (D0.t2dxy < 0.1)]
         output['cutflow']['D0 trk dxy cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1_dz < 1.) & (D0.t2_dz < 1.)]
+        D0 = D0[(D0.t1dz < 1.) & (D0.t2dz < 1.)]
         output['cutflow']['D0 trk dz cut'] += ak.sum(ak.num(D0))
 
         # D0 cosphi
@@ -146,45 +146,45 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dstar = Dstar[~Dstar.hasMuon]
         output['cutflow']['Dstar trk muon cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.K_pt > 0.5) & (Dstar.pi_pt > 0.5)]
+        Dstar = Dstar[(Dstar.Kpt > 0.5) & (Dstar.pipt > 0.5)]
         output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.K_chindof < 2.5) & (Dstar.pi_chindof < 2.5)]
+        Dstar = Dstar[(Dstar.Kchindof < 2.5) & (Dstar.pichindof < 2.5)]
         output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.K_nValid > 4) & (Dstar.pi_nValid > 4) & (Dstar.K_nPix > 1) & (Dstar.pi_nPix > 1)]
+        Dstar = Dstar[(Dstar.KnValid > 4) & (Dstar.pinValid > 4) & (Dstar.KnPix > 1) & (Dstar.pinPix > 1)]
         output['cutflow']['Dstar trk hits cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.K_dxy < 0.1) & (Dstar.pi_dxy < 0.1)]
+        Dstar = Dstar[(Dstar.Kdxy < 0.1) & (Dstar.pidxy < 0.1)]
         output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.K_dz < 1) & (Dstar.pi_dz < 1)]
+        Dstar = Dstar[(Dstar.Kdz < 1) & (Dstar.pidz < 1)]
         output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
 
         # pis cuts
-        Dstar = Dstar[Dstar.pis_pt > 0.3]
+        Dstar = Dstar[Dstar.pispt > 0.3]
         output['cutflow']['Dstar pis pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[Dstar.pis_chindof < 3]
+        Dstar = Dstar[Dstar.pischindof < 3]
         output['cutflow']['Dstar pis chi2 cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[Dstar.pis_nValid > 2]
+        Dstar = Dstar[Dstar.pisnValid > 2]
         output['cutflow']['Dstar pis hits cut'] += ak.sum(ak.num(Dstar))
 
         # D0 of Dstar cuts
-        Dstar = Dstar[Dstar.D0_cosphi > 0.99]
+        Dstar = Dstar[Dstar.D0cosphi > 0.99]
         output['cutflow']['Dstar D0 cosphi cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.D0_mass < D0_PDG_MASS + 0.025) & (Dstar.D0_mass > D0_PDG_MASS - 0.025)]
+        Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.025) & (Dstar.D0mass > D0_PDG_MASS - 0.025)]
         output['cutflow']['Dstar D0 mass cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[Dstar.D0_pt > 3]
+        Dstar = Dstar[Dstar.D0pt > 3]
         output['cutflow']['Dstar D0 pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[Dstar.D0_dlSig > 3]
+        Dstar = Dstar[Dstar.D0dlSig > 3]
         output['cutflow']['Dstar D0 dlSig cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar['wrg_chg'] = (Dstar.K_chg == Dstar.pi_chg)
+        Dstar['wrg_chg'] = (Dstar.Kchg == Dstar.pichg)
 
         ############### Dimu + OpenCharm associations
 
