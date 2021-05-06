@@ -256,22 +256,22 @@ class HistogramingProcessor(processor.ProcessorABC):
                                    mass=D0_acc['mass'].value)
 
         # D0 trks
-        output['D0_trk_p'].fill(pt=D0_trk_acc['t1_pt'].value,
-                                eta=D0_trk_acc['t1_eta'].value,
-                                phi=D0_trk_acc['t1_phi'].value)
-        output['D0_trk_p'].fill(pt=D0_trk_acc['t2_pt'].value,
-                                eta=D0_trk_acc['t2_eta'].value,
-                                phi=D0_trk_acc['t2_phi'].value)
-        output['D0_trk_chindof'].fill(chindof=D0_trk_acc['t1_chindof'].value)
-        output['D0_trk_chindof'].fill(chindof=D0_trk_acc['t2_chindof'].value)
-        output['D0_trk_nValid'].fill(nValid=D0_trk_acc['t1_nValid'].value)
-        output['D0_trk_nValid'].fill(nValid=D0_trk_acc['t2_nValid'].value)
-        output['D0_trk_nPix'].fill(nPix=D0_trk_acc['t1_nPix'].value)
-        output['D0_trk_nPix'].fill(nPix=D0_trk_acc['t2_nPix'].value)
-        output['D0_trk_dxy'].fill(dxy=D0_trk_acc['t1_dxy'].value)
-        output['D0_trk_dxy'].fill(dxy=D0_trk_acc['t2_dxy'].value)
-        output['D0_trk_dz'].fill(dz=D0_trk_acc['t1_dz'].value)
-        output['D0_trk_dz'].fill(dz=D0_trk_acc['t2_dz'].value)
+        output['D0_trk_p'].fill(pt=D0_trk_acc['t1pt'].value,
+                                eta=D0_trk_acc['t1eta'].value,
+                                phi=D0_trk_acc['t1phi'].value)
+        output['D0_trk_p'].fill(pt=D0_trk_acc['t2pt'].value,
+                                eta=D0_trk_acc['t2eta'].value,
+                                phi=D0_trk_acc['t2phi'].value)
+        output['D0_trk_chindof'].fill(chindof=D0_trk_acc['t1chindof'].value)
+        output['D0_trk_chindof'].fill(chindof=D0_trk_acc['t2chindof'].value)
+        output['D0_trk_nValid'].fill(nValid=D0_trk_acc['t1nValid'].value)
+        output['D0_trk_nValid'].fill(nValid=D0_trk_acc['t2nValid'].value)
+        output['D0_trk_nPix'].fill(nPix=D0_trk_acc['t1nPix'].value)
+        output['D0_trk_nPix'].fill(nPix=D0_trk_acc['t2nPix'].value)
+        output['D0_trk_dxy'].fill(dxy=D0_trk_acc['t1dxy'].value)
+        output['D0_trk_dxy'].fill(dxy=D0_trk_acc['t2dxy'].value)
+        output['D0_trk_dz'].fill(dz=D0_trk_acc['t1dz'].value)
+        output['D0_trk_dz'].fill(dz=D0_trk_acc['t2dz'].value)
         
         # Dstar
         output['Dstar_p'].fill(chg='right charge', 
@@ -290,36 +290,36 @@ class HistogramingProcessor(processor.ProcessorABC):
         output['Dstar_deltam'].fill(chg='wrong charge', deltam=Dstar_acc['deltam'].value[Dstar_acc['wrg_chg'].value])
         
         # Dstar trks
-        output['Dstar_K_p'].fill(pt=Dstar_trk_acc['K_pt'].value[~Dstar_acc['wrg_chg'].value],
-                                 eta=Dstar_trk_acc['K_eta'].value[~Dstar_acc['wrg_chg'].value],
-                                 phi=Dstar_trk_acc['K_phi'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_K_chindof'].fill(chindof=Dstar_trk_acc['K_chindof'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_K_nValid'].fill(nValid=Dstar_trk_acc['K_nValid'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_K_nPix'].fill(nPix=Dstar_trk_acc['K_nPix'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_K_dxy'].fill(dxy=Dstar_trk_acc['K_dxy'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_K_dz'].fill(dz=Dstar_trk_acc['K_dz'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_K_pt_eta'].fill(pt=Dstar_trk_acc['K_pt'].value[~Dstar_acc['wrg_chg'].value],
-                                      eta=Dstar_trk_acc['K_eta'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_K_p'].fill(pt=Dstar_trk_acc['Kpt'].value[~Dstar_acc['wrg_chg'].value],
+                                 eta=Dstar_trk_acc['Keta'].value[~Dstar_acc['wrg_chg'].value],
+                                 phi=Dstar_trk_acc['Kphi'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_K_chindof'].fill(chindof=Dstar_trk_acc['Kchindof'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_K_nValid'].fill(nValid=Dstar_trk_acc['KnValid'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_K_nPix'].fill(nPix=Dstar_trk_acc['KnPix'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_K_dxy'].fill(dxy=Dstar_trk_acc['Kdxy'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_K_dz'].fill(dz=Dstar_trk_acc['Kdz'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_K_pt_eta'].fill(pt=Dstar_trk_acc['Kpt'].value[~Dstar_acc['wrg_chg'].value],
+                                      eta=Dstar_trk_acc['Keta'].value[~Dstar_acc['wrg_chg'].value])
 
-        output['Dstar_pi_p'].fill(pt=Dstar_trk_acc['pi_pt'].value[~Dstar_acc['wrg_chg'].value],
-                                  eta=Dstar_trk_acc['pi_eta'].value[~Dstar_acc['wrg_chg'].value],
-                                  phi=Dstar_trk_acc['pi_phi'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pi_chindof'].fill(chindof=Dstar_trk_acc['pi_chindof'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pi_nValid'].fill(nValid=Dstar_trk_acc['pi_nValid'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pi_nPix'].fill(nPix=Dstar_trk_acc['pi_nPix'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pi_dxy'].fill(dxy=Dstar_trk_acc['pi_dxy'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pi_dz'].fill(dz=Dstar_trk_acc['pi_dz'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pi_pt_eta'].fill(pt=Dstar_trk_acc['pi_pt'].value[~Dstar_acc['wrg_chg'].value],
-                                       eta=Dstar_trk_acc['pi_eta'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pi_p'].fill(pt=Dstar_trk_acc['pipt'].value[~Dstar_acc['wrg_chg'].value],
+                                  eta=Dstar_trk_acc['pieta'].value[~Dstar_acc['wrg_chg'].value],
+                                  phi=Dstar_trk_acc['piphi'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pi_chindof'].fill(chindof=Dstar_trk_acc['pichindof'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pi_nValid'].fill(nValid=Dstar_trk_acc['pinValid'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pi_nPix'].fill(nPix=Dstar_trk_acc['pinPix'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pi_dxy'].fill(dxy=Dstar_trk_acc['pidxy'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pi_dz'].fill(dz=Dstar_trk_acc['pidz'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pi_pt_eta'].fill(pt=Dstar_trk_acc['pipt'].value[~Dstar_acc['wrg_chg'].value],
+                                       eta=Dstar_trk_acc['pieta'].value[~Dstar_acc['wrg_chg'].value])
 
-        output['Dstar_pis_p'].fill(pt=Dstar_trk_acc['pis_pt'].value[~Dstar_acc['wrg_chg'].value],
-                                   eta=Dstar_trk_acc['pis_eta'].value[~Dstar_acc['wrg_chg'].value],
-                                   phi=Dstar_trk_acc['pis_phi'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pis_chindof'].fill(chindof=Dstar_trk_acc['pis_chindof'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pis_nValid'].fill(nValid=Dstar_trk_acc['pis_nValid'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pis_nPix'].fill(nPix=Dstar_trk_acc['pis_nPix'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pis_dxy'].fill(dxy=Dstar_trk_acc['pis_dxy'].value[~Dstar_acc['wrg_chg'].value])
-        output['Dstar_pis_dz'].fill(dz=Dstar_trk_acc['pis_dz'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pis_p'].fill(pt=Dstar_trk_acc['pispt'].value[~Dstar_acc['wrg_chg'].value],
+                                   eta=Dstar_trk_acc['piseta'].value[~Dstar_acc['wrg_chg'].value],
+                                   phi=Dstar_trk_acc['pisphi'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pis_chindof'].fill(chindof=Dstar_trk_acc['pischindof'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pis_nValid'].fill(nValid=Dstar_trk_acc['pisnValid'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pis_nPix'].fill(nPix=Dstar_trk_acc['pisnPix'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pis_dxy'].fill(dxy=Dstar_trk_acc['pisdxy'].value[~Dstar_acc['wrg_chg'].value])
+        output['Dstar_pis_dz'].fill(dz=Dstar_trk_acc['pisdz'].value[~Dstar_acc['wrg_chg'].value])
 
         ############# DimuDstar
         is_ups = DimuDstar_acc['Dimu']['is_ups'].value
