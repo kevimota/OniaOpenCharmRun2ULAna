@@ -267,6 +267,12 @@ class EventSelectorProcessor(processor.ProcessorABC):
         DimuDstar_acc['nDimuDstar'] = processor.column_accumulator(ak.to_numpy(ak.num(DimuDstar)))
         output['DimuDstar'] = DimuDstar_acc
 
+        evt_info_acc = processor.dict_accumulator({})
+        evt_info_acc['event'] = processor.column_accumulator(ak.to_numpy(events.event))
+        evt_info_acc['run'] = processor.column_accumulator(ak.to_numpy(events.run))
+        evt_info_acc['luminosityBlock'] = processor.column_accumulator(ak.to_numpy(events.luminosityBlock))
+        output['event_info'] = evt_info_acc
+
         file_hash = str(random.getrandbits(128)) + str(len(events))
         save(output, "output/" + self.analyzer_name + "/" + self.analyzer_name + "_" + file_hash + ".coffea")
 
