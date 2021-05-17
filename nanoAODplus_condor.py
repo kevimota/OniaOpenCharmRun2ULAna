@@ -33,7 +33,7 @@ output = processor.run_uproot_job(files,
                                 treename='Events',
                                 processor_instance=EventSelectorProcessor(name),
                                 executor=processor.iterative_executor,
-                                executor_args={'schema': BaseSchema},
+                                executor_args={'schema': BaseSchema, 'skipbadfiles': True},
                                 chunksize=10000,
                                 )
 
