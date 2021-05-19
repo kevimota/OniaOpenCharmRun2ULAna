@@ -287,9 +287,9 @@ class HistogramingProcessor(processor.ProcessorABC):
         output['Muon_lead_p'].fill(pt=Muon_lead_acc['pt'].value,
                                    eta=Muon_lead_acc['eta'].value,
                                    phi=Muon_lead_acc['phi'].value)
-        output['Muon_lead_pt'].fill(pt=Muon_lead_acc['pt'].value)
-        output['Muon_lead_eta'].fill(eta=Muon_lead_acc['eta'].value)
-        output['Muon_lead_phi'].fill(phi=Muon_lead_acc['phi'].value)
+        output['Muon_trail_pt'].fill(pt=Muon_trail_acc['pt'].value)
+        output['Muon_trail_eta'].fill(eta=Muon_trail_acc['eta'].value)
+        output['Muon_trail_phi'].fill(phi=Muon_trail_acc['phi'].value)
         output['Muon_trail_p'].fill(pt=Muon_trail_acc['pt'].value,
                                     eta=Muon_trail_acc['eta'].value,
                                     phi=Muon_trail_acc['phi'].value)
