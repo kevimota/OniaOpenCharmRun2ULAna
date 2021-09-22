@@ -186,6 +186,19 @@ class HistogramingProcessor(processor.ProcessorABC):
                                             hist.Bin("pt", r"$p_{T, \Upsilon D*}$ [GeV]", 50, 0, 50),
                                             hist.Bin("eta", r"$\eta_{\Upsilon D*}$", 50, -4, 4),
                                             hist.Bin("phi", r"$\phi_{\Upsilon D*}$", 50, -3.5, 3.5)),
+
+                'UpsilonDstar_deltarap_zoom': hist.Hist("Events", hist.Bin("deltarap", r"$\Delta y_{\Upsilon D^*}$", 50, -5, 5)),
+                'UpsilonDstar_deltapt_zoom': hist.Hist("Events", hist.Bin("deltapt", r"$\Delta p_{T,\Upsilon D*}$ [GeV]", 100, -50, 50)),
+                'UpsilonDstar_deltaeta_zoom': hist.Hist("Events", hist.Bin("deltaeta", r"$\Delta \eta_{\Upsilon D*}$", 50, -5, 5)),
+                'UpsilonDstar_deltaphi_zoom': hist.Hist("Events", hist.Bin("deltaphi", r"$\Delta \phi_{\Upsilon D*}$", 50, -3.5, 3.5)),
+                'UpsilonDstar_mass_zoom': hist.Hist("Events", hist.Bin("mass", r"$m_{\Upsilon D*}$ [GeV]", 100, 0, 50)),
+                'UpsilonDstar_pt_zoom': hist.Hist("Events", hist.Bin("pt", r"$p_{T, \Upsilon D*}$ [GeV]", 50, 0, 50)),
+                'UpsilonDstar_eta_zoom': hist.Hist("Events", hist.Bin("eta", r"$\eta_{\Upsilon D*}$", 50, -4, 4)),
+                'UpsilonDstar_phi_zoom': hist.Hist("Events", hist.Bin("phi", r"$\phi_{\Upsilon D*}$", 50, -3.5, 3.5)),
+                'UpsilonDstar_p_zoom': hist.Hist("Events", 
+                                            hist.Bin("pt", r"$p_{T, \Upsilon D*}$ [GeV]", 50, 0, 50),
+                                            hist.Bin("eta", r"$\eta_{\Upsilon D*}$", 50, -4, 4),
+                                            hist.Bin("phi", r"$\phi_{\Upsilon D*}$", 50, -3.5, 3.5)),
                 
                 'Dstar_pt': hist.Hist("Events",
                                   hist.Cat("chg", "charge"),
@@ -479,6 +492,28 @@ class HistogramingProcessor(processor.ProcessorABC):
         output['UpsilonDstar']['UpsilonDstar_p'].fill(pt=DimuDstar_p4.pt[is_ups & ~wrg_chg],
                                                       eta=DimuDstar_p4.eta[is_ups & ~wrg_chg],
                                                       phi=DimuDstar_p4.phi[is_ups & ~wrg_chg])
+        
+        sharp_mass_cut = ((DimuDstar_acc['Dimu']['mass'].value > 9.35) & (DimuDstar_acc['Dimu']['mass'].value < 9.55)) & ((DimuDstar_acc['Dstar']['deltamr'].value > 0.1445) & (DimuDstar_acc['Dstar']['deltamr'].value < 0.146))
+        UpsilonDstar_deltarap = DimuDstar_acc['deltarap'].value[is_ups & ~wrg_chg & sharp_mass_cut]
+        UpsilonDstar_deltapt = DimuDstar_acc['deltapt'].value[is_ups & ~wrg_chg & sharp_mass_cut]
+        UpsilonDstar_deltaeta = DimuDstar_acc['deltaeta'].value[is_ups & ~wrg_chg & sharp_mass_cut]
+        UpsilonDstar_deltaphi = DimuDstar_acc['deltaphi'].value[is_ups & ~wrg_chg & sharp_mass_cut]
+        UpsilonDstar_mass = DimuDstar_p4.mass[is_ups & ~wrg_chg & sharp_mass_cut]
+        UpsilonDstar_pt = DimuDstar_p4.pt[is_ups & ~wrg_chg & sharp_mass_cut]
+        UpsilonDstar_eta = DimuDstar_p4.eta[is_ups & ~wrg_chg & sharp_mass_cut]
+        UpsilonDstar_phi = DimuDstar_p4.phi[is_ups & ~wrg_chg & sharp_mass_cut]
+
+        output['UpsilonDstar']['UpsilonDstar_deltarap_zoom'].fill(deltarap=UpsilonDstar_deltarap)
+        output['UpsilonDstar']['UpsilonDstar_deltapt_zoom'].fill(deltapt=UpsilonDstar_deltapt)
+        output['UpsilonDstar']['UpsilonDstar_deltaeta_zoom'].fill(deltaeta=UpsilonDstar_deltaeta)
+        output['UpsilonDstar']['UpsilonDstar_deltaphi_zoom'].fill(deltaphi=UpsilonDstar_deltaphi)
+        output['UpsilonDstar']['UpsilonDstar_mass_zoom'].fill(mass=UpsilonDstar_mass)
+        output['UpsilonDstar']['UpsilonDstar_pt_zoom'].fill(pt=UpsilonDstar_pt)
+        output['UpsilonDstar']['UpsilonDstar_eta_zoom'].fill(eta=UpsilonDstar_eta)
+        output['UpsilonDstar']['UpsilonDstar_phi_zoom'].fill(phi=UpsilonDstar_phi)
+        output['UpsilonDstar']['UpsilonDstar_p_zoom'].fill(pt=UpsilonDstar_pt,
+                                                        eta=UpsilonDstar_eta,
+                                                        phi=UpsilonDstar_phi)
 
         # Jpsi
         output['JpsiDstar']['Jpsi_mass'].fill(mass=DimuDstar_acc['Dimu']['mass'].value[is_jpsi & ~wrg_chg])
