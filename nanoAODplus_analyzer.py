@@ -14,6 +14,7 @@ import yaml
 import argparse
 parser = argparse.ArgumentParser(description="Onia Open Charm NanoAOD analyzer")
 parser.add_argument("-n", "--name", help="Analyzer name", type=str, required=True)
+parser.add_argument("-y", "--year", help="Year of the dataset", type=str, required=True)
 parser.add_argument("-s", "--select", help="Do the evt selection", action="store_true")
 parser.add_argument("-m","--merge", help="Merge the accumulators that were output from a analyzer", action="store_true")
 parser.add_argument("-p","--plots", help="Create the plots from the merged accumulator", action="store_true")
@@ -34,16 +35,16 @@ if (args.select or args.analyze):
     if config_yaml['executor'] == 'futures_executor': 
         output = processor.run_uproot_job(files,
                                         treename='Events',
-                                        processor_instance=EventSelectorProcessor(args.name),
+                                        processor_instance=EventSelectorProcessor(args.name, args.year),
                                         executor=processor.futures_executor,
-					executor_args={"schema": BaseSchema, 'workers': config_yaml['n_cores'], 'skipbadfiles': True},
+					                    executor_args={"schema": BaseSchema, 'workers': config_yaml['n_cores'], 'skipbadfiles': True},
                                         chunksize=config_yaml['chunksize'],
                                         )
 
     elif config_yaml['executor'] == 'iterative_executor':
         output = processor.run_uproot_job(files,
                                         treename='Events',
-                                        processor_instance=EventSelectorProcessor(args.name),
+                                        processor_instance=EventSelectorProcessor(args.name, args.year),
                                         executor=processor.iterative_executor,
                                         executor_args={'schema': BaseSchema, 'skipbadfiles': True},
                                         chunksize=config_yaml['chunksize'],

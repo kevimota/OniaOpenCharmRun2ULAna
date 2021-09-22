@@ -42,8 +42,9 @@ def association(cand1, cand2):
     return asso
 
 class EventSelectorProcessor(processor.ProcessorABC):
-    def __init__(self, analyzer_name):
+    def __init__(self, analyzer_name, year):
         self.analyzer_name = analyzer_name
+        self.year = year
 
         self._accumulator = processor.dict_accumulator({
             'cutflow': processor.defaultdict_accumulator(int),
@@ -68,11 +69,13 @@ class EventSelectorProcessor(processor.ProcessorABC):
                         'charge': events.Dstar_pischg,
                         **get_vars_dict(events, dstar_cols)}, 
                         with_name="PtEtaPhiMCandidate")
+        #PVtx = ak.zip({**get_vars_dict(events, pvtx_cols)})
+        HLT = ak.zip({**get_vars_dict(events, hlt_cols[self.year])})
 
-        output['cutflow']['Number of events'] += len(events)
-        output['cutflow']['Number of Dimu'] += ak.sum(ak.num(Dimu))
-        output['cutflow']['all D0']      += ak.sum(ak.num(D0))
-        output['cutflow']['all Dstar']   += ak.sum(ak.num(Dstar))
+        output['cutflow']['Number of events']  += len(events)
+        output['cutflow']['Number of Dimu']    += ak.sum(ak.num(Dimu))
+        output['cutflow']['Number of D0']      += ak.sum(ak.num(D0))
+        output['cutflow']['Number of Dstar']   += ak.sum(ak.num(Dstar))
 
         ############### Dimu cuts charge = 0, mass cuts and chi2...
         Dimu = Dimu[Dimu.charge == 0]
@@ -272,6 +275,11 @@ class EventSelectorProcessor(processor.ProcessorABC):
         evt_info_acc['run'] = processor.column_accumulator(ak.to_numpy(events.run))
         evt_info_acc['luminosityBlock'] = processor.column_accumulator(ak.to_numpy(events.luminosityBlock))
         output['event_info'] = evt_info_acc
+
+        triggers_acc = processor.dict_accumulator({})
+        for var in HLT.fields:
+            triggers_acc[var] = processor.column_accumulator(ak.to_numpy(HLT[var]))
+        output['triggers'] = triggers_acc
 
         file_hash = str(random.getrandbits(128)) + str(len(events))
         save(output, "output/" + self.analyzer_name + "/" + self.analyzer_name + "_" + file_hash + ".coffea")
