@@ -70,7 +70,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
                         **get_vars_dict(events, dstar_cols)}, 
                         with_name="PtEtaPhiMCandidate")
         #PVtx = ak.zip({**get_vars_dict(events, pvtx_cols)})
-        HLT = ak.zip({**get_vars_dict(events, hlt_cols[self.year])})
+        HLT = ak.zip({**get_hlt(events, hlt_cols[self.year])})
 
         output['cutflow']['Number of events']  += len(events)
         output['cutflow']['Number of Dimu']    += ak.sum(ak.num(Dimu))

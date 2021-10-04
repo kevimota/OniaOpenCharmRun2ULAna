@@ -45,8 +45,6 @@ def get_vars_dict(events, col_list):
             if col.startswith('_'): col = col[1:]
         elif c.startswith('PVtx'):
             col = c[5:]
-        elif c.startswith("HLT"):
-            col = c
         else:
             Exception('Not good!')
 
@@ -57,4 +55,19 @@ def get_vars_dict(events, col_list):
             dict[col] = np.array([])
         else:
             dict[col] = events[c]
+    return dict
+
+def get_hlt(events, cols):
+    dict = {}
+    for col in cols:
+        if not cols in events.fields:
+            if len(events['run']) == 0:
+                dict[col] = np.array([])
+            else:
+                dict[col] = np.zeros(len(events), dtype=bool)
+        else:
+            if len(events[col]) == 0:
+                dict[col] = np.array([])
+            else:
+                dict[col] = events[col]
     return dict
