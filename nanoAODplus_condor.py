@@ -10,6 +10,8 @@ from nanoAODplus_processor.EventSelectorProcessor import EventSelectorProcessor
 from tools.merger import merger
 from tools.plotter import plotter
 
+years = ['2016', '2017', '2018']
+
 tstart = time.time()
 
 job = sys.argv[1]
@@ -19,11 +21,16 @@ with open(job) as f:
     file_list = f.read().splitlines()
 
 name = file_list[0].split('/')[-1].split('_')[0]
+year = ''
+for i in years:
+    if i in name:
+        year = i
+
 name = name + '_' + number
 
 files = {name: file_list}
 
-print(name)
+print(name, year)
 
 # creating necessary folders into dir output data
 os.system("mkdir -p output/" + name)
@@ -31,7 +38,7 @@ os.system("rm -rf output/" + name + "/*")
 
 output = processor.run_uproot_job(files,
                                 treename='Events',
-                                processor_instance=EventSelectorProcessor(name),
+                                processor_instance=EventSelectorProcessor(name, year),
                                 executor=processor.iterative_executor,
                                 executor_args={'schema': BaseSchema, 'skipbadfiles': True},
                                 chunksize=10000,
