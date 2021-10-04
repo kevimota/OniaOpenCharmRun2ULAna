@@ -69,7 +69,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
                         'charge': events.Dstar_pischg,
                         **get_vars_dict(events, dstar_cols)}, 
                         with_name="PtEtaPhiMCandidate")
-        #PVtx = ak.zip({**get_vars_dict(events, pvtx_cols)})
+        PVtx = ak.zip({**get_vars_dict(events, pvtx_cols)})
         HLT = ak.zip({**get_hlt(events, hlt_cols[self.year])})
 
         output['cutflow']['Number of events']  += len(events)
@@ -275,6 +275,11 @@ class EventSelectorProcessor(processor.ProcessorABC):
         evt_info_acc['run'] = processor.column_accumulator(ak.to_numpy(events.run))
         evt_info_acc['luminosityBlock'] = processor.column_accumulator(ak.to_numpy(events.luminosityBlock))
         output['event_info'] = evt_info_acc
+
+        PVtx_acc = processor.dict_accumulator({})
+        for var in PVtx.fields:
+            PVtx_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(PVtx[var])))
+        output['PVtx'] = PVtx_acc
 
         triggers_acc = processor.dict_accumulator({})
         for var in HLT.fields:
