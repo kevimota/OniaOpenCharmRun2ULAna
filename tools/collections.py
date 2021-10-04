@@ -45,6 +45,8 @@ def get_vars_dict(events, col_list):
             if col.startswith('_'): col = col[1:]
         elif c.startswith('PVtx'):
             col = c[5:]
+        elif c.startswith("HLT"):
+            col = c
         else:
             Exception('Not good!')
 
