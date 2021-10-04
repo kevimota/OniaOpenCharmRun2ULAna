@@ -279,6 +279,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         PVtx_acc = processor.dict_accumulator({})
         for var in PVtx.fields:
             PVtx_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(PVtx[var])))
+        PVtx_acc['nPVtx'] = processor.column_accumulator(ak.to_numpy(ak.num(PVtx)))
         output['PVtx'] = PVtx_acc
 
         triggers_acc = processor.dict_accumulator({})
