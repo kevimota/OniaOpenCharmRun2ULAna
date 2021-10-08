@@ -60,7 +60,7 @@ def get_vars_dict(events, col_list):
 def get_hlt(events, cols):
     dict = {}
     for col in cols:
-        if not cols in events.fields:
+        if not col in events.fields:
             if len(events['run']) == 0:
                 dict[col] = np.array([])
             else:
