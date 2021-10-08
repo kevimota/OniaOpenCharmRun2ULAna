@@ -93,10 +93,10 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Muon = Muon[soft_id]
         output['cutflow']['Dimu muon softId'] += ak.sum(ak.num(Dimu))
 
-        global_muon = (Muon.slot0.isGlobal > 0) & (Muon.slot1.isGlobal > 0)
+        """ global_muon = (Muon.slot0.isGlobal > 0) & (Muon.slot1.isGlobal > 0)
         Dimu = Dimu[global_muon]
         Muon = Muon[global_muon]
-        output['cutflow']['Dimu muon global'] += ak.sum(ak.num(Dimu))
+        output['cutflow']['Dimu muon global'] += ak.sum(ak.num(Dimu)) """
 
         # pt and eta cuts
         muon_pt_cut = (Muon.slot0.pt > 3) & (Muon.slot1.pt > 3)
