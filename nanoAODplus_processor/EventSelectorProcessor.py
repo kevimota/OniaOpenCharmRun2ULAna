@@ -18,7 +18,6 @@ def association(cand1, cand2):
     computation of quantities can go here. individual cuts can go on the main processing'''
     asso = ak.cartesian([cand1, cand2])
     asso = asso[asso.slot0.vtxIdx == asso.slot1.vtxIdx]
-    asso = asso[ak.num(asso) > 0]
     cand1 = ak.zip({
             'pt': asso.slot0.pt,
             'eta': asso.slot0.eta,
