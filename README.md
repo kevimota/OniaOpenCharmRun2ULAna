@@ -6,17 +6,17 @@ Repository for Quarkonia + Open Charm Analysis using Run2 UL datasets.
 
 ## Setting up the conda environment
 
-Miniconda should be installed as in:
+Using Miniforge as python package manager:
 
-https://conda.io/projects/conda/en/latest/user-guide/install/linux.html
+https://github.com/conda-forge/miniforge
+
+To install in a UNIX-like platform:
 
 ```
 cd ~
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b 
-~/miniconda3/bin/conda init
-echo 'conda deactivate ; conda deactivate' >> ~/.bashrc
-rm Miniconda3-latest-Linux-x86_64.sh
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh -b 
+conda config --set auto_activate_base false
 ```
 
 After installation, reload the session.
@@ -25,12 +25,8 @@ After installation, reload the session.
 
 ```
 conda deactivate ; conda deactivate 
-
 conda env create -f environment.yml
-
-# for jupyterlab w/ ipython widgets
 conda activate OniaOpenCharmRun2ULenv
-jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 #only if CMSSW needed:
 
