@@ -21,7 +21,7 @@ with open(job) as f:
     file_list = f.read().splitlines()
 
 name = file_list[0].split('/')[-1].split('_')[0]
-year = ''
+year = '2017'
 for i in years:
     if i in name:
         year = i
