@@ -1,0 +1,13 @@
+trigger: 
+  "2016": "HLT_Dimuon13_Upsilon"
+  "2017": "HLT_Dimuon24_Upsilon_noCorrL1"
+  "2018": "HLT_Dimuon24_Upsilon_noCorrL1"
+
+limits: 
+  Upsilon_pt: 12
+  Upsilon_eta: 2.5
+  Dstar_pt: 0.0
+  Dstar_eta: 2.5
+  Dstar_D0_pt: 3
+  Dstar_D0_eta: 2.5
+  right_charge_only: True
