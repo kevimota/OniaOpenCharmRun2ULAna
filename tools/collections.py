@@ -32,24 +32,15 @@ def get_vars_dict(events, col_list):
     dict = {}
     col = ''
     for c in col_list:
-        if c.startswith('Muon'):
-            col = c[5:]
-        elif c.startswith('Dimu'):
-            col = c[4:]
-            if col.startswith('_'): col = col[1:]
-        elif c.startswith('D0'):
-            col = c[2:]
-            if col.startswith('_'): col = col[1:]
-        elif c.startswith('Dstar'):
-            col = c[5:]
-            if col.startswith('_'): col = col[1:]
-        elif c.startswith('PVtx'):
-            col = c[5:]
+        col = c[c.find("_")+1:]
+        if len(events[c]) == 0:
+            dict[col] = np.array([])
         else:
-            Exception('Not good!')
+            dict[col] = events[c]
 
-        if col == 'x' or col == 'y' or col == 'z':
-            col = 'vtx_' + col
+        if not c[:c.find("_")] == 'PVtx':
+            if col == 'x' or col == 'y' or col == 'z':
+                col = 'v' + col
 
         if len(events[c]) == 0:
             dict[col] = np.array([])

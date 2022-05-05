@@ -4,7 +4,7 @@ channels:
 dependencies:
   - python = 3.9
   - xrootd
-  - coffea == 0.7.7
+  - coffea == 0.7.14
   - pip
   - root
   - jupyterlab >= 3

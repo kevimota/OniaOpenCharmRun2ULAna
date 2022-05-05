@@ -36,13 +36,17 @@ print(name, year)
 os.system("mkdir -p output/" + name)
 os.system("rm -rf output/" + name + "/*")          
 
-output = processor.run_uproot_job(files,
-                                treename='Events',
-                                processor_instance=EventSelectorProcessor(name, year),
-                                executor=processor.iterative_executor,
-                                executor_args={'schema': BaseSchema, 'skipbadfiles': True},
-                                chunksize=10000,
-                                )
+runner = processor.Runner(
+                executor=processor.IterativeExecutor(compression=None),
+                schema=BaseSchema,
+                skipbadfiles=True, 
+                chunksize=10000
+            )
+
+output = runner(files,
+                treename='Events',
+                processor_instance=EventSelectorProcessor(name, year),
+                )
 
 elapsed = round(time.time() - tstart, 2)
 print(f"Process finished in: {elapsed} s")

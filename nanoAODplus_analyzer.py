@@ -34,22 +34,26 @@ if __name__ == '__main__':
         os.system("rm -rf output/" + args.name + "/*")          
 
         if config_yaml['executor'] == 'futures_executor': 
-            output = processor.run_uproot_job(files,
-                                            treename='Events',
-                                            processor_instance=EventSelectorProcessor(args.name, args.year),
-                                            executor=processor.futures_executor,
-                                            executor_args={"schema": BaseSchema, 'workers': config_yaml['n_cores'], 'skipbadfiles': True},
-                                            chunksize=config_yaml['chunksize'],
-                                            )
+            runner = processor.Runner(
+                executor=processor.FuturesExecutor(compression=None, workers=config_yaml['n_cores']),
+                schema=BaseSchema,
+                skipbadfiles=True, 
+                chunksize=config_yaml['chunksize']
+            )
 
         elif config_yaml['executor'] == 'iterative_executor':
-            output = processor.run_uproot_job(files,
-                                            treename='Events',
-                                            processor_instance=EventSelectorProcessor(args.name, args.year),
-                                            executor=processor.iterative_executor,
-                                            executor_args={'schema': BaseSchema, 'skipbadfiles': True},
-                                            chunksize=config_yaml['chunksize'],
-                                            )
+            runner = processor.Runner(
+                executor=processor.IterativeExecutor(compression=None),
+                schema=BaseSchema,
+                skipbadfiles=True, 
+                chunksize=config_yaml['chunksize']
+            )
+
+        output = runner(
+            files,
+            treename="Events",
+            processor_instance=EventSelectorProcessor(args.name, args.year)
+        )
 
         elapsed = round(time.time() - tstart, 2)
         print(f"Process finished in: {elapsed} s")
