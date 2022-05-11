@@ -117,7 +117,8 @@ class Skimmer:
         DimuDstar = DimuDstar[np.absolute(DimuDstar.dstar_d0_eta) < self.config['limits']['Dstar_D0_eta']]
         DimuDstar = DimuDstar[~DimuDstar.wrg_chg]
 
-        filename = f"{f[:f.rfind('/')]}/skim{f[f.rfind('/'):]}"
+        folder = f[f.rfind('/'):f.rfind('_')]
+        filename = f"output/RunII_trigger_processed/{self.year}{folder}{f[f.rfind('/'):]}"
         
         pDimu_acc = build_acc(Dimu)
         pDstar_acc = build_acc(Dstar)
@@ -142,7 +143,7 @@ def get_coffea_files(path):
     return files
 
 def merger(path):
-    files = get_coffea_files(f"{path}/skim")
+    files = get_coffea_files(path)
     for idx, f in tqdm(enumerate(files), desc="Merging", unit=" files", total=len(files)):
         if (idx == 0): 
             acc = load(f)
@@ -151,13 +152,15 @@ def merger(path):
         os.system("rm -rf " + f)
 
     filename = files[0][:files[0].rfind("_")] + ".coffea"
+    #filename = f'output/RunII_trigger_processed/{year}/MuOniaRun{year}.coffea'
     save(acc, filename)
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description="Apply trigger and skim dataset")
-    parser.add_argument("-p", "--path", help="Analyzer name", type=str, required=True)
+    parser.add_argument("-p", "--path", help="Path to coffea files", type=str, required=True)
     parser.add_argument("-y", "--year", help="Year of the dataset", type=str, required=True)
+    parser.add_argument("-m", "--merge", help="Merge output", action="store_true")
     args = parser.parse_args()
 
     years = ['2016', '2017', '2018']
@@ -168,8 +171,10 @@ if __name__ == '__main__':
     config_run = yaml.load(open("config/multicore.yaml", "r"), Loader=yaml.FullLoader)
     config_trigger = yaml.load(open("config/skim_trigger.yaml", "r"), Loader=yaml.FullLoader)
 
-    os.system(f"mkdir -p {args.path}/skim")
-    os.system(f"rm -rf {args.path}/skim/*")
+    folder = args.path[args.path.rfind('/'):args.path.rfind('_')]
+    path = f"output/RunII_trigger_processed/{args.year}{folder}"
+    os.system(f"mkdir -p {path}")
+    os.system(f"rm -rf {path}/*")
 
     files = get_coffea_files(args.path)  
 
@@ -192,7 +197,8 @@ if __name__ == '__main__':
     elapsed = round(time.time() - tstart, 2)
     print(f"Skimming finished in: {elapsed} s")
 
-    print("Starting merging process...")
-    merger(args.path)
+    if (args.merge):
+        print("Starting merging process...")
+        merger(path)
 
     print("DONE!")
