@@ -9,36 +9,9 @@ ak.behavior.update(candidate.behavior)
 import random
 
 from tools.collections import *
+from tools.utils import *
 
 D0_PDG_MASS = 1.864
-
-
-def association(cand1, cand2):
-    ''' Function for association of the particles. The cuts that operates on all of them and 
-    computation of quantities can go here. individual cuts can go on the main processing'''
-    asso = ak.cartesian([cand1, cand2])
-    asso = asso[asso.slot0.vtxIdx == asso.slot1.vtxIdx]
-    cand1 = ak.zip({
-            'pt': asso.slot0.pt,
-            'eta': asso.slot0.eta,
-            'phi': asso.slot0.phi,
-            'mass': asso.slot0.mass,
-            'charge': asso.slot0.charge}, with_name="PtEtaPhiMCandidate")
-
-    cand2 = ak.zip({
-            'pt': asso.slot1.pt,
-            'eta': asso.slot1.eta,
-            'phi': asso.slot1.phi,
-            'mass': asso.slot1.mass,
-            'charge': asso.slot1.charge}, with_name="PtEtaPhiMCandidate")
-
-    asso['deltarap'] = asso.slot0.rap - asso.slot1.rap
-    asso['deltapt'] = asso.slot0.pt - asso.slot1.pt
-    asso['deltaeta'] = asso.slot0.eta - asso.slot1.eta
-    asso['deltaphi'] = asso.slot0.phi - asso.slot1.phi
-    asso['cand'] = cand1 + cand2
-    
-    return asso
 
 class EventSelectorProcessor(processor.ProcessorABC):
     def __init__(self, analyzer_name, year):
@@ -103,44 +76,13 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Muon = Muon[muon_pt_cut]
         output['cutflow']['Dimu muon pt cut'] += ak.sum(ak.num(Dimu))
 
-        muon_eta_cut = (np.absolute(Muon.slot0.eta) <= 2.4) & (np.absolute(Muon.slot1.eta) <= 2.4)
+        muon_eta_cut = (np.absolute(Muon.slot0.eta) < 2.4) & (np.absolute(Muon.slot1.eta) < 2.4)
         Dimu = Dimu[muon_eta_cut]
         Muon = Muon[muon_eta_cut]
         output['cutflow']['Dimu muon eta cut'] += ak.sum(ak.num(Dimu))
 
         Dimu['is_ups'] = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
         Dimu['is_jpsi'] = (Dimu.mass > 2.95) & (Dimu.mass < 3.25)
-
-        ############### Cuts for D0
-        D0 = D0[~D0.hasMuon]
-        output['cutflow']['D0 trk muon cut'] += ak.sum(ak.num(D0))
-
-        D0 = D0[(D0.t1pt > 0.8) & (D0.t2pt > 0.8)]
-        output['cutflow']['D0 trk pt cut'] += ak.sum(ak.num(D0))
-
-        D0 = D0[(D0.t1chindof < 2.5) & (D0.t2chindof < 2.5)]
-        output['cutflow']['D0 trk chi2 cut'] += ak.sum(ak.num(D0))
-
-        D0 = D0[(D0.t1nValid > 4) & (D0.t2nValid > 4) & (D0.t1nPix > 1) & (D0.t2nPix > 1)]
-        output['cutflow']['D0 trk hits cut'] += ak.sum(ak.num(D0))
-
-        D0 = D0[(D0.t1dxy < 0.1) & (D0.t2dxy < 0.1)]
-        output['cutflow']['D0 trk dxy cut'] += ak.sum(ak.num(D0))
-
-        D0 = D0[(D0.t1dz < 1.) & (D0.t2dz < 1.)]
-        output['cutflow']['D0 trk dz cut'] += ak.sum(ak.num(D0))
-
-        # D0 cosphi
-        D0 = D0[D0.cosphi > 0.99]
-        output['cutflow']['D0 cosphi cut'] += ak.sum(ak.num(D0))
-
-        # D0 dl Significance
-        D0 = D0[D0.dlSig > 5.]
-        output['cutflow']['D0 dlSig cut'] += ak.sum(ak.num(D0))
-
-        # D0 pt
-        D0 = D0[D0.pt > 3.]
-        output['cutflow']['D0 pt cut'] += ak.sum(ak.num(D0))
 
         ############### Cuts for Dstar
 
@@ -191,6 +133,61 @@ class EventSelectorProcessor(processor.ProcessorABC):
         ############### Dimu + OpenCharm associations
 
         DimuDstar = association(Dimu, Dstar)
+        calc = ak.zip({
+            'x': DimuDstar.slot0.x - DimuDstar.slot1.D0x,
+            'y': DimuDstar.slot0.y - DimuDstar.slot1.D0y,
+            'z': DimuDstar.slot0.z - DimuDstar.slot1.D0z,
+            'Dimu_Covxx': DimuDstar.slot0.Covxx,
+            'Dimu_Covyx': DimuDstar.slot0.Covyx,
+            'Dimu_Covzx': DimuDstar.slot0.Covzx,
+            'Dimu_Covyy': DimuDstar.slot0.Covyy,
+            'Dimu_Covzy': DimuDstar.slot0.Covzy,
+            'Dimu_Covzz': DimuDstar.slot0.Covzz,
+            'Dstar_Covxx': D0[DimuDstar.slot1.D0recIdx].Covxx,
+            'Dstar_Covyx': D0[DimuDstar.slot1.D0recIdx].Covyx,
+            'Dstar_Covzx': D0[DimuDstar.slot1.D0recIdx].Covzx,
+            'Dstar_Covyy': D0[DimuDstar.slot1.D0recIdx].Covyy,
+            'Dstar_Covzy': D0[DimuDstar.slot1.D0recIdx].Covzy,
+            'Dstar_Covzz': D0[DimuDstar.slot1.D0recIdx].Covzz,
+            }, with_name='ThreeVector')
+
+        err = np.sqrt(calc.x*calc.x*(calc.Dimu_Covxx + calc.Dstar_Covxx) + 2*calc.x*calc.y*(calc.Dimu_Covyx + calc.Dstar_Covyx) + 
+                calc.y*calc.y*(calc.Dimu_Covyy + calc.Dstar_Covyy) + 2*calc.x*calc.z*(calc.Dimu_Covzx + calc.Dstar_Covzx) +
+                calc.z*calc.z*(calc.Dimu_Covzz + calc.Dstar_Covzz) + 2*calc.y*calc.z*(calc.Dimu_Covzy + calc.Dstar_Covzy))
+
+        DimuDstar['d'] = calc.p
+        DimuDstar['dSig'] = calc.p/err
+
+        ############### Cuts for D0
+        D0 = D0[~D0.hasMuon]
+        output['cutflow']['D0 trk muon cut'] += ak.sum(ak.num(D0))
+
+        D0 = D0[(D0.t1pt > 0.8) & (D0.t2pt > 0.8)]
+        output['cutflow']['D0 trk pt cut'] += ak.sum(ak.num(D0))
+
+        D0 = D0[(D0.t1chindof < 2.5) & (D0.t2chindof < 2.5)]
+        output['cutflow']['D0 trk chi2 cut'] += ak.sum(ak.num(D0))
+
+        D0 = D0[(D0.t1nValid > 4) & (D0.t2nValid > 4) & (D0.t1nPix > 1) & (D0.t2nPix > 1)]
+        output['cutflow']['D0 trk hits cut'] += ak.sum(ak.num(D0))
+
+        D0 = D0[(D0.t1dxy < 0.1) & (D0.t2dxy < 0.1)]
+        output['cutflow']['D0 trk dxy cut'] += ak.sum(ak.num(D0))
+
+        D0 = D0[(D0.t1dz < 1.) & (D0.t2dz < 1.)]
+        output['cutflow']['D0 trk dz cut'] += ak.sum(ak.num(D0))
+
+        # D0 cosphi
+        D0 = D0[D0.cosphi > 0.99]
+        output['cutflow']['D0 cosphi cut'] += ak.sum(ak.num(D0))
+
+        # D0 dl Significance
+        D0 = D0[D0.dlSig > 5.]
+        output['cutflow']['D0 dlSig cut'] += ak.sum(ak.num(D0))
+
+        # D0 pt
+        D0 = D0[D0.pt > 3.]
+        output['cutflow']['D0 pt cut'] += ak.sum(ak.num(D0))
 
         ############### Final computation of number of objects
         output['cutflow']['Dimu final']    += ak.sum(ak.num(Dimu))
