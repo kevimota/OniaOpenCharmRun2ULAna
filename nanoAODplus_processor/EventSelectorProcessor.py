@@ -116,27 +116,26 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Dstar pis hits cut'] += ak.sum(ak.num(Dstar))
 
         # D0 of Dstar cuts
-        Dstar = Dstar[Dstar.D0cosphi > 0.99]
-        output['cutflow']['Dstar D0 cosphi cut'] += ak.sum(ak.num(Dstar))
+        #Dstar = Dstar[Dstar.D0cosphi > 0.99]
+        #output['cutflow']['Dstar D0 cosphi cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.025) & (Dstar.D0mass > D0_PDG_MASS - 0.025)]
-        output['cutflow']['Dstar D0 mass cut'] += ak.sum(ak.num(Dstar))
+        #Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.025) & (Dstar.D0mass > D0_PDG_MASS - 0.025)]
+        #output['cutflow']['Dstar D0 mass cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[Dstar.D0pt > 3]
-        output['cutflow']['Dstar D0 pt cut'] += ak.sum(ak.num(Dstar))
+        #Dstar = Dstar[Dstar.D0pt > 3]
+        #output['cutflow']['Dstar D0 pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[Dstar.D0dlSig > 3]
-        output['cutflow']['Dstar D0 dlSig cut'] += ak.sum(ak.num(Dstar))
+        #Dstar = Dstar[Dstar.D0dlSig > 3]
+        #output['cutflow']['Dstar D0 dlSig cut'] += ak.sum(ak.num(Dstar))
 
         Dstar['wrg_chg'] = (Dstar.Kchg == Dstar.pichg)
 
         ############### Dimu + OpenCharm associations
-
         DimuDstar = association(Dimu, Dstar)
         calc = ak.zip({
-            'x': DimuDstar.slot0.x - DimuDstar.slot1.D0x,
-            'y': DimuDstar.slot0.y - DimuDstar.slot1.D0y,
-            'z': DimuDstar.slot0.z - DimuDstar.slot1.D0z,
+            'x': DimuDstar.slot0.x - D0[DimuDstar.slot1.D0recIdx].x,
+            'y': DimuDstar.slot0.y - D0[DimuDstar.slot1.D0recIdx].y,
+            'z': DimuDstar.slot0.z - D0[DimuDstar.slot1.D0recIdx].z,
             'Dimu_Covxx': DimuDstar.slot0.Covxx,
             'Dimu_Covyx': DimuDstar.slot0.Covyx,
             'Dimu_Covzx': DimuDstar.slot0.Covzx,
@@ -156,6 +155,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
                 calc.z*calc.z*(calc.Dimu_Covzz + calc.Dstar_Covzz) + 2*calc.y*calc.z*(calc.Dimu_Covzy + calc.Dstar_Covzy))
 
         DimuDstar['d'] = calc.p
+        DimuDstar['derr'] = err
         DimuDstar['dSig'] = calc.p/err
 
         ############### Cuts for D0
