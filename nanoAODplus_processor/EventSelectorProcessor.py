@@ -116,17 +116,17 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Dstar pis hits cut'] += ak.sum(ak.num(Dstar))
 
         # D0 of Dstar cuts
-        #Dstar = Dstar[Dstar.D0cosphi > 0.99]
-        #output['cutflow']['Dstar D0 cosphi cut'] += ak.sum(ak.num(Dstar))
+        Dstar = Dstar[Dstar.D0cosphi > 0.95]
+        output['cutflow']['Dstar D0 cosphi cut'] += ak.sum(ak.num(Dstar))
 
-        #Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.025) & (Dstar.D0mass > D0_PDG_MASS - 0.025)]
-        #output['cutflow']['Dstar D0 mass cut'] += ak.sum(ak.num(Dstar))
+        Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.030) & (Dstar.D0mass > D0_PDG_MASS - 0.030)]
+        output['cutflow']['Dstar D0 mass cut'] += ak.sum(ak.num(Dstar))
 
         #Dstar = Dstar[Dstar.D0pt > 3]
         #output['cutflow']['Dstar D0 pt cut'] += ak.sum(ak.num(Dstar))
 
-        #Dstar = Dstar[Dstar.D0dlSig > 3]
-        #output['cutflow']['Dstar D0 dlSig cut'] += ak.sum(ak.num(Dstar))
+        Dstar = Dstar[Dstar.D0dlSig > 1]
+        output['cutflow']['Dstar D0 dlSig cut'] += ak.sum(ak.num(Dstar))
 
         Dstar['wrg_chg'] = (Dstar.Kchg == Dstar.pichg)
 
