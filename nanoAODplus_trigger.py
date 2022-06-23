@@ -5,132 +5,16 @@ from concurrent.futures import ProcessPoolExecutor
 from tqdm.auto import tqdm
 
 import awkward as ak
-import numpy as np
 from coffea.util import load, save
-from coffea import processor
 
 from coffea.nanoevents.methods import candidate
 ak.behavior.update(candidate.behavior)
 
+from nanoAODplus_processor.Skimmers import Skimmer, FOM
+
 from tools.utils import *
 
 import yaml
-
-class Skimmer:
-    def __init__(self, config, year):
-        if config is None or year is None:
-            print("Configuration not complete!!!")
-        self.config = config
-        self.year = year
-
-    def process(self, f):
-        # Load the accumulator
-        acc = load(f)
-        
-        Dimu_acc = acc['Dimu']
-        Dstar_acc = acc['Dstar']
-        Dstar_D0_acc = acc['Dstar_D0']
-        DimuDstar_acc = acc['DimuDstar']
-        triggers = acc['triggers']
-
-        # Loading variables as awkward arrays
-        Dimu = ak.zip({
-                'pt': Dimu_acc['pt'].value,
-                'eta': Dimu_acc['eta'].value,
-                'phi': Dimu_acc['phi'].value,
-                'mass': Dimu_acc['mass'].value,
-                'rap': Dimu_acc['rap'].value,
-                'dl': Dimu_acc['dl'].value,
-                'dlSig': Dimu_acc['dlSig'].value,
-                'chi2': Dimu_acc['chi2'].value,
-                'cosphi': Dimu_acc['cosphi'].value,
-                'is_ups': Dimu_acc['is_ups'].value,}, with_name="PtEtaPhiMLorentzVector")
-
-        Dstar = ak.zip({
-                'pt': Dstar_acc['pt'].value,
-                'eta': Dstar_acc['eta'].value,
-                'phi': Dstar_acc['phi'].value,
-                'mass': Dstar_acc['mass'].value,
-                'rap': Dstar_acc['rap'].value,
-                'charge': Dstar_acc['charge'].value,
-                'deltam': Dstar_acc['deltam'].value,
-                'deltamr': Dstar_acc['deltamr'].value,
-                'D0cosphi': Dstar_D0_acc['D0cosphi'].value,
-                'D0dlSig': Dstar_D0_acc['D0dlSig'].value,
-                'D0pt': Dstar_D0_acc['D0pt'].value,
-                'D0eta': Dstar_D0_acc['D0eta'].value,
-                'wrg_chg': Dstar_acc['wrg_chg'].value,}, with_name='PtEtaPhiMCandidate')
-
-        DimuDstar_p4 = build_p4(DimuDstar_acc)
-        DimuDstar = ak.zip({
-                'pt': DimuDstar_p4.pt,
-                'eta': DimuDstar_p4.eta,
-                'phi': DimuDstar_p4.phi,
-                'mass': DimuDstar_p4.mass,
-                'charge': DimuDstar_acc['charge'].value,
-                'dimu_mass': DimuDstar_acc['Dimu']['mass'].value,
-                'dimu_pt': DimuDstar_acc['Dimu']['pt'].value,
-                'dimu_eta': DimuDstar_acc['Dimu']['eta'].value,
-                'dimu_phi': DimuDstar_acc['Dimu']['phi'].value,
-                'dimu_rap': DimuDstar_acc['Dimu']['rap'].value,
-                'dstar_deltam': DimuDstar_acc['Dstar']['deltam'].value,
-                'dstar_deltamr': DimuDstar_acc['Dstar']['deltamr'].value,
-                'dstar_pt': DimuDstar_acc['Dstar']['pt'].value,
-                'dstar_eta': DimuDstar_acc['Dstar']['eta'].value,
-                'dstar_phi': DimuDstar_acc['Dstar']['phi'].value,
-                'dstar_rap': DimuDstar_acc['Dstar']['rap'].value,
-                'dstar_d0_pt': DimuDstar_acc['Dstar']['D0pt'].value,
-                'dstar_d0_eta': DimuDstar_acc['Dstar']['D0eta'].value,
-                'deltarap': DimuDstar_acc['deltarap'].value,
-                'deltapt': DimuDstar_acc['deltapt'].value,
-                'deltaeta': DimuDstar_acc['deltaeta'].value,
-                'deltaphi': DimuDstar_acc['deltaphi'].value,
-                'is_ups': DimuDstar_acc['Dimu']['is_ups'].value,
-                'wrg_chg': DimuDstar_acc['Dstar']['wrg_chg'].value,}, with_name='PtEtaPhiMCandidate')
-
-        # Unflatten
-        Dimu = ak.unflatten(Dimu, Dimu_acc['nDimu'].value)
-        Dstar = ak.unflatten(Dstar, Dstar_acc['nDstar'].value)
-        DimuDstar = ak.unflatten(DimuDstar, DimuDstar_acc['nDimuDstar'].value)
-
-        #Apply the Trigger and the cuts in the config
-        HLT = triggers[self.config['trigger'][self.year]].value
-        Dimu = Dimu[HLT]
-        Dstar = Dstar[HLT]
-        DimuDstar = DimuDstar[HLT]
-        
-        Dimu = Dimu[Dimu.pt > self.config['limits']['Upsilon_pt']]
-        Dimu = Dimu[np.absolute(Dimu.eta) < self.config['limits']['Upsilon_eta']]
-        Dimu = Dimu[Dimu.is_ups]
-        DimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_pt']]
-        DimuDstar = DimuDstar[np.absolute(DimuDstar.dimu_eta) < self.config['limits']['Upsilon_eta']]
-        DimuDstar = DimuDstar[DimuDstar.is_ups]
-
-        Dstar = Dstar[Dstar.pt > self.config['limits']['Dstar_pt']]
-        Dstar = Dstar[np.absolute(Dstar.eta) < self.config['limits']['Dstar_eta']]
-        Dstar = Dstar[Dstar.D0pt > self.config['limits']['Dstar_D0_pt']]
-        Dstar = Dstar[np.absolute(Dstar.D0eta) < self.config['limits']['Dstar_D0_eta']]
-        Dstar = Dstar[~Dstar.wrg_chg]
-        DimuDstar = DimuDstar[DimuDstar.dstar_pt > self.config['limits']['Dstar_pt']]
-        DimuDstar = DimuDstar[np.absolute(DimuDstar.dstar_eta) < self.config['limits']['Dstar_eta']]
-        DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
-        DimuDstar = DimuDstar[np.absolute(DimuDstar.dstar_d0_eta) < self.config['limits']['Dstar_D0_eta']]
-        DimuDstar = DimuDstar[~DimuDstar.wrg_chg]
-
-        folder = f[f.rfind('/'):f.rfind('_')]
-        filename = f"output/RunII_trigger_processed/{self.year}{folder}{f[f.rfind('/'):]}"
-        
-        pDimu_acc = build_acc(Dimu)
-        pDstar_acc = build_acc(Dstar)
-        pDimuDstar_acc = build_acc(DimuDstar)
-
-        output = processor.dict_accumulator({
-            'Dimu': pDimu_acc,
-            'Dstar': pDstar_acc,
-            'DimuDstar': pDimuDstar_acc
-        })
-
-        save(output, filename)
 
 def get_coffea_files(path):
     files = []
@@ -161,6 +45,7 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--path", help="Path to coffea files", type=str, required=True)
     parser.add_argument("-y", "--year", help="Year of the dataset", type=str, required=True)
     parser.add_argument("-m", "--merge", help="Merge output", action="store_true")
+    parser.add_argument("-f", "--fom", help="create the FOM datasets", action="store_true")
     args = parser.parse_args()
 
     years = ['2016', '2017', '2018']
@@ -170,11 +55,21 @@ if __name__ == '__main__':
 
     config_run = yaml.load(open("config/multicore.yaml", "r"), Loader=yaml.FullLoader)
     config_trigger = yaml.load(open("config/skim_trigger.yaml", "r"), Loader=yaml.FullLoader)
+    if args.fom:
+        config_fom = yaml.load(open("config/fom.yaml", "r"), Loader=yaml.FullLoader)
 
     folder = args.path[args.path.rfind('/'):args.path.rfind('_')]
-    path = f"output/RunII_trigger_processed/{args.year}{folder}"
+    if args.fom: path = f"output/fom/{args.year}{folder}"
+    else: path = f"output/RunII_trigger_processed/{args.year}{folder}"
+
     os.system(f"mkdir -p {path}")
     os.system(f"rm -rf {path}/*")
+
+    if args.fom:
+        for var in config_fom:
+            if var == 'path': continue
+            for lim in config_fom[var]:
+                os.system(f"mkdir -p {path}/{var}/{str(lim).replace('.', 'p')}")
 
     files = get_coffea_files(args.path)  
 
@@ -182,7 +77,8 @@ if __name__ == '__main__':
         print("No files were found in the specified directory. Exiting...")
         sys.exit()
     
-    s = Skimmer(config_trigger, args.year)
+    if args.fom: s = FOM(config_trigger, config_fom, args.year)
+    else: s = Skimmer(config_trigger, args.year)
     print("Starting processing the files...")
     
     tstart = time.time()
@@ -199,6 +95,13 @@ if __name__ == '__main__':
 
     if (args.merge):
         print("Starting merging process...")
-        merger(path)
+        if args.fom: 
+            for var in config_fom:
+                if var == 'path': continue
+                print(f"Merging process: {var}")
+                for lim in config_fom[var]:
+                    l = str(lim).replace('.', 'p')
+                    merger(f'{path}/{var}/{l}')
+        else: merger(path)
 
     print("DONE!")

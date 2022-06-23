@@ -5,9 +5,11 @@ trigger:
 
 limits: 
   Upsilon_pt: 12
-  Upsilon_eta: 2.5
+  Upsilon_rap: 2.5
   Dstar_pt: 0.0
-  Dstar_eta: 2.5
-  Dstar_D0_pt: 3
-  Dstar_D0_eta: 2.5
+  Dstar_rap: 2.5
+  Dstar_D0_pt: 3.
+  Dstar_D0_cosphi: 0.99
+  Dstar_D0_mass: 0.028
+  Dstar_D0_dlSig: 3
   right_charge_only: True
