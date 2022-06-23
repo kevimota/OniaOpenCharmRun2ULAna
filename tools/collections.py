@@ -23,7 +23,8 @@ dstar_cols = ['Dstar_pt', 'Dstar_eta', 'Dstar_phi', 'Dstar_rap', 'Dstar_deltam',
               'Dstar_pispt', 'Dstar_piseta', 'Dstar_pisphi', 'Dstar_pisvtxIdx', 'Dstar_pischindof', 'Dstar_pisnValid', 'Dstar_pisnPix',
               'Dstar_pisdxy', 'Dstar_pisdz',]
 
-pvtx_cols = ['PVtx_isGood', 'PVtx_x', 'PVtx_y', 'PVtx_z', 'PVtx_Id', 'PVtx_sumPt', 'PVtx_ntrk']
+pvtx_cols = ['PVtx_isGood', 'PVtx_x', 'PVtx_y', 'PVtx_z', 'PVtx_Id', 'PVtx_sumPt', 'PVtx_ntrk',
+             'PVtx_Covxx', 'PVtx_Covyx', 'PVtx_Covzx', 'PVtx_Covyy', 'PVtx_Covzy', 'PVtx_Covzz',]
 
 hlt_cols = {'2016': ['HLT_Dimuon13_Upsilon', 'HLT_Dimuon8_Upsilon_Barrel'],
             '2017': ['HLT_Dimuon10_Upsilon_Barrel_Seagulls', 'HLT_Dimuon12_Upsilon_eta1p5', 'HLT_Dimuon24_Upsilon_noCorrL1'],

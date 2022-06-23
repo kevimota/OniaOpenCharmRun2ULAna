@@ -11,8 +11,6 @@ import random
 from tools.collections import *
 from tools.utils import *
 
-D0_PDG_MASS = 1.864
-
 class EventSelectorProcessor(processor.ProcessorABC):
     def __init__(self, analyzer_name, year):
         self.analyzer_name = analyzer_name

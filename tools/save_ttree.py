@@ -23,38 +23,39 @@ def load_acc(file_list):
         acc += load(i)
     return acc
 
-def create_ttree(acc, out, n=None):
+def create_ttree(acc, out, n=None, association_only=False):
     if n is None:
         n = ""
     else:
         n = "_" + str(n)
 
-    Upsilon = acc['Dimu']
-    Dstar = acc['Dstar']
+    if not association_only:
+        Upsilon = acc['Dimu']
+        Dstar = acc['Dstar']
+        filename = f"{out}/Upsilon{n}.root"
+        print(f"Saving Upsilon data to {filename}")
+        with uproot3.recreate(filename) as f:
+            tree_dict = {}
+            data_dict = {}
+            for key in Upsilon.keys():
+                tree_dict[key] = "float64"
+                data_dict[key] = Upsilon[key].value
+            f['Upsilon'] = uproot3.newtree(tree_dict)
+            f['Upsilon'].extend(data_dict)
+
+        filename = f"{out}/Dstar{n}.root"
+        print(f"Saving Dstar data to {filename}")
+        with uproot3.recreate(filename) as f:
+            tree_dict = {}
+            data_dict = {}
+            for key in Dstar.keys():
+                tree_dict[key] = "float64"
+                data_dict[key] = Dstar[key].value
+            f['Dstar'] = uproot3.newtree(tree_dict)
+            f['Dstar'].extend(data_dict)
+    
     UpsilonDstar = acc['DimuDstar']
-
-    filename = f"{out}/Upsilon{n}.root"
-    print(f"Saving Upsilon data to {filename}")
-    with uproot3.recreate(filename) as f:
-        tree_dict = {}
-        data_dict = {}
-        for key in Upsilon.keys():
-            tree_dict[key] = "float64"
-            data_dict[key] = Upsilon[key].value
-        f['Upsilon'] = uproot3.newtree(tree_dict)
-        f['Upsilon'].extend(data_dict)
-
-    filename = f"{out}/Dstar{n}.root"
-    print(f"Saving Dstar data to {filename}")
-    with uproot3.recreate(filename) as f:
-        tree_dict = {}
-        data_dict = {}
-        for key in Dstar.keys():
-            tree_dict[key] = "float64"
-            data_dict[key] = Dstar[key].value
-        f['Dstar'] = uproot3.newtree(tree_dict)
-        f['Dstar'].extend(data_dict)
-
+    
     filename = f"{out}/UpsilonDstar{n}.root"
     print(f"Saving UpsilonDstar data to {filename}")
     with uproot3.recreate(f"{filename}") as f:
@@ -71,6 +72,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Create TTree from coffea files")
     parser.add_argument("-p", "--path", help="Path of the coffea files", type=str, required=True)
     parser.add_argument("-o", "--out", help="Output file to be written", type=str, required=True)
+    parser.add_argument("-a", "--association", help="Save association ttree only", action="store_true")
 
     args = parser.parse_args()
 
@@ -95,4 +97,5 @@ if __name__ == '__main__':
             gc.collect()
     else:
         acc = load_acc(chunks[0])
-        create_ttree(acc, args.out)
+        if args.association: create_ttree(acc, args.out, association_only=True)
+        else: create_ttree(acc, args.out)

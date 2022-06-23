@@ -1,6 +1,8 @@
 import re
 import awkward as ak
 
+D0_PDG_MASS = 1.864
+
 def atoi(text):
     return int(text) if text.isdigit() else text
 
@@ -13,7 +15,7 @@ def natural_keys(text):
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
 def build_p4(acc):
-    p4 = ak.zip({'x': acc['x'].value, 
+    p4 = ak.zip({'x': acc['x'].value,
                  'y': acc['y'].value,
                  'z': acc['z'].value,
                  't': acc['t'].value}, with_name="LorentzVector")
