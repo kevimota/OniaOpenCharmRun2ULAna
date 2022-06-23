@@ -1,20 +1,5 @@
-import ROOT
-
 import yaml, sys, os
 from fit.fit_fom import *
-
-ROOT.gInterpreter.Declare('''
-int fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year) {
-    std::cout << param << " " << value << " " << alpha_CB << " " << n_CB << " " << year << std::endl;
-    for (auto& i : path){
-        std::cout << i << std::endl;
-    }
-    for (auto& i : fit_params){
-        std::cout << i << std::endl;
-    } 
-    return 0
-}
-''')
 
 if __name__ == '__main__':
     import argparse
