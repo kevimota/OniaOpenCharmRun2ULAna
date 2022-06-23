@@ -27,6 +27,9 @@ if __name__ == '__main__':
     with open("config/skim_trigger.yaml", 'r') as f:
         trigger = yaml.load(f, Loader=yaml.FullLoader)['trigger'][args.year]
 
+    if args.plot:
+        os.system(f'mkdir -p plots/fom/{args.year}')
+
     processed_lumi = 0
     for era in lumi:
         processed_lumi += lumi[era][trigger]
