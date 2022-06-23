@@ -1,0 +1,26 @@
+dlSig: [1.0, 1.5, 2.0, 2.3, 2.5, 2.7, 2.8, 2.9, 3.0, 3.2, 3.4, 3.6, 4.0, 4.5, 5.0]
+D0pt: [3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0, 9.0, 10.0]
+cosphi: [0.95, 0.96, 0.97, 0.98, 0.99, 0.995, 0.999]
+#dSig: [400, 300, 250, 200, 150, 100, 80, 60, 50, 40, 30, 20]
+
+path:
+  '2016': 
+  - output/fom/2016/MuOniaRun2016B-ver2-HIPM
+  - output/fom/2016/MuOniaRun2016C-HIPM
+  - output/fom/2016/MuOniaRun2016D-HIPM
+  - output/fom/2016/MuOniaRun2016E-HIPM
+  - output/fom/2016/MuOniaRun2016F
+  - output/fom/2016/MuOniaRun2016F-HIPM
+  - output/fom/2016/MuOniaRun2016G
+  - output/fom/2016/MuOniaRun2016H
+  '2017':
+  - output/fom/2017/MuOniaRun2017B
+  - output/fom/2017/MuOniaRun2017C
+  - output/fom/2017/MuOniaRun2017D
+  - output/fom/2017/MuOniaRun2017E
+  - output/fom/2017/MuOniaRun2017F
+  '2018':
+  - output/fom/2018/MuOniaRun2018A
+  - output/fom/2018/MuOniaRun2018B
+  - output/fom/2018/MuOniaRun2018C
+  - output/fom/2018/MuOniaRun2018D
