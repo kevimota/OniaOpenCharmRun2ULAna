@@ -34,6 +34,7 @@ if __name__ == '__main__':
     for era in lumi:
         processed_lumi += lumi[era][trigger]
 
+    failed = {}
     for param in config:
         if param == 'path': continue
         if args.plot: 
@@ -44,6 +45,14 @@ if __name__ == '__main__':
             path = config['path'][args.year]
             if args.plot: 
                 path = path[0][:path[0].rfind('/')]
-                plot_results(param, str(value).replace('.', 'p'), path, args.year, processed_lumi)
+                r = plot_results(param, str(value).replace('.', 'p'), path, args.year, processed_lumi)
+                if r != 0:
+                    if param in failed.keys(): failed[param] = [value]
+                    else: failed[param].append(value)
             else: fit_fom(param, config['path'][args.year], str(value).replace('.', 'p'), fit, alpha_CB, n_CB, args.year)
+    if args.plot:
+        if len(failed.keys()) > 0:
+            print("Fit failed for following values:")
+            print(failed)
+        else: print("Good values for chi2 for all the plots!!!")
             
