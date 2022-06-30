@@ -12,4 +12,5 @@ limits:
   Dstar_D0_cosphi: 0.99
   Dstar_D0_mass: 0.028
   Dstar_D0_dlSig: 3
+  Dstar_track_pt: 0.5
   right_charge_only: True

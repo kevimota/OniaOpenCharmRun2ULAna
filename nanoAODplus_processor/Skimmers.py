@@ -177,6 +177,8 @@ class FOM:
                 'dstar_d0_mass': DimuDstar_acc['Dstar']['D0mass'].value,
                 'dstar_d0_cosphi': DimuDstar_acc['Dstar']['D0cosphi'].value,
                 'dstar_d0_dlSig': DimuDstar_acc['Dstar']['D0dlSig'].value,
+                'dstar_k_pt': DimuDstar_acc['Dstar']['Kpt'].value,
+                'dstar_pi_pt': DimuDstar_acc['Dstar']['pipt'].value,
                 'deltarap': DimuDstar_acc['deltarap'].value,
                 'deltapt': DimuDstar_acc['deltapt'].value,
                 'deltaeta': DimuDstar_acc['deltaeta'].value,
@@ -209,6 +211,8 @@ class FOM:
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
                 DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
+                DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
+                DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
                 for i in self.fom[var]:
                     DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
@@ -226,6 +230,8 @@ class FOM:
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
                 DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
+                DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
+                DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
                 for i in self.fom[var]:
                     DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
@@ -243,6 +249,8 @@ class FOM:
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
                 DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
+                DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
+                DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
                 for i in self.fom[var]:
                     DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
@@ -260,8 +268,28 @@ class FOM:
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
                 DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
+                DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
+                DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
                 for i in self.fom[var]:
                     DimuDstar = DimuDstar[DimuDstar.dSig < i]
+                    folder = f[f.rfind('/'):f.rfind('_')]
+                    filename = f"output/fom/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
+                    
+                    pDimuDstar_acc = build_acc(DimuDstar)
+
+                    output = processor.dict_accumulator({
+                        'DimuDstar': pDimuDstar_acc
+                    })
+                    save(output, filename)
+
+            elif var == 'track_pt':
+                DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
+                DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
+                DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
+                DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
+                for i in self.fom[var]:
+                    DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > i]
+                    DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
                     filename = f"output/fom/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
                     
