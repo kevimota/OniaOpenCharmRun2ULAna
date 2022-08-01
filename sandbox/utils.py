@@ -13,12 +13,14 @@ def natural_keys(text):
     '''
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
             
-def get_root_files(paths):
+def get_files(paths, pattern='.root', exclude=None):
     files = []
     for path in paths:
         with os.scandir(path) as it:
             for file in it:
-                if file.name.endswith('.root') and (file.stat().st_size != 0):
+                if file.name.find(pattern) > -1 and (file.stat().st_size != 0):
+                    if not exclude == None: 
+                        if file.name.find(exclude) > -1: continue
                     files.append(file.path)
     files.sort(key=natural_keys)
     return files
@@ -100,24 +102,29 @@ cuts_category = {
     0: "No cuts",
     1: "Dimu charge = 0",
     2: "8.5 < Dimu mass < 11.5",
-    3: "Muon pt > 3 GeV",
-    4: "Muon |eta| < 2.5",
-    5: "Muon Soft Id",
-    6: "D* tracks are not muons",
-    7: "K and pi charge = 0 ",
-    8: "D* |eta| < 2.5",
-    9: "D0 from D* |eta| < 2.5",
-    10: "D* pt > 2 GeV",
-    11: "D* D0 tracks reduced chi2 < 2.5",
-    12: "D* D0 tracks hits >4 in tracker >1 pix",
-    13: "D* D0 tracks dxy < 0.1",
-    14: "D* D0 tracks dz < 1",
-    15: "D* pi slow track reduced chi2 < 3",
-    16: "D* pi slow # hits in the tracker > 2",
-    17: "D0 of D* |mass - D0_PDG_mass| < 0.028",
-    18: "D0 of D* cossine of pointing angle > 0.99",
-    19: "D0 of D* decay length significance > 3",
-    20: "Apply the Triggers",
+    3: "Dimu pt > 9 GeV",
+    4: "Dimu |eta| < 3.0",
+    5: "Muon pt > 3 GeV",
+    6: "Muon |eta| < 2.5",
+    7: "Muon Soft Id",
+    8: "D* tracks are not muons",
+    9: "K and pi charge = 0 ",
+    10: "D* |eta| < 2.5",
+    11: "D0 from D* |eta| < 2.5",
+    12: "D* pt > 2 GeV",
+    13: "D* D0 tracks reduced chi2 < 2.5",
+    14: "D* D0 tracks hits >4 in tracker >1 pix",
+    15: "D* D0 tracks dxy < 0.1",
+    16: "D* D0 tracks dz < 1",
+    17: "D* pi slow track reduced chi2 < 3",
+    18: "D* pi slow # hits in the tracker > 2",
+    19: "D0 of D* pT > 3 GeV",
+    20: "D0 of D* |eta| < 2.5",
+    21: "D0 of D* |mass - D0_PDG_mass| < 0.025",
+    22: "D0 of D* cossine of pointing angle > 0.99",
+    23: "D0 of D* decay length significance > 3",
+    24: "D* |eta| < 2.5",
+    25: "Apply the Triggers",
 }
 
 """ cuts_category = {

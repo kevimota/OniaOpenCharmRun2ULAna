@@ -19,7 +19,7 @@ def fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year):
     for f in path:
         chain.Add(f"{f}/{param}/{value}/UpsilonDstar.root")
 
-    wspace = ROOT.RooWorkspace(f"upsilondstar_fom_{year}")
+    wspace = ROOT.RooWorkspace(f"upsilondstar_fom_{param}{value}_{year}")
     upsilon_mass = ROOT.RooRealVar("dimu_mass", "Mass Upsilon", 8.7, 11.2)
     dstar_deltamr = ROOT.RooRealVar("dstar_deltamr", "Dstar Delta m", 0.141, 0.158)
     data = ROOT.RooDataSet("data", 
@@ -92,9 +92,9 @@ def fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year):
     result = model2D.fitTo(data, ROOT.RooFit.BatchMode("cpu"), ROOT.RooFit.Save())
 
     print("Fit DONE. Saving workspace and params to " + save_path)
-    getattr(wspace, "import")(data)
-    getattr(wspace, "import")(model2D)
-    getattr(wspace, "import")(result)
+    wspace.Import(data)
+    wspace.Import(model2D)
+    wspace.Import(result)
 
     os.system('mkdir -p ' + save_path)
 
@@ -110,7 +110,7 @@ def plot_results(param, value, path, year, lumi):
         return
 
     f = ROOT.TFile.Open(f"{path}/{param}/{value}/UpsilonDstar_fit.root")
-    wspace = f.Get(f"upsilondstar_fom_{year}")
+    wspace = f.Get(f"upsilondstar_fom_{param}{value}_{year}")
 
     all_vars = []
     upsilon_mass = wspace.var("dimu_mass")
@@ -204,7 +204,6 @@ def plot_results(param, value, path, year, lumi):
     c2.Draw()
     plot.CMS_lumi(c2, 4, 1)
 
-
     chi2_label_dstar = ROOT.TLatex()
     chi2_label_dstar.SetNDC()
     chi2_label_dstar.SetTextFont(43)
@@ -212,6 +211,9 @@ def plot_results(param, value, path, year, lumi):
     chi2_label_dstar.DrawLatex(.80, 0.65,"#chi^{2} = " + f'{chi2_dstar:.2f}')
 
     c2.SaveAs(f"plots/fom/{year}/fit2D_dstar_proj_{param}{value}_{year}.png")
+
+    if (chi2_dstar > 3) or (chi2_upsilon > 3): return -1
+    else: return 0
 
 
 def plot_fom(param, config, path, year, lumi):
@@ -222,7 +224,7 @@ def plot_fom(param, config, path, year, lumi):
     for i in config:
         value = str(i).replace('.', 'p')
         f = ROOT.TFile.Open(f"{path}/{param}/{value}/UpsilonDstar_fit.root")
-        wspace = f.Get(f"upsilondstar_fom_{year}")
+        wspace = f.Get(f"upsilondstar_fom_{param}{value}_{year}")
 
         data = wspace.data("data")
         model2D = wspace.pdf("model2D")

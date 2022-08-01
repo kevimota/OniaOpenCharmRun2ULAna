@@ -20,7 +20,7 @@ def create_plot1d(hist1d, log=False, ax=None, lumi=None):
     if ax == None:
         ax = plt.gca()
 
-    hist1d.plot1d(ax=ax, fill=True, ec=(0,0,0,0.5))
+    x = mplhep.histplot(hist1d, ax=ax, histtype="fill")
     
     if not lumi == None:
         lumi = plt.text(1., 1., lumi + r" fb$^{-1}$ (13 TeV)",
