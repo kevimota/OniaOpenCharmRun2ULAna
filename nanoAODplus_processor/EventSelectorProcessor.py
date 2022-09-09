@@ -27,7 +27,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
     def process(self, events):
         output = self.accumulator.identity()
         
-        # test if there is any events in the file
+        # test if there are any events in the file
         if len(events) == 0:
             return output
         
@@ -130,7 +130,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
         ############### Dimu + OpenCharm associations
         DimuDstar = association(Dimu, Dstar)
-        calc = ak.zip({
+        """ calc = ak.zip({
             'x': DimuDstar.slot0.x - D0[DimuDstar.slot1.D0recIdx].x,
             'y': DimuDstar.slot0.y - D0[DimuDstar.slot1.D0recIdx].y,
             'z': DimuDstar.slot0.z - D0[DimuDstar.slot1.D0recIdx].z,
@@ -154,7 +154,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
         DimuDstar['d'] = calc.p
         DimuDstar['derr'] = err
-        DimuDstar['dSig'] = calc.p/err
+        DimuDstar['dSig'] = calc.p/err """
 
         ############### Cuts for D0
         D0 = D0[~D0.hasMuon]

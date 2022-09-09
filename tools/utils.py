@@ -1,4 +1,4 @@
-import re
+import os, re
 import awkward as ak
 
 D0_PDG_MASS = 1.864
@@ -58,3 +58,32 @@ def association(cand1, cand2):
     asso['cand'] = cand1 + cand2
     
     return asso
+
+def get_files(paths, pattern='.root', exclude=None):
+    files = []
+    for path in paths:
+        for it in os.scandir(path):
+            exclude_file = True
+            if it.name.find(pattern) > -1 and (it.stat().st_size != 0):
+                exclude_file = False
+                if not exclude == None:
+                    for e in exclude:
+                        if it.name.find(e) > -1: exclude_file = True
+            if not exclude_file: files.append(it.path)
+    files.sort(key=natural_keys)
+    return files
+
+def save_kin_hists(hists, cand, gen=False, get_deltam=False):
+    hists['pt'].fill(pt=ak.flatten(cand.pt))
+    hists['eta'].fill(eta=ak.flatten(cand.eta))
+    hists['phi'].fill(phi=ak.flatten(cand.phi))
+    if not gen: 
+        if get_deltam: hists['deltam'].fill(deltam=ak.flatten(cand.deltamr))
+        else: hists['mass'].fill(mass=ak.flatten(cand.mass))
+
+def get_n(array):
+    array2 = array[ak.fill_none(array, -1) > -1]
+    return ak.num(array2)
+
+def remove_none(array):
+    return ak.fill_none(array, -99) > -1
