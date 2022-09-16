@@ -117,7 +117,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dstar = Dstar[Dstar.D0cosphi > 0.95]
         output['cutflow']['Dstar D0 cosphi cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.030) & (Dstar.D0mass > D0_PDG_MASS - 0.030)]
+        Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.040) & (Dstar.D0mass > D0_PDG_MASS - 0.040)]
         output['cutflow']['Dstar D0 mass cut'] += ak.sum(ak.num(Dstar))
 
         #Dstar = Dstar[Dstar.D0pt > 3]
