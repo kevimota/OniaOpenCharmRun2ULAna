@@ -1,5 +1,6 @@
 import os, re
 import awkward as ak
+import numpy as np
 
 D0_PDG_MASS = 1.864
 
@@ -35,7 +36,8 @@ def build_acc(obj, name=None):
 def association(cand1, cand2):
     ''' Function for association of the particles. The cuts that operates on all of them and 
     computation of quantities can go here. individual cuts can go on the main processing'''
-    asso = ak.cartesian([cand1, cand2])
+    cand2 = cand2[cand2.associationIdx >= 0]
+    asso = ak.zip({'0': cand1[cand2.associationIdx], '1': cand2})
     
     cand1 = ak.zip({
             'pt': asso.slot0.pt,
@@ -54,7 +56,7 @@ def association(cand1, cand2):
     asso['deltarap'] = asso.slot0.rap - asso.slot1.rap
     asso['deltapt'] = asso.slot0.pt - asso.slot1.pt
     asso['deltaeta'] = asso.slot0.eta - asso.slot1.eta
-    asso['deltaphi'] = asso.slot0.phi - asso.slot1.phi
+    asso['deltaphi'] = np.remainder(np.abs(asso.slot0.phi - asso.slot1.phi), np.pi)
     asso['cand'] = cand1 + cand2
     
     return asso

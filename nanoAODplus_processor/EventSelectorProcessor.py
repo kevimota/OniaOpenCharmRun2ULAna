@@ -48,20 +48,20 @@ class EventSelectorProcessor(processor.ProcessorABC):
         output['cutflow']['Number of Dstar']   += ak.sum(ak.num(Dstar))
 
         ############### Dimu cuts charge = 0, mass cuts and chi2...
-        Dimu = Dimu[Dimu.charge == 0]
-        output['cutflow']['Dimu 0 charge'] += ak.sum(ak.num(Dimu))
+        Dimu = ak.mask(Dimu, Dimu.charge == 0)
+        output['cutflow']['Dimu 0 charge'] += ak.sum(ak.num(Dimu[remove_none(Dimu.pt)]))
 
-        Dimu = Dimu[((Dimu.mass > 8.5) & (Dimu.mass < 11.5)) | ((Dimu.mass > 2.95) & (Dimu.mass < 3.25))]
-        output['cutflow']['Quarkonia mass'] += ak.sum(ak.num(Dimu))
+        Dimu = ak.mask(Dimu, ((Dimu.mass > 8.5) & (Dimu.mass < 11.5)) | ((Dimu.mass > 2.95) & (Dimu.mass < 3.25)))
+        output['cutflow']['Quarkonia mass'] += ak.sum(ak.num(Dimu[remove_none(Dimu.pt)]))
 
         ############### Get the Muons from Dimu, for cuts in their params
         Muon = ak.zip({'0': Muon[Dimu.t1muIdx], '1': Muon[Dimu.t2muIdx]})
 
         # SoftId and Global Muon cuts
         soft_id = (Muon.slot0.softId > 0) & (Muon.slot1.softId > 0)
-        Dimu = Dimu[soft_id]
-        Muon = Muon[soft_id]
-        output['cutflow']['Dimu muon softId'] += ak.sum(ak.num(Dimu))
+        Dimu = ak.mask(Dimu, soft_id)
+        Muon = ak.mask(Muon, soft_id)
+        output['cutflow']['Dimu muon softId'] += ak.sum(ak.num(Dimu[remove_none(Dimu.pt)]))
 
         """ global_muon = (Muon.slot0.isGlobal > 0) & (Muon.slot1.isGlobal > 0)
         Dimu = Dimu[global_muon]
@@ -70,14 +70,14 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
         # pt and eta cuts
         muon_pt_cut = (Muon.slot0.pt > 3) & (Muon.slot1.pt > 3)
-        Dimu = Dimu[muon_pt_cut]
-        Muon = Muon[muon_pt_cut]
-        output['cutflow']['Dimu muon pt cut'] += ak.sum(ak.num(Dimu))
+        Dimu = ak.mask(Dimu, muon_pt_cut)
+        Muon = ak.mask(Muon, muon_pt_cut)
+        output['cutflow']['Dimu muon pt cut'] += ak.sum(ak.num(Dimu[remove_none(Dimu.pt)]))
 
         muon_eta_cut = (np.absolute(Muon.slot0.eta) < 2.4) & (np.absolute(Muon.slot1.eta) < 2.4)
-        Dimu = Dimu[muon_eta_cut]
-        Muon = Muon[muon_eta_cut]
-        output['cutflow']['Dimu muon eta cut'] += ak.sum(ak.num(Dimu))
+        Dimu = ak.mask(Dimu, muon_eta_cut)
+        Muon = ak.mask(Muon, muon_eta_cut)
+        output['cutflow']['Dimu muon eta cut'] += ak.sum(ak.num(Dimu[remove_none(Dimu.pt)]))
 
         Dimu['is_ups'] = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
         Dimu['is_jpsi'] = (Dimu.mass > 2.95) & (Dimu.mass < 3.25)
@@ -130,31 +130,8 @@ class EventSelectorProcessor(processor.ProcessorABC):
 
         ############### Dimu + OpenCharm associations
         DimuDstar = association(Dimu, Dstar)
-        """ calc = ak.zip({
-            'x': DimuDstar.slot0.x - D0[DimuDstar.slot1.D0recIdx].x,
-            'y': DimuDstar.slot0.y - D0[DimuDstar.slot1.D0recIdx].y,
-            'z': DimuDstar.slot0.z - D0[DimuDstar.slot1.D0recIdx].z,
-            'Dimu_Covxx': DimuDstar.slot0.Covxx,
-            'Dimu_Covyx': DimuDstar.slot0.Covyx,
-            'Dimu_Covzx': DimuDstar.slot0.Covzx,
-            'Dimu_Covyy': DimuDstar.slot0.Covyy,
-            'Dimu_Covzy': DimuDstar.slot0.Covzy,
-            'Dimu_Covzz': DimuDstar.slot0.Covzz,
-            'Dstar_Covxx': D0[DimuDstar.slot1.D0recIdx].Covxx,
-            'Dstar_Covyx': D0[DimuDstar.slot1.D0recIdx].Covyx,
-            'Dstar_Covzx': D0[DimuDstar.slot1.D0recIdx].Covzx,
-            'Dstar_Covyy': D0[DimuDstar.slot1.D0recIdx].Covyy,
-            'Dstar_Covzy': D0[DimuDstar.slot1.D0recIdx].Covzy,
-            'Dstar_Covzz': D0[DimuDstar.slot1.D0recIdx].Covzz,
-            }, with_name='ThreeVector')
-
-        err = np.sqrt(calc.x*calc.x*(calc.Dimu_Covxx + calc.Dstar_Covxx) + 2*calc.x*calc.y*(calc.Dimu_Covyx + calc.Dstar_Covyx) + 
-                calc.y*calc.y*(calc.Dimu_Covyy + calc.Dstar_Covyy) + 2*calc.x*calc.z*(calc.Dimu_Covzx + calc.Dstar_Covzx) +
-                calc.z*calc.z*(calc.Dimu_Covzz + calc.Dstar_Covzz) + 2*calc.y*calc.z*(calc.Dimu_Covzy + calc.Dstar_Covzy))
-
-        DimuDstar['d'] = calc.p
-        DimuDstar['derr'] = err
-        DimuDstar['dSig'] = calc.p/err """
+        DimuDstar = DimuDstar[ak.fill_none(DimuDstar.slot0.pt, -1) > -1]
+        Dimu = Dimu[remove_none(Dimu.pt)]
 
         ############### Cuts for D0
         D0 = D0[~D0.hasMuon]
@@ -197,6 +174,8 @@ class EventSelectorProcessor(processor.ProcessorABC):
         leading_mu = (Muon.slot0.pt > Muon.slot1.pt)
         Muon_lead = ak.where(leading_mu, Muon.slot0, Muon.slot1)
         Muon_trail = ak.where(~leading_mu, Muon.slot0, Muon.slot1)
+        Muon_lead = Muon_lead[remove_none(Muon_lead.pt)]
+        Muon_trail = Muon_trail[remove_none(Muon_trail.pt)]
 
         ############### Create the accumulators to save output
         muon_lead_acc = processor.dict_accumulator({})
