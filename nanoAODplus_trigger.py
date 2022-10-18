@@ -1,5 +1,5 @@
 import time
-import os, sys, re
+import os, sys
 
 from concurrent.futures import ProcessPoolExecutor
 from tqdm.auto import tqdm
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     parser.add_argument("-f", "--fom", help="create the FOM datasets", action="store_true")
     args = parser.parse_args()
 
-    years = ['2016', '2017', '2018']
+    years = ['2016APV', '2016', '2017', '2018']
     if args.year not in years:
         print("Year not in Run II, exiting...")
         sys.exit()
@@ -59,8 +59,8 @@ if __name__ == '__main__':
         config_fom = yaml.load(open("config/fom.yaml", "r"), Loader=yaml.FullLoader)
 
     folder = args.path[args.path.rfind('/'):args.path.rfind('_')]
-    if args.fom: path = f"output/fom/{args.year}{folder}"
-    else: path = f"output/RunII_trigger_processed/{args.year}{folder}"
+    if args.fom: path = f"output/fom_vtxfit/{args.year}{folder}"
+    else: path = f"output/RunII_trigger_processed_vtxfit/{args.year}{folder}"
 
     os.system(f"mkdir -p {path}")
     os.system(f"rm -rf {path}/*")
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         for f in tqdm(files, total=len(files), unit=" files", desc="Processing"):
             s.process(f)
     else:
-        with ProcessPoolExecutor(max_workers=config_run['n_cores']) as executor:
+        with ProcessPoolExecutor(max_workers=len(files) if (len(files) < config_run['n_cores']) else config_run['n_cores']) as executor:
             list(tqdm(executor.map(s.process, files), total=len(files), unit=" files", desc="Processing"))
 
     elapsed = round(time.time() - tstart, 2)
