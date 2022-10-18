@@ -4,7 +4,7 @@ from fit.fit_fom import *
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description="Run fit routines to data")
-    parser.add_argument("-y", "--year", help="Year to fit", type=str, required=True)
+    parser.add_argument("-y", "--year", help="Year to fit", nargs='+', type=str, required=True)
     parser.add_argument("-p", "--plot", help="Create FOM plots", action="store_true")
     args = parser.parse_args()
 
@@ -13,43 +13,52 @@ if __name__ == '__main__':
     with open('config/fit.yaml', 'r') as f:
         fit = yaml.load(f, Loader=yaml.FullLoader)
 
-    if args.year not in config['path']:
-        print("Year not found in the config file!")
-        sys.exit()
+    for year in args.year:
+        if year not in config['path']:
+            print(f"Year {year} not found in the config file!")
+            sys.exit()
 
-    with open(f'output/RunII_trigger_processed/{args.year}/Upsilon_fit_params.yaml') as f:
+    y = max(args.year)
+    with open(f'output/RunII_trigger_processed_vtxfit/{y}/Upsilon_fit_params.yaml') as f:
         fit_params = yaml.load(f, Loader=yaml.FullLoader)
         alpha_CB = fit_params['alpha_CB']['value']
         n_CB = fit_params['n_CB']['value']
 
-    with open("config/lumi.yaml", 'r') as f:
-        lumi = yaml.load(f, Loader=yaml.FullLoader)[args.year]
+    processed_lumi = 0
     with open("config/skim_trigger.yaml", 'r') as f:
-        trigger = yaml.load(f, Loader=yaml.FullLoader)['trigger'][args.year]
+        trigger = yaml.load(f, Loader=yaml.FullLoader)['trigger']
+    with open("config/lumi.yaml", 'r') as f:
+        lumis = yaml.load(f, Loader=yaml.FullLoader)
+        for year in args.year:
+            for era in lumis[year]:
+                processed_lumi += lumis[year][era][trigger[year]]
+
+    f_name = ""
+    if len(args.year) > 1:
+        for year in args.year:
+            f_name += year+'-'
+        f_name = f_name[:-1]
+    else: 
+        f_name = args.year[0]
 
     if args.plot:
-        os.system(f'mkdir -p plots/fom/{args.year}')
-
-    processed_lumi = 0
-    for era in lumi:
-        processed_lumi += lumi[era][trigger]
+        os.system(f'mkdir -p plots/fom_vtxfit/{f_name}')  
 
     failed = {}
     for param in config:
         if param == 'path': continue
+        failed[param] = []
         if args.plot: 
-            path = config['path'][args.year]
-            path = path[0][:path[0].rfind('/')]
-            plot_fom(param, config[param], path, args.year, processed_lumi)
+            path = f'output/fom_vtxfit/{f_name}'
+            plot_fom(param, config[param], path, f_name, processed_lumi)
         for value in config[param]:
-            path = config['path'][args.year]
+            path = [p for y in args.year for p in config['path'][y]]
             if args.plot: 
-                path = path[0][:path[0].rfind('/')]
-                r = plot_results(param, str(value).replace('.', 'p'), path, args.year, processed_lumi)
+                path = f'output/fom_vtxfit/{f_name}'
+                r = plot_results(param, str(value).replace('.', 'p'), path, f_name, processed_lumi)
                 if r != 0:
-                    if param in failed.keys(): failed[param] = [value]
-                    else: failed[param].append(value)
-            else: fit_fom(param, config['path'][args.year], str(value).replace('.', 'p'), fit, alpha_CB, n_CB, args.year)
+                    failed[param].append(value)
+            else: fit_fom(param, path, str(value).replace('.', 'p'), fit, alpha_CB, n_CB, f_name)
     if args.plot:
         if len(failed.keys()) > 0:
             print("Fit failed for following values:")

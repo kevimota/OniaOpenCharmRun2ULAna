@@ -7,6 +7,7 @@ from tools.figure import create_fom
 
 import os
 import numpy as np
+from uncertainties import unumpy
 
 colors_hex = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33']
 TColor = ROOT.TColor()
@@ -21,13 +22,15 @@ def fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year):
 
     wspace = ROOT.RooWorkspace(f"upsilondstar_fom_{param}{value}_{year}")
     upsilon_mass = ROOT.RooRealVar("dimu_mass", "Mass Upsilon", 8.7, 11.2)
-    dstar_deltamr = ROOT.RooRealVar("dstar_deltamr", "Dstar Delta m", 0.141, 0.158)
+    dstar_deltamr = ROOT.RooRealVar("dstar_deltamr", "Dstar Delta m ", 0.14, 0.158)
     data = ROOT.RooDataSet("data", 
                        "Data 2D Upsilon + Dstar", 
                        ROOT.RooArgSet(upsilon_mass, dstar_deltamr), 
                        ROOT.RooFit.Import(chain))
 
-    save_path = path[0][:path[0].rfind('/')] + f'/{param}/{value}'
+    save_path = f'output/fom_vtxfit/{year}/{param}/{value}'
+    os.system(f'mkdir -p {save_path}')
+    #save_path = path[0][:path[0].rfind('/')] + f'/{param}/{value}'
 
     # Signal PDFs
     m1S = ROOT.RooRealVar("m1S","PDG mass Upsilon(1S)", fit_params['Upsilon']['M1S'])
@@ -42,7 +45,8 @@ def fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year):
     sigma3S  = ROOT.RooFormulaVar("sigma3S","@0*@1/@2", ROOT.RooArgList(sigma1S, m3S, m1S))
     upsilon1S_frac = ROOT.RooRealVar("upsilon1S_frac", "Upsilon(1S) fraction", *fit_params['UpsilonDstar']['upsilon1S_frac'])
     upsilon2S_frac = ROOT.RooRealVar("upsilon2S_frac", "Upsilon(2S) fraction", *fit_params['UpsilonDstar']['upsilon2S_frac']) 
-    alpha_CB = ROOT.RooRealVar("alpha_CB", "alpha CB Upsilon", alpha_CB)
+    alpha_CB = ROOT.RooRealVar("alpha_CB", "alpha CB Upsilon", *fit_params['UpsilonDstar']['alpha_CB'])
+    """ alpha_CB = ROOT.RooRealVar("alpha_CB", "alpha CB Upsilon", alpha_CB) """
     n_CB = ROOT.RooRealVar("n_CB", "n CB Upsilon", n_CB)
 
     signal1S = ROOT.RooCBShape("signal1S", "Upsilon(1S) signal PDF", upsilon_mass, mean1S, sigma1S, alpha_CB, n_CB)
@@ -57,7 +61,7 @@ def fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year):
 
     upsilon_bkg = ROOT.RooChebychev("upsilon_bkg", "Upsilon Background PDF", upsilon_mass, ROOT.RooArgList(bkg_a1, bkg_a2))
 
-    # Dstar Signal Double Gaussian - same mean
+    """ # Dstar Signal Double Gaussian - same mean
     dstar_mean = ROOT.RooRealVar("dstar_mean", "Dstar Gaussian Mean", *fit_params['UpsilonDstar']['dstar_mean'])
     dstar_sigma1 = ROOT.RooRealVar("dstar_sigma1", "Dstar Gaussian 1 Sigma", *fit_params['UpsilonDstar']['dstar_sigma1'])
     dstar_sigma2 = ROOT.RooRealVar("dstar_sigma2", "Dstar Gaussian 2 Sigma", *fit_params['UpsilonDstar']['dstar_sigma2'])
@@ -66,16 +70,29 @@ def fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year):
     g1 = ROOT.RooGaussian("g1", "Dstar Gaussian 1", dstar_deltamr, dstar_mean, dstar_sigma1)
     g2 = ROOT.RooGaussian("g2", "Dstar Gaussian 2", dstar_deltamr, dstar_mean, dstar_sigma2)
 
-    # Dstar Background = Phenomenological Threshold Function 
+     # Dstar Background = Phenomenological Threshold Function 
     p0 = ROOT.RooRealVar("p0","", *fit_params['UpsilonDstar']['p0'])
     p1 = ROOT.RooRealVar('p1',"", *fit_params['UpsilonDstar']['p1'])
-    p2 = ROOT.RooRealVar('p2',"", *fit_params['UpsilonDstar']['p2'])
+    p2 = ROOT.RooRealVar('p2',"", *fit_params['UpsilonDstar']['p2']) 
 
     dstar_signal = ROOT.RooAddPdf("dstar_model", "Dstar Model", ROOT.RooArgList(g1, g2),
                                 ROOT.RooArgList(gauss1_frac), ROOT.kTRUE)
 
     dstar_bkg = ROOT.RooGenericPdf("dstar_bkg","Dstar Background PDF","(1 - exp(-(@0 -0.13957)/@1)) * (@0/0.13957)**@2 + @3 * (@0/0.13957 - 1)",
-                                ROOT.RooArgList(dstar_deltamr,p0,p1,p2))
+                                ROOT.RooArgList(dstar_deltamr,p0,p1,p2)) """
+    dstar_mean = ROOT.RooRealVar("dstar_mean", "Dstar Gaussian Mean", *fit_params['UpsilonDstar']['dstar_mean'])
+    dstar_lambda = ROOT.RooRealVar("dstar_lambda", "Dstar Johnson's lambda", *fit_params['UpsilonDstar']['dstar_lambda'])
+    dstar_gamma = ROOT.RooRealVar("dstar_gamma", "Dstar Johnson's gamma", *fit_params['UpsilonDstar']['dstar_gamma'])
+    dstar_delta = ROOT.RooRealVar("dstar_delta", "Dstar Johnson's delta", *fit_params['UpsilonDstar']['dstar_delta'])
+
+    A = ROOT.RooRealVar("A","", *fit_params['UpsilonDstar']['A'])
+    B = ROOT.RooRealVar("B","", *fit_params['UpsilonDstar']['B'])
+    C = ROOT.RooRealVar("C","", *fit_params['UpsilonDstar']['C'])
+
+    dstar_signal = ROOT.RooJohnson("dstar_signal", "Dstar Jhonson", dstar_deltamr, dstar_mean, dstar_lambda, dstar_gamma, dstar_delta)
+
+    dstar_bkg = ROOT.RooGenericPdf("dstar_bkg","Dstar Background PDF"," @1 * (@0 - 0.13957)**@2 * exp(@3*(@0-0.13957))", 
+    ROOT.RooArgList(dstar_deltamr, A, B, C))
 
     signal = ROOT.RooProdPdf("signal", "Signal of 2D model", ROOT.RooArgList(upsilon_signal, dstar_signal))
     bkg1 = ROOT.RooProdPdf("bkg1", "Bkg1 of 2D model", ROOT.RooArgList(upsilon_signal, dstar_bkg))
@@ -89,7 +106,7 @@ def fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year):
     model2D = ROOT.RooAddPdf("model2D", "2D Model Upsilon + Dstar", ROOT.RooArgList(signal, bkg1, bkg2, bkg3),
                                 ROOT.RooArgList(signal_frac, bkg1_frac, bkg2_frac), ROOT.kTRUE)
 
-    result = model2D.fitTo(data, ROOT.RooFit.BatchMode("cpu"), ROOT.RooFit.Save())
+    result = model2D.fitTo(data, BatchMode="cpu", Save=True)
 
     print("Fit DONE. Saving workspace and params to " + save_path)
     wspace.Import(data)
@@ -101,7 +118,7 @@ def fit_fom(param, path, value, fit_params, alpha_CB, n_CB, year):
     wspace.writeToFile(save_path + "/UpsilonDstar_fit.root")
 
 def plot_results(param, value, path, year, lumi):
-    print("Saving plots to: plots/fom/" + year)
+    print("Saving plots to: plots/fom_vtxfit/" + year)
 
     plot.ModTDRStyle(width=800)
     plot.lumi_13TeV = f"{lumi:.2f} " + "fb^{-1}"
@@ -129,6 +146,7 @@ def plot_results(param, value, path, year, lumi):
     
     # Plot the Data
     data.plotOn(frame_upsilon, Name="Data", DataError="SumW2")
+    #data.plotOn(frame_upsilon, Name="Data", DataError="SumW2")
 
     # Plot the Model components
     model2D.plotOn(frame_upsilon, ROOT.RooFit.Name("Signal"), ROOT.RooFit.Components("signal"),
@@ -164,13 +182,13 @@ def plot_results(param, value, path, year, lumi):
     chi2_label_ups.SetTextSize(15)
     chi2_label_ups.DrawLatex(.80, 0.65,"#chi^{2} = " + f'{chi2_upsilon:.2f}')
 
-    c1.SaveAs(f"plots/fom/{year}/fit2D_upsilon_proj_{param}{value}_{year}.png")
+    c1.SaveAs(f"plots/fom_vtxfit/{year}/fit2D_upsilon_proj_{param}{value}_{year}.png")
     
     # Canvas for Dstar 
     c2 = ROOT.TCanvas("Dstar deltamr")
 
     # Frame
-    frame_dstar = dstar_deltamr.frame(ROOT.RooFit.Title("Dstar delta m"))
+    frame_dstar = dstar_deltamr.frame()
     frame_dstar.GetXaxis().SetTitle("M(k\pi\pi_s) - M(k\pi) [GeV/c^2]")
     
     # Data
@@ -210,9 +228,9 @@ def plot_results(param, value, path, year, lumi):
     chi2_label_dstar.SetTextSize(15)
     chi2_label_dstar.DrawLatex(.80, 0.65,"#chi^{2} = " + f'{chi2_dstar:.2f}')
 
-    c2.SaveAs(f"plots/fom/{year}/fit2D_dstar_proj_{param}{value}_{year}.png")
+    c2.SaveAs(f"plots/fom_vtxfit/{year}/fit2D_dstar_proj_{param}{value}_{year}.png")
 
-    if (chi2_dstar > 3) or (chi2_upsilon > 3): return -1
+    if (chi2_dstar > 2.5) or (chi2_upsilon > 2.5): return -1
     else: return 0
 
 
@@ -236,9 +254,16 @@ def plot_fom(param, config, path, year, lumi):
         n_sig_frac = np.append(n_sig_frac, signal_frac.getVal())
         n_sig_frac_error = np.append(n_sig_frac_error, signal_frac.getErrorHi())
 
+    n_evt_error = np.sqrt(n_evt)
     n_sig = n_evt*n_sig_frac
     n_sig_error = n_evt*n_sig_frac_error
     n_bkg = n_evt - n_sig
     fom = n_sig/np.sqrt(n_sig + n_bkg)
 
-    create_fom(fom, config, param, year, lumi=lumi)
+
+    u_nevt = unumpy.uarray(n_evt, n_evt_error)
+    u_nsig = unumpy.uarray(n_sig, n_sig_error)
+    u_nbkg = u_nevt - u_nsig
+    u_fom = u_nsig/unumpy.sqrt(u_nsig + u_nbkg)
+
+    create_fom(u_fom, config, param, year, lumi=lumi)
