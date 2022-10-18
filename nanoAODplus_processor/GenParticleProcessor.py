@@ -13,7 +13,7 @@ from tools.utils import *
 
 D0_PDG_MASS = 1.864
 
-class EventSelectorProcessor(processor.ProcessorABC):
+class GenParticleProcessor(processor.ProcessorABC):
     def __init__(self, analyzer_name, year):
         self.analyzer_name = analyzer_name
         self.year = year
@@ -29,7 +29,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
     def process(self, events):
         output = self.accumulator.identity()
         
-        # test if there is any events in the file
+        # test if there are any events in the file
         if len(events) == 0:
             return output
         
@@ -42,6 +42,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
                         **get_vars_dict(events, dstar_cols)}, 
                         with_name="PtEtaPhiMCandidate")
         HLT = ak.zip({**get_hlt(events, hlt_cols[self.year])})
+        PVtx = ak.zip({**get_vars_dict(events, pvtx_cols)})
         GenPart = ak.zip({**get_vars_dict(events, gen_part_cols)}, with_name="PtEtaPhiMCandidate")
 
         ############### Load config files
@@ -134,7 +135,7 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dstar = Dstar[Dstar.D0cosphi > 0.99]
         Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.025) & (Dstar.D0mass > D0_PDG_MASS - 0.025)]
         Dstar = Dstar[Dstar.D0pt > cuts['Dstar_D0_pt']]
-        Dstar = Dstar[Dstar.D0eta < ]
+        Dstar = Dstar[Dstar.D0eta < 2.5]
         Dstar = Dstar[Dstar.D0dlSig > 3]
 
         Dstar['wrg_chg'] = (Dstar.Kchg == Dstar.pichg)

@@ -9,6 +9,8 @@ from coffea.nanoevents import BaseSchema
 from nanoAODplus_processor.GenParticleProcessor import GenParticleProcessor
 import yaml
 
+from tools.utils import get_files
+
 base_folder = "/Users/kevimota/cernbox/CRAB_UserFiles"
 
 if __name__ == '__main__':
@@ -35,12 +37,13 @@ if __name__ == '__main__':
     config_yaml = yaml.load(open("config/multicore.yaml", "r"), Loader=yaml.FullLoader)
 
     tstart = time.time()
-    
-    files = {args.name: }
+
+    files = {args.name: get_files([path])}
+    print(files)
 
     # creating necessary folders into dir output data
     os.system("mkdir -p output/" + args.name)
-    os.system("rm -rf output/" + args.name + "/*")          
+    os.system("rm -rf output/" + args.name + "/*")       
 
     if config_yaml['executor'] == 'futures_executor': 
         runner = processor.Runner(
@@ -58,11 +61,11 @@ if __name__ == '__main__':
             chunksize=config_yaml['chunksize']
         )
 
-    """output = runner(
+    output = runner(
         files,
         treename="Events",
-        processor_instance=GenParticleProcessor(args.name, args.year)
-    )"""
+        processor_instance=GenParticleProcessor(args.name, year)
+    )
 
     elapsed = round(time.time() - tstart, 2)
     print(f"Process finished in: {elapsed} s")
