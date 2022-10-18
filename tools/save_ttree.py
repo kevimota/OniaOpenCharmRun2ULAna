@@ -1,7 +1,7 @@
 import os, sys, re
 from coffea.util import load
 import numpy as np
-import uproot3
+import uproot
 from tqdm import tqdm
 from pprint import pprint
 import gc
@@ -19,8 +19,9 @@ def natural_keys(text):
 
 def load_acc(file_list):
     acc = load(file_list[0])
-    for i in tqdm(file_list[1:], desc="Loading", unit=" files", total=(len(file_list)-1)):
-        acc += load(i)
+    if len(file_list) > 1:
+        for i in tqdm(file_list[1:], desc="Loading", unit=" files", total=(len(file_list)-1)):
+            acc += load(i)
     return acc
 
 def create_ttree(acc, out, n=None, association_only=False):
@@ -34,38 +35,29 @@ def create_ttree(acc, out, n=None, association_only=False):
         Dstar = acc['Dstar']
         filename = f"{out}/Upsilon{n}.root"
         print(f"Saving Upsilon data to {filename}")
-        with uproot3.recreate(filename) as f:
-            tree_dict = {}
+        with uproot.recreate(filename) as f:
             data_dict = {}
             for key in Upsilon.keys():
-                tree_dict[key] = "float64"
                 data_dict[key] = Upsilon[key].value
-            f['Upsilon'] = uproot3.newtree(tree_dict)
-            f['Upsilon'].extend(data_dict)
+            f['Upsilon'] = data_dict
 
         filename = f"{out}/Dstar{n}.root"
         print(f"Saving Dstar data to {filename}")
-        with uproot3.recreate(filename) as f:
-            tree_dict = {}
+        with uproot.recreate(filename) as f:
             data_dict = {}
             for key in Dstar.keys():
-                tree_dict[key] = "float64"
                 data_dict[key] = Dstar[key].value
-            f['Dstar'] = uproot3.newtree(tree_dict)
-            f['Dstar'].extend(data_dict)
+            f['Dstar'] = data_dict
     
     UpsilonDstar = acc['DimuDstar']
     
     filename = f"{out}/UpsilonDstar{n}.root"
     print(f"Saving UpsilonDstar data to {filename}")
-    with uproot3.recreate(f"{filename}") as f:
-        tree_dict = {}
-        data_dict = {}
-        for key in UpsilonDstar.keys():
-            tree_dict[key] = "float64"
-            data_dict[key] = UpsilonDstar[key].value
-        f['UpsilonDstar'] = uproot3.newtree(tree_dict)
-        f['UpsilonDstar'].extend(data_dict)
+    with uproot.recreate(filename) as f:
+            data_dict = {}
+            for key in UpsilonDstar.keys():
+                data_dict[key] = UpsilonDstar[key].value
+            f['UpsilonDstar'] = data_dict
     
 if __name__ == '__main__':
     import argparse

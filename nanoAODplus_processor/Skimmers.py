@@ -48,9 +48,11 @@ class Skimmer:
                 'deltam': Dstar_acc['deltam'].value,
                 'deltamr': Dstar_acc['deltamr'].value,
                 'D0cosphi': Dstar_D0_acc['D0cosphi'].value,
+                'D0dl': Dstar_D0_acc['D0dl'].value,
                 'D0dlSig': Dstar_D0_acc['D0dlSig'].value,
                 'D0pt': Dstar_D0_acc['D0pt'].value,
                 'D0eta': Dstar_D0_acc['D0eta'].value,
+                'D0phi': Dstar_D0_acc['D0phi'].value,
                 'D0mass': Dstar_D0_acc['D0mass'].value,
                 'wrg_chg': Dstar_acc['wrg_chg'].value,}, with_name='PtEtaPhiMCandidate')
 
@@ -60,12 +62,17 @@ class Skimmer:
                 'eta': DimuDstar_p4.eta,
                 'phi': DimuDstar_p4.phi,
                 'mass': DimuDstar_p4.mass,
+                'rap': DimuDstar_p4.rap,
                 'charge': DimuDstar_acc['charge'].value,
                 'dimu_mass': DimuDstar_acc['Dimu']['mass'].value,
                 'dimu_pt': DimuDstar_acc['Dimu']['pt'].value,
                 'dimu_eta': DimuDstar_acc['Dimu']['eta'].value,
                 'dimu_phi': DimuDstar_acc['Dimu']['phi'].value,
                 'dimu_rap': DimuDstar_acc['Dimu']['rap'].value,
+                'dimu_dl': DimuDstar_acc['Dimu']['dl'].value,
+                'dimu_dlSig': DimuDstar_acc['Dimu']['dlSig'].value,
+                'dimu_chi2': DimuDstar_acc['Dimu']['chi2'].value,
+                'dimu_cosphi': DimuDstar_acc['Dimu']['cosphi'].value,
                 'dstar_deltam': DimuDstar_acc['Dstar']['deltam'].value,
                 'dstar_deltamr': DimuDstar_acc['Dstar']['deltamr'].value,
                 'dstar_pt': DimuDstar_acc['Dstar']['pt'].value,
@@ -74,9 +81,15 @@ class Skimmer:
                 'dstar_rap': DimuDstar_acc['Dstar']['rap'].value,
                 'dstar_d0_pt': DimuDstar_acc['Dstar']['D0pt'].value,
                 'dstar_d0_eta': DimuDstar_acc['Dstar']['D0eta'].value,
+                'dstar_d0_phi': DimuDstar_acc['Dstar']['D0phi'].value,
                 'dstar_d0_mass': DimuDstar_acc['Dstar']['D0mass'].value,
                 'dstar_d0_cosphi': DimuDstar_acc['Dstar']['D0cosphi'].value,
+                'dstar_d0_dl': DimuDstar_acc['Dstar']['D0dl'].value,
                 'dstar_d0_dlSig': DimuDstar_acc['Dstar']['D0dlSig'].value,
+                'dstar_k_pt': DimuDstar_acc['Dstar']['Kpt'].value,
+                'dstar_pi_pt': DimuDstar_acc['Dstar']['pipt'].value,
+                'dstar_asso_chi2': DimuDstar_acc['Dstar']['associationchi2'].value,
+                'dstar_asso_prob': DimuDstar_acc['Dstar']['associationProb'].value,
                 'deltarap': DimuDstar_acc['deltarap'].value,
                 'deltapt': DimuDstar_acc['deltapt'].value,
                 'deltaeta': DimuDstar_acc['deltaeta'].value,
@@ -84,10 +97,7 @@ class Skimmer:
                 'is_ups': DimuDstar_acc['Dimu']['is_ups'].value,
                 'wrg_chg': DimuDstar_acc['Dstar']['wrg_chg'].value,
                 'dimu_vtxIdx': DimuDstar_acc['Dimu']['vtxIdx'].value,
-                'dstar_vtxIdx': DimuDstar_acc['Dstar']['vtxIdx'].value,
-                'd': DimuDstar_acc['d'].value,
-                'derr': DimuDstar_acc['derr'].value,
-                'dSig': DimuDstar_acc['dSig'].value,}, with_name='PtEtaPhiMCandidate')
+                'dstar_vtxIdx': DimuDstar_acc['Dstar']['vtxIdx'].value,}, with_name='PtEtaPhiMCandidate')
 
         # Unflatten
         Dimu = ak.unflatten(Dimu, Dimu_acc['nDimu'].value)
@@ -100,32 +110,36 @@ class Skimmer:
         Dstar = Dstar[HLT]
         DimuDstar = DimuDstar[HLT]
         
-        Dimu = Dimu[Dimu.pt > self.config['limits']['Upsilon_pt']]
+        Dimu = Dimu[Dimu.pt > self.config['limits']['Upsilon_min_pt']]
+        Dimu = Dimu[Dimu.pt < self.config['limits']['Upsilon_max_pt']]
         Dimu = Dimu[np.absolute(Dimu.rap) < self.config['limits']['Upsilon_rap']]
         Dimu = Dimu[Dimu.is_ups]
-        DimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_pt']]
+        DimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_min_pt']]
+        DimuDstar = DimuDstar[DimuDstar.dimu_pt < self.config['limits']['Upsilon_max_pt']]
         DimuDstar = DimuDstar[np.absolute(DimuDstar.dimu_rap) < self.config['limits']['Upsilon_rap']]
         DimuDstar = DimuDstar[DimuDstar.is_ups]
 
-        Dstar = Dstar[Dstar.pt > self.config['limits']['Dstar_pt']]
+        Dstar = Dstar[Dstar.pt > self.config['limits']['Dstar_min_pt']]
+        Dstar = Dstar[Dstar.pt < self.config['limits']['Dstar_max_pt']]
         Dstar = Dstar[np.absolute(Dstar.rap) < self.config['limits']['Dstar_rap']]
         Dstar = Dstar[Dstar.D0pt > self.config['limits']['Dstar_D0_pt']]
         Dstar = Dstar[Dstar.D0cosphi > self.config['limits']['Dstar_D0_cosphi']]
         Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (Dstar.D0mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
         Dstar = Dstar[Dstar.D0dlSig > self.config['limits']['Dstar_D0_dlSig']]
         Dstar = Dstar[~Dstar.wrg_chg]
-        DimuDstar = DimuDstar[DimuDstar.dstar_pt > self.config['limits']['Dstar_pt']]
+        DimuDstar = DimuDstar[DimuDstar.dstar_pt > self.config['limits']['Dstar_min_pt']]
+        DimuDstar = DimuDstar[DimuDstar.dstar_pt < self.config['limits']['Dstar_max_pt']]
         DimuDstar = DimuDstar[np.absolute(DimuDstar.dstar_rap) < self.config['limits']['Dstar_rap']]
         DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
         DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
         DimuDstar = DimuDstar[(DimuDstar.dstar_d0_mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (DimuDstar.dstar_d0_mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
         DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
-        DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
+        DimuDstar = DimuDstar[DimuDstar.dstar_asso_prob > self.config['limits']['Dstar_association_prob']]
 
         DimuDstar = DimuDstar[~DimuDstar.wrg_chg]
 
         folder = f[f.rfind('/'):f.rfind('_')]
-        filename = f"output/RunII_trigger_processed/{self.year}{folder}{f[f.rfind('/'):]}"
+        filename = f"output/RunII_trigger_processed_vtxfit/{self.year}{folder}{f[f.rfind('/'):]}"
         
         pDimu_acc = build_acc(Dimu)
         pDstar_acc = build_acc(Dstar)
@@ -136,7 +150,6 @@ class Skimmer:
             'Dstar': pDstar_acc,
             'DimuDstar': pDimuDstar_acc
         })
-
         save(output, filename)
 
 class FOM:
@@ -179,6 +192,8 @@ class FOM:
                 'dstar_d0_dlSig': DimuDstar_acc['Dstar']['D0dlSig'].value,
                 'dstar_k_pt': DimuDstar_acc['Dstar']['Kpt'].value,
                 'dstar_pi_pt': DimuDstar_acc['Dstar']['pipt'].value,
+                'dstar_asso_chi2': DimuDstar_acc['Dstar']['associationchi2'].value,
+                'dstar_asso_prob': DimuDstar_acc['Dstar']['associationProb'].value,
                 'deltarap': DimuDstar_acc['deltarap'].value,
                 'deltapt': DimuDstar_acc['deltapt'].value,
                 'deltaeta': DimuDstar_acc['deltaeta'].value,
@@ -186,10 +201,7 @@ class FOM:
                 'is_ups': DimuDstar_acc['Dimu']['is_ups'].value,
                 'wrg_chg': DimuDstar_acc['Dstar']['wrg_chg'].value,
                 'dimu_vtxIdx': DimuDstar_acc['Dimu']['vtxIdx'].value,
-                'dstar_vtxIdx': DimuDstar_acc['Dstar']['vtxIdx'].value,
-                'd': DimuDstar_acc['d'].value,
-                'derr': DimuDstar_acc['derr'].value,
-                'dSig': DimuDstar_acc['dSig'].value,}, with_name='PtEtaPhiMCandidate')
+                'dstar_vtxIdx': DimuDstar_acc['Dstar']['vtxIdx'].value,}, with_name='PtEtaPhiMCandidate')
 
         # Unflatten
         DimuDstar = ak.unflatten(DimuDstar, DimuDstar_acc['nDimuDstar'].value)
@@ -199,26 +211,28 @@ class FOM:
         DimuDstar = DimuDstar[HLT]
         
         for var in self.fom:
-            DimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_pt']]
-            DimuDstar = DimuDstar[np.absolute(DimuDstar.dimu_rap) < self.config['limits']['Upsilon_rap']]
-            DimuDstar = DimuDstar[DimuDstar.is_ups]
-
-            DimuDstar = DimuDstar[DimuDstar.dstar_pt > self.config['limits']['Dstar_pt']]
-            DimuDstar = DimuDstar[np.absolute(DimuDstar.dstar_rap) < self.config['limits']['Dstar_rap']]
-            DimuDstar = DimuDstar[(DimuDstar.dstar_d0_mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (DimuDstar.dstar_d0_mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
-            DimuDstar = DimuDstar[~DimuDstar.wrg_chg]
             if var == 'D0pt': 
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
-                DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
-                DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
+                pDimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dimu_pt < self.config['limits']['Upsilon_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dimu_rap) < self.config['limits']['Upsilon_rap']]
+                pDimuDstar = pDimuDstar[pDimuDstar.is_ups]
+
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt > self.config['limits']['Dstar_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt < self.config['limits']['Dstar_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dstar_rap) < self.config['limits']['Dstar_rap']]
+                pDimuDstar = pDimuDstar[(pDimuDstar.dstar_d0_mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (pDimuDstar.dstar_d0_mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
+                pDimuDstar = pDimuDstar[~pDimuDstar.wrg_chg]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_asso_prob > self.config['limits']['Dstar_association_prob']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
                 for i in self.fom[var]:
-                    DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > i]
+                    pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_pt > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
-                    filename = f"output/fom/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
+                    filename = f"output/fom_vtxfit/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
                     
-                    pDimuDstar_acc = build_acc(DimuDstar)
+                    pDimuDstar_acc = build_acc(pDimuDstar)
 
                     output = processor.dict_accumulator({
                         'DimuDstar': pDimuDstar_acc
@@ -227,17 +241,27 @@ class FOM:
                     save(output, filename)
 
             elif var == 'cosphi': 
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
-                DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
-                DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
+                pDimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dimu_pt < self.config['limits']['Upsilon_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dimu_rap) < self.config['limits']['Upsilon_rap']]
+                pDimuDstar = pDimuDstar[pDimuDstar.is_ups]
+
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt > self.config['limits']['Dstar_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt < self.config['limits']['Dstar_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dstar_rap) < self.config['limits']['Dstar_rap']]
+                pDimuDstar = pDimuDstar[(pDimuDstar.dstar_d0_mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (pDimuDstar.dstar_d0_mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
+                pDimuDstar = pDimuDstar[~pDimuDstar.wrg_chg]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_asso_prob > self.config['limits']['Dstar_association_prob']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
                 for i in self.fom[var]:
-                    DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > i]
+                    pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_cosphi > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
-                    filename = f"output/fom/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
+                    filename = f"output/fom_vtxfit/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
                     
-                    pDimuDstar_acc = build_acc(DimuDstar)
+                    pDimuDstar_acc = build_acc(pDimuDstar)
 
                     output = processor.dict_accumulator({
                         'DimuDstar': pDimuDstar_acc
@@ -246,17 +270,27 @@ class FOM:
                     save(output, filename)
 
             elif var == 'dlSig': 
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
-                DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
-                DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
+                pDimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dimu_pt < self.config['limits']['Upsilon_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dimu_rap) < self.config['limits']['Upsilon_rap']]
+                pDimuDstar = pDimuDstar[pDimuDstar.is_ups]
+
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt > self.config['limits']['Dstar_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt < self.config['limits']['Dstar_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dstar_rap) < self.config['limits']['Dstar_rap']]
+                pDimuDstar = pDimuDstar[(pDimuDstar.dstar_d0_mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (pDimuDstar.dstar_d0_mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
+                pDimuDstar = pDimuDstar[~pDimuDstar.wrg_chg]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_asso_prob > self.config['limits']['Dstar_association_prob']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
                 for i in self.fom[var]:
-                    DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > i]
+                    pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_dlSig > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
-                    filename = f"output/fom/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
+                    filename = f"output/fom_vtxfit/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
                     
-                    pDimuDstar_acc = build_acc(DimuDstar)
+                    pDimuDstar_acc = build_acc(pDimuDstar)
 
                     output = processor.dict_accumulator({
                         'DimuDstar': pDimuDstar_acc
@@ -264,18 +298,28 @@ class FOM:
 
                     save(output, filename)
 
-            elif var == 'dSig': 
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
+            elif var == 'association_prob': 
+                pDimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dimu_pt < self.config['limits']['Upsilon_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dimu_rap) < self.config['limits']['Upsilon_rap']]
+                pDimuDstar = pDimuDstar[pDimuDstar.is_ups]
+
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt > self.config['limits']['Dstar_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt < self.config['limits']['Dstar_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dstar_rap) < self.config['limits']['Dstar_rap']]
+                pDimuDstar = pDimuDstar[(pDimuDstar.dstar_d0_mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (pDimuDstar.dstar_d0_mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
+                pDimuDstar = pDimuDstar[~pDimuDstar.wrg_chg]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
                 for i in self.fom[var]:
-                    DimuDstar = DimuDstar[DimuDstar.dSig < i]
+                    pDimuDstar = pDimuDstar[pDimuDstar.dstar_asso_prob > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
-                    filename = f"output/fom/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
+                    filename = f"output/fom_vtxfit/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
                     
-                    pDimuDstar_acc = build_acc(DimuDstar)
+                    pDimuDstar_acc = build_acc(pDimuDstar)
 
                     output = processor.dict_accumulator({
                         'DimuDstar': pDimuDstar_acc
@@ -283,17 +327,27 @@ class FOM:
                     save(output, filename)
 
             elif var == 'track_pt':
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
-                DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
-                DimuDstar = DimuDstar[DimuDstar.dimu_vtxIdx == DimuDstar.dstar_vtxIdx]
+                pDimuDstar = DimuDstar[DimuDstar.dimu_pt > self.config['limits']['Upsilon_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dimu_pt < self.config['limits']['Upsilon_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dimu_rap) < self.config['limits']['Upsilon_rap']]
+                pDimuDstar = pDimuDstar[pDimuDstar.is_ups]
+
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt > self.config['limits']['Dstar_min_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_pt < self.config['limits']['Dstar_max_pt']]
+                pDimuDstar = pDimuDstar[np.absolute(pDimuDstar.dstar_rap) < self.config['limits']['Dstar_rap']]
+                pDimuDstar = pDimuDstar[(pDimuDstar.dstar_d0_mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (pDimuDstar.dstar_d0_mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
+                pDimuDstar = pDimuDstar[~pDimuDstar.wrg_chg]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
+                pDimuDstar = pDimuDstar[pDimuDstar.dstar_asso_prob > self.config['limits']['Dstar_association_prob']]
                 for i in self.fom[var]:
-                    DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > i]
-                    DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > i]
+                    pDimuDstar = pDimuDstar[pDimuDstar.dstar_k_pt > i]
+                    pDimuDstar = pDimuDstar[pDimuDstar.dstar_pi_pt > i]
                     folder = f[f.rfind('/'):f.rfind('_')]
-                    filename = f"output/fom/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
+                    filename = f"output/fom_vtxfit/{self.year}{folder}/{var}/{str(i).replace('.', 'p')}{f[f.rfind('/'):f.rfind('_')]}{var}{f[f.rfind('_'):]}"
                     
-                    pDimuDstar_acc = build_acc(DimuDstar)
+                    pDimuDstar_acc = build_acc(pDimuDstar)
 
                     output = processor.dict_accumulator({
                         'DimuDstar': pDimuDstar_acc
