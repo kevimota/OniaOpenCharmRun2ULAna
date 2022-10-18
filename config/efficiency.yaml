@@ -1,0 +1,38 @@
+dimu_mass_low: 8.5
+dimu_mass_high: 11.5
+#bins_pt_dimu: [12, 20, 30, 50, 70, 100, 150, 200, 300]
+#bins_rap_dimu: [0.0, 0.5, 1.0, 1.5, 2.5]
+#bins_pt_dstar: [4, 10, 20, 30, 50, 70, 100]
+#bins_rap_dstar: [0.0, 0.5, 1.0, 1.5, 2.5]
+bins_pt_dimu: [20, 30, 50, 70, 100, 130]
+bins_rap_dimu: [0.0, 0.5, 1.2]
+bins_pt_dstar: [4, 10, 20, 30, 50, 70, 100]
+bins_rap_dstar: [0.0, 0.5, 1.2, 2.1]
+particle: "Y"
+
+#Acceptance
+muon_pt_min: 3.
+muon_eta: 2.4
+dimu_pt_min: 20.
+dimu_pt_max: 130.
+dimu_rap: 2.5
+dstar_pt_min: 4.
+dstar_pt_max: 100.
+dstar_rap: 2.1
+
+# Cuts Efficiency
+dstar_track_pt_cut: 1.0
+dstar_d0_cosphi: 0.99
+dstar_d0_dlSig: 2.7
+dstar_d0_mass: 0.028
+dstar_d0_pt: 3.0
+
+# Trigger Efficiency
+trigger: 
+  "2016APV": "HLT_Dimuon13_Upsilon"
+  "2016": "HLT_Dimuon13_Upsilon"
+  "2017": "HLT_Dimuon24_Upsilon_noCorrL1"
+  "2018": "HLT_Dimuon24_Upsilon_noCorrL1"
+
+# Association Efficiency
+vertex_probability_cut: 0.01
