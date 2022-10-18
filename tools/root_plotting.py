@@ -229,15 +229,15 @@ def ModTDRStyle(width=600, height=600, t=0.06, b=0.12, l=0.16, r=0.04):
 
     R.gROOT.ForceStyle()
 
-cmsText     = "CMS";
-cmsTextFont   = 61  
+cmsText     = "CMS"
+cmsTextFont   = 61
 
 writeExtraText = True
 extraText   = "Internal"
-extraTextFont = 52 
+extraTextFont = 52
 
 lumiTextSize     = 0.6
-lumiTextOffset   = 0.2
+lumiTextOffset   = 0.2 
 
 cmsTextSize      = 0.75
 cmsTextOffset    = 0.1
