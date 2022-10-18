@@ -1,6 +1,6 @@
 # Luminosity extracted from brilcalc tool
 
-"2016":
+"2016APV":
   MuOniaRun2016B-ver2-HIPM:
     HLT_Dimuon13_Upsilon: 5.824066408
     HLT_Dimuon8_Upsilon_Barrel: 5.265197875
@@ -21,6 +21,8 @@
     HLT_Dimuon13_Upsilon: 2.627511758
     HLT_Dimuon8_Upsilon_Barrel: 2.610302367
     Full_Era: 2.717344923
+
+"2016":    
   MuOniaRun2016F:
     HLT_Dimuon13_Upsilon: 0.418120616
     HLT_Dimuon8_Upsilon_Barrel: 0.418120616
@@ -33,6 +35,40 @@
     HLT_Dimuon13_Upsilon: 8.739883636
     HLT_Dimuon8_Upsilon_Barrel: 8.739883636
     Full_Era: 8.739883636
+
+#"2016":
+#  MuOniaRun2016B-ver2-HIPM:
+#    HLT_Dimuon13_Upsilon: 5.824066408
+#    HLT_Dimuon8_Upsilon_Barrel: 5.265197875
+#    Full_Era: 5.824235614
+#  MuOniaRun2016C-HIPM:
+#    HLT_Dimuon13_Upsilon: 2.621295973
+#    HLT_Dimuon8_Upsilon_Barrel: 2.621295973
+#    Full_Era: 2.621295973
+#  MuOniaRun2016D-HIPM:
+#    HLT_Dimuon13_Upsilon: 4.285851496
+#    HLT_Dimuon8_Upsilon_Barrel: 4.285851496
+#    Full_Era: 4.285851496
+#  MuOniaRun2016E-HIPM:
+#    HLT_Dimuon13_Upsilon: 4.034930658
+#    HLT_Dimuon8_Upsilon_Barrel: 3.669489150
+#    Full_Era: 4.065974639
+#  MuOniaRun2016F-HIPM:
+#    HLT_Dimuon13_Upsilon: 2.627511758
+#    HLT_Dimuon8_Upsilon_Barrel: 2.610302367
+#    Full_Era: 2.717344923
+#  MuOniaRun2016F:
+#    HLT_Dimuon13_Upsilon: 0.418120616
+#    HLT_Dimuon8_Upsilon_Barrel: 0.418120616
+#    Full_Era: 0.418120616
+#  MuOniaRun2016G:
+#    HLT_Dimuon13_Upsilon: 7.652808366
+#    HLT_Dimuon8_Upsilon_Barrel: 7.652808366
+#    Full_Era: 7.652808366
+#  MuOniaRun2016H:
+#    HLT_Dimuon13_Upsilon: 8.739883636
+#    HLT_Dimuon8_Upsilon_Barrel: 8.739883636
+#    Full_Era: 8.739883636
 
 "2017":
   MuOniaRun2017B:

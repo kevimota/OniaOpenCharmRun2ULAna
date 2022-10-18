@@ -1,6 +1,14 @@
-import os, re
+import os, re, json
 import awkward as ak
+
+from collections import defaultdict
+
+from coffea.nanoevents.methods import candidate
+ak.behavior.update(candidate.behavior)
+
 import numpy as np
+
+import yaml
 
 D0_PDG_MASS = 1.864
 
@@ -20,6 +28,7 @@ def build_p4(acc):
                  'y': acc['y'].value,
                  'z': acc['z'].value,
                  't': acc['t'].value}, with_name="LorentzVector")
+    p4.rap = np.log((p4.energy + p4.z)/np.sqrt(p4.mass2 + p4.pt2))
 
     return p4
 
@@ -89,3 +98,64 @@ def get_n(array):
 
 def remove_none(array):
     return ak.fill_none(array, -99) > -1
+
+def get_lumi(year, trigger):
+    processed_lumi = 0
+    with open("config/lumi.yaml", 'r') as f:
+        lumis = yaml.load(f, Loader=yaml.FullLoader)
+        for era in lumis[year]:
+            processed_lumi += lumis[year][era][trigger]
+
+    return processed_lumi
+
+def get_trigger(year):
+    with open("config/skim_trigger.yaml", "r") as f:
+        trigger = yaml.load(f, Loader=yaml.FullLoader)['trigger'][year]
+    return trigger
+
+def get_xsec(dictionary_in, dictionary_out, group, eta_width):
+    for values in dictionary_in['values']:
+        bins_width = float(values['x'][0]['high']) - float(values['x'][0]['low'])
+        for y in values['y']:
+            if y['group'] != group: continue
+            value = float(y['value'])
+            if '%' in y['errors'][0]['symerror']:
+                error_stat = float(y['errors'][0]['symerror'][:-1])/100*value
+                error_syst = float(y['errors'][1]['symerror'][:-1])/100*value
+            else:
+                error_stat = float(y['errors'][0]['symerror'][:-1])
+                error_syst = float(y['errors'][1]['symerror'][:-1])
+            dictionary_out['value'] += value*bins_width*eta_width
+            dictionary_out['error_stat'] += error_stat*bins_width*eta_width
+            dictionary_out['error_syst'] += error_syst*bins_width*eta_width
+
+def get_all_xsec():
+    with open('data/cross_section/Y_1S_xsection.json', 'r') as f:
+        Y_1S = json.load(f)
+
+    with open('data/cross_section/Y_2S_xsection.json', 'r') as f:
+        Y_2S = json.load(f)
+        
+    with open('data/cross_section/Y_3S_xsection.json', 'r') as f:
+        Y_3S = json.load(f)
+
+    with open('data/cross_section/open_charm_xsection.json', 'r') as f:
+        open_charm = json.load(f)
+
+    xsection_total = {
+        'Y_1S': defaultdict(float),
+        'Y_2S': defaultdict(float),
+        'Y_3S': defaultdict(float),
+        'D0': defaultdict(float),
+        'D+': defaultdict(float),
+        'D*+': defaultdict(float),
+    }
+
+    get_xsec(Y_1S, xsection_total['Y_1S'], 2, 2.4)
+    get_xsec(Y_2S, xsection_total['Y_2S'], 2, 2.4)
+    get_xsec(Y_3S, xsection_total['Y_3S'], 2, 2.4)
+    get_xsec(open_charm, xsection_total['D0'], 1, 1)
+    get_xsec(open_charm, xsection_total['D+'], 2, 1)
+    get_xsec(open_charm, xsection_total['D*+'], 0, 1)
+
+    return xsection_total
