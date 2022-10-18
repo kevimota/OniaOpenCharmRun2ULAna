@@ -7,7 +7,7 @@ import coffea.processor as processor
 from coffea.nanoevents import BaseSchema
 
 from nanoAODplus_processor.EventSelectorProcessor import EventSelectorProcessor
-from data.fileset import filesets
+#from data.fileset import filesets
 import yaml
 
 if __name__ == '__main__':
@@ -18,7 +18,6 @@ if __name__ == '__main__':
     parser.add_argument("-y", "--year", help="Year of the dataset", type=str, required=True)
     parser.add_argument("-s", "--select", help="Do the evt selection", action="store_true")
     parser.add_argument("-m","--merge", help="Merge the accumulators that were output from a analyzer", action="store_true")
-    parser.add_argument("-p","--plots", help="Create the plots from the merged accumulator", action="store_true")
     parser.add_argument("-a","--analyze", help="Do the full analysis chain", action="store_true")
     args = parser.parse_args()
 
@@ -27,7 +26,7 @@ if __name__ == '__main__':
 
         tstart = time.time()
 
-        files = {'MuOniatestAOD': ['~/tmp/UpsilonToMuMuDstarToD0pi_628.root']}
+        files = {'MuOniatestAOD': ['MuOniaRun2018A_AOD_994.root']}
 
         # creating necessary folders into dir output data
         os.system("mkdir -p output/" + args.name)
@@ -61,7 +60,4 @@ if __name__ == '__main__':
     if (args.merge or args.analyze):
         from tools.merger import merger
         merger(args.name)
-
-    if (args.plots or args.analyze):
-        from tools.plotter import plotter
-        plotter(args.name)    
+  
