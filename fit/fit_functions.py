@@ -33,12 +33,12 @@ def save_fit_params(path, result, wspace, channel):
         yaml.dump(fit_params, f)
 
 def fit_upsilon(config, year):
-    chain = ROOT.TChain("Upsilon")
+    chain = ROOT.TChain("UpsilonDstar")
     for f in config['path'][year]:
-        chain.Add(f"{f}/Upsilon.root")
+        chain.Add(f"{f}/UpsilonDstar.root")
 
     wspace = ROOT.RooWorkspace(f"upsilon_fit_{year}")
-    mass = ROOT.RooRealVar("mass", "Mass Upsilon", 8.7, 11.2)
+    mass = ROOT.RooRealVar("dimu_mass", "Mass Upsilon", 8.7, 11.2)
     data = ROOT.RooDataSet("data", "Data Upsilon", ROOT.RooArgSet(mass), ROOT.RooFit.Import(chain))
 
     # Signal Variables
@@ -87,35 +87,53 @@ def fit_upsilon(config, year):
     save_fit_params(save_path, result, wspace, "Upsilon")
 
 def fit_dstar(config, year):
-    chain = ROOT.TChain("Dstar")
+    chain = ROOT.TChain("UpsilonDstar")
     for f in config['path'][year]:
-        chain.Add(f"{f}/Dstar.root")
+        chain.Add(f"{f}/UpsilonDstar.root")
 
     wspace = ROOT.RooWorkspace(f"dstar_fit_{year}")
-    deltamr = ROOT.RooRealVar("deltamr", "Dstar Delta m ", 0.141, 0.158)
+    deltamr = ROOT.RooRealVar("dstar_deltamr", "Dstar Delta m ", 0.14, 0.158)
     data = ROOT.RooDataSet("data", "Data Dstar", ROOT.RooArgSet(deltamr), ROOT.RooFit.Import(chain))
 
-    # Signal Double Gaussian - same mean
+    """ # Signal Double Gaussian - same mean
     mean = ROOT.RooRealVar("mean", "Dstar Gaussian Mean", *config['Dstar']['mean'])
     sigma1 = ROOT.RooRealVar("sigma1", "Dstar Gaussian 1 Sigma", *config['Dstar']['sigma1'])
     sigma2 = ROOT.RooRealVar("sigma2", "Dstar Gaussian 2 Sigma", *config['Dstar']['sigma2'])
 
     g1 = ROOT.RooGaussian("g1", "Dstar Gaussian 1", deltamr, mean, sigma1)
-    g2 = ROOT.RooGaussian("g2", "Dstar Gaussian 2", deltamr, mean, sigma2)
+    g2 = ROOT.RooGaussian("g2", "Dstar Gaussian 2", deltamr, mean, sigma2) """
+
+    #Signal Jhonson PDF
+    dstar_mean = ROOT.RooRealVar("dstar_mean", "Dstar Gaussian Mean", *config['Dstar']['mean'])
+    dstar_lambda = ROOT.RooRealVar("dstar_lambda", "Dstar Johnson's lambda", *config['Dstar']['lambda'])
+    dstar_gamma = ROOT.RooRealVar("dstar_gamma", "Dstar Johnson's gamma", *config['Dstar']['gamma'])
+    dstar_delta = ROOT.RooRealVar("dstar_delta", "Dstar Johnson's delta", *config['Dstar']['delta'])
+    signal = ROOT.RooJohnson("signal", "Dstar Jhonson", deltamr, dstar_mean, dstar_lambda, dstar_gamma, dstar_delta)
 
     # Background = Phenomenological Threshold Function 
-    p0 = ROOT.RooRealVar("p0","", *config['Dstar']['p0'])
+    """ p0 = ROOT.RooRealVar("p0","", *config['Dstar']['p0'])
     p1 = ROOT.RooRealVar('p1',"", *config['Dstar']['p1'])
-    p2 = ROOT.RooRealVar('p2',"", *config['Dstar']['p2'])
+    p2 = ROOT.RooRealVar('p2',"", *config['Dstar']['p2']) """
 
-    bkg = ROOT.RooGenericPdf("bkg","Dstar Background PDF","(1 - exp(-(@0 -0.13957)/@1)) * (@0/0.13957)**@2 + @3 * (@0/0.13957 - 1)",
-                            ROOT.RooArgList(deltamr, p0, p1, p2))
+    A = ROOT.RooRealVar("A","", *config['Dstar']['A'])
+    B = ROOT.RooRealVar("B","", *config['Dstar']['B'])
+    C = ROOT.RooRealVar("C","", *config['Dstar']['C'])
+    # Background definition
+    bkg = ROOT.RooGenericPdf("bkg","Dstar Background PDF"," @1 * (@0 - 0.13957)**@2 * exp(@3*(@0-0.13957))", 
+    ROOT.RooArgList(deltamr, A, B, C))
 
-    gauss1_frac = ROOT.RooRealVar("gauss1_frac", "Dstar Gaussian Fraction", *config['Dstar']['gauss1_frac'])
-    gauss2_frac = ROOT.RooRealVar("gauss2_frac", "Dstar Signal Fraction", *config['Dstar']['gauss2_frac'])
+    """ bkg = ROOT.RooGenericPdf("bkg","Dstar Background PDF","(1 - exp(-(@0 -0.13957)/@1)) * (@0/0.13957)**@2 + @3 * (@0/0.13957 - 1)",
+                            ROOT.RooArgList(deltamr, p0, p1, p2)) """
 
-    model = ROOT.RooAddPdf("model", "Dstar Model", ROOT.RooArgList(g1, g2, bkg),
-                       ROOT.RooArgList(gauss1_frac, gauss2_frac), ROOT.kTRUE)
+    #gauss1_frac = ROOT.RooRealVar("gauss1_frac", "Dstar Gaussian Fraction", *config['Dstar']['gauss1_frac'])
+    #gauss2_frac = ROOT.RooRealVar("gauss2_frac", "Dstar Signal Fraction", *config['Dstar']['gauss2_frac'])
+
+    #model = ROOT.RooAddPdf("model", "Dstar Model", ROOT.RooArgList(g1, g2, bkg),
+    #                   ROOT.RooArgList(gauss1_frac, gauss2_frac), ROOT.kTRUE)
+
+    signal_frac = ROOT.RooRealVar("signal_frac", "Dstar Signal Fraction", *config['Dstar']['signal_frac'])
+    model = ROOT.RooAddPdf("model", "Dstar Model", ROOT.RooArgList(signal, bkg),
+                       ROOT.RooArgList(signal_frac), ROOT.kTRUE)
 
     result = model.fitTo(data, ROOT.RooFit.BatchMode("cpu"), ROOT.RooFit.Save()) #fitting
 
@@ -135,7 +153,7 @@ def fit_upsilondstar(config, year):
 
     wspace = ROOT.RooWorkspace(f"upsilondstar_fit_{year}")
     upsilon_mass = ROOT.RooRealVar("dimu_mass", "Mass Upsilon", 8.7, 11.2)
-    dstar_deltamr = ROOT.RooRealVar("dstar_deltamr", "Dstar Delta m ", 0.141, 0.158)
+    dstar_deltamr = ROOT.RooRealVar("dstar_deltamr", "Dstar Delta m ", 0.14, 0.158)
     data = ROOT.RooDataSet("data", 
                        "Data 2D Upsilon + Dstar", 
                        ROOT.RooArgSet(upsilon_mass, dstar_deltamr), 
@@ -145,6 +163,9 @@ def fit_upsilondstar(config, year):
     save_path = config['path'][year][0][:config['path'][year][0].rfind('/')]
     with open(f"{save_path}/Upsilon_fit_params.yaml") as f:
         upsilon_fit = yaml.load(f, Loader=yaml.FullLoader)
+
+    with open(f"{save_path}/Dstar_fit_params.yaml") as f:
+        dstar_fit = yaml.load(f, Loader=yaml.FullLoader)
 
     # Signal PDFs
     m1S = ROOT.RooRealVar("m1S","PDG mass Upsilon(1S)", config['Upsilon']['M1S'])
@@ -159,10 +180,10 @@ def fit_upsilondstar(config, year):
     sigma3S  = ROOT.RooFormulaVar("sigma3S","@0*@1/@2", ROOT.RooArgList(sigma1S, m3S, m1S))
     upsilon1S_frac = ROOT.RooRealVar("upsilon1S_frac", "Upsilon(1S) fraction", *config['UpsilonDstar']['upsilon1S_frac'])
     upsilon2S_frac = ROOT.RooRealVar("upsilon2S_frac", "Upsilon(2S) fraction", *config['UpsilonDstar']['upsilon2S_frac']) 
-    alpha_CB = ROOT.RooRealVar("alpha_CB", "alpha CB Upsilon", upsilon_fit['alpha_CB']['value'])
+    #alpha_CB = ROOT.RooRealVar("alpha_CB", "alpha CB Upsilon", upsilon_fit['alpha_CB']['value'])
     n_CB = ROOT.RooRealVar("n_CB", "n CB Upsilon", upsilon_fit['n_CB']['value'])
-    """ alpha_CB = ROOT.RooRealVar("alpha_CB", "alpha CB Upsilon", *config['Upsilon']['alpha_CB'])
-    n_CB = ROOT.RooRealVar("n_CB", "n CB Upsilon", *config['Upsilon']['n_CB']) """
+    alpha_CB = ROOT.RooRealVar("alpha_CB", "alpha CB Upsilon", *config['UpsilonDstar']['alpha_CB'])
+    #n_CB = ROOT.RooRealVar("n_CB", "n CB Upsilon", *config['UpsilonDstar']['n_CB'])
 
     signal1S = ROOT.RooCBShape("signal1S", "Upsilon(1S) signal PDF", upsilon_mass, mean1S, sigma1S, alpha_CB, n_CB)
     signal2S = ROOT.RooCBShape("signal2S", "Upsilon(2S) signal PDF", upsilon_mass, mean2S, sigma2S, alpha_CB, n_CB)
@@ -176,25 +197,37 @@ def fit_upsilondstar(config, year):
 
     upsilon_bkg = ROOT.RooChebychev("upsilon_bkg", "Upsilon Background PDF", upsilon_mass, ROOT.RooArgList(bkg_a1, bkg_a2))
 
-    # Dstar Signal Double Gaussian - same mean
+    """ # Dstar Signal Double Gaussian - same mean
     dstar_mean = ROOT.RooRealVar("dstar_mean", "Dstar Gaussian Mean", *config['UpsilonDstar']['dstar_mean'])
     dstar_sigma1 = ROOT.RooRealVar("dstar_sigma1", "Dstar Gaussian 1 Sigma", *config['UpsilonDstar']['dstar_sigma1'])
     dstar_sigma2 = ROOT.RooRealVar("dstar_sigma2", "Dstar Gaussian 2 Sigma", *config['UpsilonDstar']['dstar_sigma2'])
     gauss1_frac = ROOT.RooRealVar("gauss1_frac", "Dstar Gaussian Fraction", *config['UpsilonDstar']['gauss1_frac'])
 
     g1 = ROOT.RooGaussian("g1", "Dstar Gaussian 1", dstar_deltamr, dstar_mean, dstar_sigma1)
-    g2 = ROOT.RooGaussian("g2", "Dstar Gaussian 2", dstar_deltamr, dstar_mean, dstar_sigma2)
+    g2 = ROOT.RooGaussian("g2", "Dstar Gaussian 2", dstar_deltamr, dstar_mean, dstar_sigma2) """
+
+    dstar_mean = ROOT.RooRealVar("dstar_mean", "Dstar Gaussian Mean", *config['UpsilonDstar']['dstar_mean'])
+    dstar_lambda = ROOT.RooRealVar("dstar_lambda", "Dstar Johnson's lambda", *config['UpsilonDstar']['dstar_lambda'])
+    dstar_gamma = ROOT.RooRealVar("dstar_gamma", "Dstar Johnson's gamma", *config['UpsilonDstar']['dstar_gamma'])
+    dstar_delta = ROOT.RooRealVar("dstar_delta", "Dstar Johnson's delta", *config['UpsilonDstar']['dstar_delta'])
 
     # Dstar Background = Phenomenological Threshold Function 
-    p0 = ROOT.RooRealVar("p0","", *config['UpsilonDstar']['p0'])
+    """ p0 = ROOT.RooRealVar("p0","", *config['UpsilonDstar']['p0'])
     p1 = ROOT.RooRealVar('p1',"", *config['UpsilonDstar']['p1'])
-    p2 = ROOT.RooRealVar('p2',"", *config['UpsilonDstar']['p2'])
+    p2 = ROOT.RooRealVar('p2',"", *config['UpsilonDstar']['p2']) """
+    A = ROOT.RooRealVar("A","", *config['UpsilonDstar']['A'])
+    B = ROOT.RooRealVar("B","", *config['UpsilonDstar']['B'])
+    C = ROOT.RooRealVar("C","", *config['UpsilonDstar']['C'])
+    
 
-    dstar_signal = ROOT.RooAddPdf("dstar_model", "Dstar Model", ROOT.RooArgList(g1, g2),
-                                ROOT.RooArgList(gauss1_frac), ROOT.kTRUE)
+    #dstar_signal = ROOT.RooAddPdf("dstar_model", "Dstar Model", ROOT.RooArgList(g1, g2),
+    #                            ROOT.RooArgList(gauss1_frac), ROOT.kTRUE)
+    dstar_signal = ROOT.RooJohnson("dstar_signal", "Dstar Jhonson", dstar_deltamr, dstar_mean, dstar_lambda, dstar_gamma, dstar_delta)
 
-    dstar_bkg = ROOT.RooGenericPdf("dstar_bkg","Dstar Background PDF","(1 - exp(-(@0 -0.13957)/@1)) * (@0/0.13957)**@2 + @3 * (@0/0.13957 - 1)",
-                                ROOT.RooArgList(dstar_deltamr,p0,p1,p2))
+    dstar_bkg = ROOT.RooGenericPdf("dstar_bkg","Dstar Background PDF"," @1 * (@0 - 0.13957)**@2 * exp(@3*(@0-0.13957))", 
+    ROOT.RooArgList(dstar_deltamr, A, B, C))
+    """ dstar_bkg = ROOT.RooGenericPdf("dstar_bkg","Dstar Background PDF","(1 - exp(-(@0 -0.13957)/@1)) * (@0/0.13957)**@2 + @3 * (@0/0.13957 - 1)",
+                                ROOT.RooArgList(dstar_deltamr,p0,p1,p2)) """
 
     signal = ROOT.RooProdPdf("signal", "Signal of 2D model", ROOT.RooArgList(upsilon_signal, dstar_signal))
     bkg1 = ROOT.RooProdPdf("bkg1", "Bkg1 of 2D model", ROOT.RooArgList(upsilon_signal, dstar_bkg))
@@ -241,7 +274,7 @@ def plot_fit(config, year, channel):
         f = ROOT.TFile.Open(path + "/Upsilon_fit.root")
         wspace = f.Get(f"upsilon_fit_{year}")
 
-        mass = wspace.var("mass")
+        mass = wspace.var("dimu_mass")
         data = wspace.data("data")
         model = wspace.pdf("model")
         result = wspace.obj("fitresult_model_data")
@@ -272,7 +305,7 @@ def plot_fit(config, year, channel):
         leg.Draw("same")
 
         canvas.Draw()
-        canvas.SaveAs(f"plots/fit/{channel.lower()}_{year}_fit.png")
+        canvas.SaveAs(f"plots/fit_vtxfit/{channel.lower()}_{year}_fit.png")
 
         # Save to file some interesting params
         fit_params['chi2'] = chi2
@@ -292,14 +325,15 @@ def plot_fit(config, year, channel):
         f = ROOT.TFile.Open(path + "/Dstar_fit.root")
         wspace = f.Get(f"dstar_fit_{year}")
 
-        deltamr = wspace.var("deltamr")
+        deltamr = wspace.var("dstar_deltamr")
         data = wspace.data("data")
         model = wspace.pdf("model")
         result = wspace.obj("fitresult_model_data")
 
         frame = deltamr.frame(ROOT.RooFit.Title("D* #Delta m fit"))
         data.plotOn(frame, ROOT.RooFit.Name("Data"), ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2))
-        model.plotOn(frame, ROOT.RooFit.Name("D* fit"), ROOT.RooFit.Components("g*"), ROOT.RooFit.LineColor(colors[1]))
+        #model.plotOn(frame, ROOT.RooFit.Name("D* fit"), ROOT.RooFit.Components("g*"), ROOT.RooFit.LineColor(colors[1]))
+        model.plotOn(frame, ROOT.RooFit.Name("D* fit"), ROOT.RooFit.Components("signal"), ROOT.RooFit.LineColor(colors[1]))
         model.plotOn(frame, ROOT.RooFit.Name("Combinatorial fit"), ROOT.RooFit.Components("bkg"), ROOT.RooFit.LineColor(colors[2]), ROOT.RooFit.LineStyle(2))
         model.plotOn(frame, ROOT.RooFit.Name("Model"), ROOT.RooFit.LineColor(colors[0]))
 
@@ -310,7 +344,7 @@ def plot_fit(config, year, channel):
         leg = ROOT.TLegend(0.7, 0.7, 0.93, 0.92)
         leg.AddEntry(frame.findObject("Data"), "Data", "LEP")
         leg.AddEntry(frame.findObject("Model"), "Fit", "L")
-        leg.AddEntry(frame.findObject("D* fit"), "D* fit Fit", "L")
+        leg.AddEntry(frame.findObject("D* fit"), "D* Fit", "L")
         leg.AddEntry(frame.findObject("Combinatorial fit"), "Combinatorial Fit", "L")
 
         canvas = ROOT.TCanvas("c1")
@@ -319,7 +353,7 @@ def plot_fit(config, year, channel):
         leg.Draw("same")
 
         canvas.Draw()
-        canvas.SaveAs(f"plots/fit/{channel.lower()}_{year}_fit.png")
+        canvas.SaveAs(f"plots/fit_vtxfit/{channel.lower()}_{year}_fit.png")
 
         # Save to file some interesting params
         fit_params['chi2'] = chi2
@@ -386,7 +420,7 @@ def plots_upsilondstar(path, year, lumi):
 
     plot.CMS_lumi(c1, 4, 1)
 
-    c1.SaveAs(f"plots/fit/fit2D_upsilon_proj_{year}.png")
+    c1.SaveAs(f"plots/fit_vtxfit/fit2D_upsilon_proj_{year}.png")
 
     ## Upsilon pull distribution
     cp_upsilon = ROOT.TCanvas("Upsilon Pull", "", 0, 0, 800, 250)
@@ -409,7 +443,7 @@ def plots_upsilondstar(path, year, lumi):
     line.SetLineStyle(2)
     line.Draw()
 
-    cp_upsilon.SaveAs(f"plots/fit/fit2D_upsilon_pull_{year}.png")
+    cp_upsilon.SaveAs(f"plots/fit_vtxfit/fit2D_upsilon_pull_{year}.png")
     
     # Canvas for Dstar 
     c2 = ROOT.TCanvas("Dstar deltamr")
@@ -449,7 +483,7 @@ def plots_upsilondstar(path, year, lumi):
     c2.Draw()
     plot.CMS_lumi(c2, 4, 1)
 
-    c2.SaveAs(f"plots/fit/fit2D_dstar_proj_{year}.png")
+    c2.SaveAs(f"plots/fit_vtxfit/fit2D_dstar_proj_{year}.png")
 
     ## Dstar pull distribution
 
@@ -474,7 +508,7 @@ def plots_upsilondstar(path, year, lumi):
     line.SetLineStyle(2)
     line.Draw()
 
-    cpd.SaveAs(f"plots/fit/fit2D_dstar_pull_{year}.png")
+    cpd.SaveAs(f"plots/fit_vtxfit/fit2D_dstar_pull_{year}.png")
 
     #################################### 2D fitting
     plot.ModTDRStyle(width=1000, height=1000)
@@ -538,7 +572,7 @@ def plots_upsilondstar(path, year, lumi):
     PaletteAxis.SetX2NDC(0.95) """
     
     c3.Update()
-    c3.SaveAs(f"plots/fit/fit2D_pdf_{year}.png")
+    c3.SaveAs(f"plots/fit_vtxfit/fit2D_pdf_{year}.png")
 
     #################################### Mass correlation plot
     with open('config/fit.yaml') as f:
@@ -607,7 +641,7 @@ def plots_upsilondstar(path, year, lumi):
     PaletteAxis.SetX2NDC(0.95)
 
     c4.Update()
-    c4.SaveAs(f"plots/fit/fit2D_mass_corr_{year}.png")
+    c4.SaveAs(f"plots/fit_vtxfit/fit2D_mass_corr_{year}.png")
 
     # Save to file some interesting params
     fit_params['chi2_upsilon'] = chi2_upsilon
