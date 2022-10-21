@@ -146,10 +146,10 @@ class EventSelectorProcessor(processor.ProcessorABC):
         D0 = D0[(D0.t1nValid > 4) & (D0.t2nValid > 4) & (D0.t1nPix > 1) & (D0.t2nPix > 1)]
         output['cutflow']['D0 trk hits cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1dxy < 0.5) & (D0.t2dxy < 0.5)]
+        D0 = D0[(D0.t1dxy < 0.5/(2 * np.arctan(np.exp(-D0.t1eta)))) & (D0.t2dxy < 0.5/(2 * np.arctan(np.exp(-D0.t2eta))))]
         output['cutflow']['D0 trk dxy cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1dz < .5) & (D0.t2dz < .5)]
+        D0 = D0[(D0.t1dz < .5/(2 * np.arctan(np.exp(-D0.t1eta)))) & (D0.t2dz < .5/(2 * np.arctan(np.exp(-D0.t2eta))))]
         output['cutflow']['D0 trk dz cut'] += ak.sum(ak.num(D0))
 
         # D0 cosphi
