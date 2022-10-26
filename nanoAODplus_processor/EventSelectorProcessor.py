@@ -97,11 +97,11 @@ class EventSelectorProcessor(processor.ProcessorABC):
         Dstar = Dstar[(Dstar.KnValid > 4) & (Dstar.pinValid > 4) & (Dstar.KnPix > 1) & (Dstar.pinPix > 1)]
         output['cutflow']['Dstar trk hits cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.Kdxy < 0.5/np.cos(2 * np.arctan(np.exp(-Dstar.Keta)))) & (Dstar.pidxy < 0.5/np.cos(2 * np.arctan(np.exp(-Dstar.pieta))))]
-        output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
+        #Dstar = Dstar[(Dstar.Kdxy < 0.5/np.cos(2 * np.arctan(np.exp(-Dstar.Keta)))) & (Dstar.pidxy < 0.5/np.cos(2 * np.arctan(np.exp(-Dstar.pieta))))]
+        #output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[(Dstar.Kdz < 0.5/np.cos(2 * np.arctan(np.exp(-Dstar.Keta)))) & (Dstar.pidz < 0.5/np.cos(2 * np.arctan(np.exp(-Dstar.pieta))))]
-        output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
+        #Dstar = Dstar[(Dstar.Kdz < 0.5/np.cos(2 * np.arctan(np.exp(-Dstar.Keta)))) & (Dstar.pidz < 0.5/np.cos(2 * np.arctan(np.exp(-Dstar.pieta))))]
+        #output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
 
         # pis cuts
         Dstar = Dstar[Dstar.pispt > 0.3]
@@ -146,11 +146,11 @@ class EventSelectorProcessor(processor.ProcessorABC):
         D0 = D0[(D0.t1nValid > 4) & (D0.t2nValid > 4) & (D0.t1nPix > 1) & (D0.t2nPix > 1)]
         output['cutflow']['D0 trk hits cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1dxy < 0.5/np.cos(2 * np.arctan(np.exp(-D0.t1eta)))) & (D0.t2dxy < 0.5/np.cos(2 * np.arctan(np.exp(-D0.t2eta))))]
-        output['cutflow']['D0 trk dxy cut'] += ak.sum(ak.num(D0))
+        #D0 = D0[(D0.t1dxy < 0.5/np.cos(2 * np.arctan(np.exp(-D0.t1eta)))) & (D0.t2dxy < 0.5/np.cos(2 * np.arctan(np.exp(-D0.t2eta))))]
+        #output['cutflow']['D0 trk dxy cut'] += ak.sum(ak.num(D0))
 
-        D0 = D0[(D0.t1dz < 0.5/np.cos(2 * np.arctan(np.exp(-D0.t1eta)))) & (D0.t2dz < 0.5/np.cos(2 * np.arctan(np.exp(-D0.t2eta))))]
-        output['cutflow']['D0 trk dz cut'] += ak.sum(ak.num(D0))
+        #D0 = D0[(D0.t1dz < 0.5/np.cos(2 * np.arctan(np.exp(-D0.t1eta)))) & (D0.t2dz < 0.5/np.cos(2 * np.arctan(np.exp(-D0.t2eta))))]
+        #output['cutflow']['D0 trk dz cut'] += ak.sum(ak.num(D0))
 
         # D0 cosphi
         D0 = D0[D0.cosphi > 0.99]
