@@ -104,16 +104,16 @@ class EventSelectorProcessor(processor.ProcessorABC):
         #output['cutflow']['Dstar trk pt cut'] += ak.sum(ak.num(Dstar))
 
         # pis cuts
-        Dstar = Dstar[Dstar.pispt > 0.3]
+        Dstar = Dstar[Dstar.pisptr > 0.3]
         output['cutflow']['Dstar pis pt cut'] += ak.sum(ak.num(Dstar))
 
-        Dstar = Dstar[Dstar.pischindof < 3]
+        Dstar = Dstar[Dstar.pischir < 3]
         output['cutflow']['Dstar pis chi2 cut'] += ak.sum(ak.num(Dstar))
 
         Dstar = Dstar[Dstar.pisnValid > 2]
         output['cutflow']['Dstar pis hits cut'] += ak.sum(ak.num(Dstar))
 
-        # D0 of Dstar cuts
+        # D0 of Dstar cutsa
         Dstar = Dstar[Dstar.D0cosphi > 0.95]
         output['cutflow']['Dstar D0 cosphi cut'] += ak.sum(ak.num(Dstar))
 

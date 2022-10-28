@@ -29,6 +29,7 @@ dstar_cols = [
     'Dstar_pidxy', 'Dstar_pidz', 'Dstar_pichg',
     'Dstar_pispt', 'Dstar_piseta', 'Dstar_pisphi', 'Dstar_pisvtxIdx', 'Dstar_pischindof', 'Dstar_pisnValid', 'Dstar_pisnPix',
     'Dstar_pisdxy', 'Dstar_pisdz',
+    'Dstar_pisptr', 'Dstar_pisetar', 'Dstar_pisphir', 'Dstar_pischir',
     'Dstar_associationchi2', 'Dstar_associationIdx', 'Dstar_associationProb',
 ]
 
