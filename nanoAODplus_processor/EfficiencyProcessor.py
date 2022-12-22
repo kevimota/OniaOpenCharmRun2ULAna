@@ -35,20 +35,17 @@ class EfficiencyProcessor(processor.ProcessorABC):
             'eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{Gen \mu\mu}$").Double(),
             'phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{Gen \mu\mu}$").Double(),
         }
-
         Reco_Dimu_hists = {
             'pt': Hist.new.Regular(100, 0, 300, name='pt', label=r"$p_{T,Reco \mu\mu}$ [GeV]").Double(),
             'eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{Reco \mu\mu}$").Double(),
             'phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{Reco \mu\mu}$").Double(),
             'mass': Hist.new.Regular(100, 8.6, 11, name="mass", label=r"$m_{Reco \mu\mu}$ [GeV]").Double(),
         }
-
         Gen_Dstar_hists = {
             'pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,Gen D^*}$ [GeV]").Double(),
             'eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{Gen D^*}$").Double(),
             'phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{Gen D^*}$").Double(),
         }
-
         Reco_Dstar_hists = {
             'pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,Reco D^*}$ [GeV]").Double(),
             'eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{Reco D^*}$").Double(),
@@ -97,7 +94,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         GenPart = ak.zip({**get_vars_dict(events, gen_part_cols)}, with_name="PtEtaPhiMCandidate")
         HLT = ak.zip({**get_hlt(events, [self.config['trigger'][self.year]])})
 
-        #GenParticles for Dimu and for Dstar
+        # GenParticles for Dimu and for Dstar
         GenPart_Muon = GenPart[(np.absolute(GenPart.pdgId) == 13) & (GenPart.genPartIdxMother > -1)]
 
         ############### Acceptance
@@ -178,12 +175,12 @@ class EfficiencyProcessor(processor.ProcessorABC):
         Dstar = Dstar[(Dstar.Kpt > self.config['dstar_track_pt_cut']) & (Dstar.pipt > self.config['dstar_track_pt_cut'])]
         Dstar = Dstar[(Dstar.Kchindof < 2.5) & (Dstar.pichindof < 2.5)]
         Dstar = Dstar[(Dstar.KnValid > 4) & (Dstar.pinValid > 4) & (Dstar.KnPix > 1) & (Dstar.pinPix > 1)]
-        Dstar = Dstar[(Dstar.Kdxy < 0.1) & (Dstar.pidxy < 0.1)]
-        Dstar = Dstar[(Dstar.Kdz < 1) & (Dstar.pidz < 1)]
+        Dstar = Dstar[(Dstar.Kdxy < 0.5/(2 * np.arctan(np.exp(-Dstar.Keta)))) & (Dstar.pidxy < 0.5/(2 * np.arctan(np.exp(-Dstar.pieta))))]
+        Dstar = Dstar[(Dstar.Kdz < 0.5/(2 * np.arctan(np.exp(-Dstar.Keta)))) & (Dstar.pidz < 0.5/(2 * np.arctan(np.exp(-Dstar.pieta))))]
 
         # pis cuts
-        Dstar = Dstar[Dstar.pispt > 0.3]
-        Dstar = Dstar[Dstar.pischindof < 3]
+        Dstar = Dstar[Dstar.pisptr > 0.3]
+        Dstar = Dstar[Dstar.pischir < 3]
         Dstar = Dstar[Dstar.pisnValid > 2]
 
         # D0 of Dstar cuts
