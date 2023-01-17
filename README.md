@@ -49,3 +49,38 @@ mkdir output
 cd OniaOpenCharmRun2ULAna
 . quick_setup.sh
 ```
+
+# Running the Analysis
+
+Events selection: `nanoAODplus_analyzer.py`, can be used with condor with `nanoAODplus_condor.py`. With the selection done, follow the steps
+
+## Do trigger and more tight selection:
+
+Run the code `nanoAODplus_trigger.py` by:
+```
+python nanoAODplus_trigger.py -p {path} -y {year} -m
+```
+path = path to the directory where the data is stored
+
+years = ['2016APV', '2016', '2017', '2018']
+
+The data can be plotted by using `nanoAODplus_plotter.py`
+```
+python nanoAODplus_plotter.py -y {year}
+```
+
+Save the data to ROOT TTrees to be able to use RooFit:
+```
+python tools/save_ttree.py -p {path_in} -o {path_out} -a
+```
+
+Fit to the 2D model:
+```
+python nanoAODplus_fit.py -y {year} -c {particle}
+python nanoAODplus_fit.py -y {year} -c {particle} -p
+```
+particles = ['Upsilon', 'Dstar', 'UpsilonDstar']
+
+## Calculate efficiency from MC
+
+TODO
