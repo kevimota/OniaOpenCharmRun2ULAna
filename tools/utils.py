@@ -45,7 +45,7 @@ def build_acc(obj, name=None):
 def association(cand1, cand2):
     ''' Function for association of the particles. The cuts that operates on all of them and 
     computation of quantities can go here. individual cuts can go on the main processing'''
-    cand2 = cand2[cand2.associationIdx >= 0]
+    cand2 = cand2[cand2.associationIdx > -1]
     asso = ak.zip({'0': cand1[cand2.associationIdx], '1': cand2})
     
     cand1 = ak.zip({
@@ -113,7 +113,7 @@ def get_trigger(year):
         trigger = yaml.load(f, Loader=yaml.FullLoader)['trigger'][year]
     return trigger
 
-def get_xsec(dictionary_in, dictionary_out, group, eta_width):
+def get_xsec(dictionary_in, dictionary_out, group, eta_width, factor):
     for values in dictionary_in['values']:
         bins_width = float(values['x'][0]['high']) - float(values['x'][0]['low'])
         for y in values['y']:
@@ -125,9 +125,9 @@ def get_xsec(dictionary_in, dictionary_out, group, eta_width):
             else:
                 error_stat = float(y['errors'][0]['symerror'][:-1])
                 error_syst = float(y['errors'][1]['symerror'][:-1])
-            dictionary_out['value'] += value*bins_width*eta_width
-            dictionary_out['error_stat'] += error_stat*bins_width*eta_width
-            dictionary_out['error_syst'] += error_syst*bins_width*eta_width
+            dictionary_out['value'] += value*bins_width*eta_width*factor
+            dictionary_out['error_stat'] += error_stat*bins_width*eta_width*factor
+            dictionary_out['error_syst'] += error_syst*bins_width*eta_width*factor
 
 def get_all_xsec():
     with open('data/cross_section/Y_1S_xsection.json', 'r') as f:
@@ -151,11 +151,11 @@ def get_all_xsec():
         'D*+': defaultdict(float),
     }
 
-    get_xsec(Y_1S, xsection_total['Y_1S'], 2, 2.4)
-    get_xsec(Y_2S, xsection_total['Y_2S'], 2, 2.4)
-    get_xsec(Y_3S, xsection_total['Y_3S'], 2, 2.4)
-    get_xsec(open_charm, xsection_total['D0'], 1, 1)
-    get_xsec(open_charm, xsection_total['D+'], 2, 1)
-    get_xsec(open_charm, xsection_total['D*+'], 0, 1)
+    get_xsec(Y_1S, xsection_total['Y_1S'], 2, 2.4, 1e-12)
+    get_xsec(Y_2S, xsection_total['Y_2S'], 2, 2.4, 1e-12)
+    get_xsec(Y_3S, xsection_total['Y_3S'], 2, 2.4, 1e-12)
+    get_xsec(open_charm, xsection_total['D0'], 1, 1, 1e-6)
+    get_xsec(open_charm, xsection_total['D+'], 2, 1, 1e-6)
+    get_xsec(open_charm, xsection_total['D*+'], 0, 1, 1e-6)
 
     return xsection_total
