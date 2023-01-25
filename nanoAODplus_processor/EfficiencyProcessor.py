@@ -15,10 +15,10 @@ pileup_file = '/Users/kevimota/CERN/OniaOpenCharmRun2ULAna/data/corrections/pile
 muon_reco_file = '/Users/kevimota/CERN/OniaOpenCharmRun2ULAna/data/corrections/Efficiency_muon_generalTracks_Run{year}_UL_trackerMuon.json'
 muon_id_file = '/Users/kevimota/CERN/OniaOpenCharmRun2ULAna/data/corrections/Efficiency_muon_trackerMuon_Run{year}_UL_ID.json'
 
-def get_dimu_weight(evaluator, Muon, Dimu, PVtx):
+def get_weight(evaluator, Muon, Dimu, PVtx):
     pileup_weight = evaluator['pileup'](ak.num(PVtx))[ak.num(Dimu)>0]
     muon = Muon[ak.num(Dimu)>0]
-    dimu = Dimu[ak.num(Dimu)>0]
+    #dimu = Dimu[ak.num(Dimu)>0]
     mu0_reco_weight = evaluator['NUM_TrackerMuons_DEN_genTracks/abseta_pt_value'](np.absolute(muon.slot0.eta[:,0]), muon.slot0.pt[:,0])
     mu1_reco_weight = evaluator['NUM_TrackerMuons_DEN_genTracks/abseta_pt_value'](np.absolute(muon.slot1.eta[:,0]), muon.slot1.pt[:,0])
     mu0_id_weight = evaluator['NUM_SoftID_DEN_TrackerMuons/abseta_pt_value'](np.absolute(muon.slot0.eta[:,0]), muon.slot0.pt[:,0])
@@ -219,7 +219,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         Dimu_aux = Dimu[remove_none(Dimu.pt)]
         Muon_aux = Muon[remove_none(Dimu.pt)]
 
-        dimu_weight = get_dimu_weight(evaluator, Muon_aux, Dimu_aux, PVtx)
+        dimu_weight = get_weight(evaluator, Muon_aux, Dimu_aux, PVtx)
         dstar_weight = evaluator['pileup'](ak.num(PVtx))[ak.num(Dstar_sim)>0]
 
         output['Gen_Dimu'].fill(
@@ -268,7 +268,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         Dimu_aux = Dimu[remove_none(Dimu.pt)]
         Muon_aux = Muon[remove_none(Dimu.pt)]
 
-        dimu_weight = get_dimu_weight(evaluator, Muon_aux, Dimu_aux, PVtx)
+        dimu_weight = get_weight(evaluator, Muon_aux, Dimu_aux, PVtx)
         dstar_weight = evaluator['pileup'](ak.num(PVtx))[ak.num(Dstar)>0]
 
         output['Cuts_Dimu'].fill(
@@ -295,7 +295,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         Dimu_aux = Dimu[remove_none(Dimu.pt)]
         Muon_aux = Muon[remove_none(Dimu.pt)]
 
-        dimu_weight = get_dimu_weight(evaluator, Muon_aux, Dimu_aux, PVtx)
+        dimu_weight = get_weight(evaluator, Muon_aux, Dimu_aux, PVtx)
 
         output['Trigger_Dimu'].fill(
             pt=Dimu_aux[ak.num(Dimu_aux)>0].pt[:,0], 
@@ -318,7 +318,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         DimuDstar = DimuDstar[arg_sort]
         MuonDstar = MuonDstar[arg_sort]
 
-        weight = get_dimu_weight(evaluator, MuonDstar.slot0, DimuDstar.slot1, PVtx)
+        weight = get_weight(evaluator, MuonDstar.slot0, DimuDstar.slot1, PVtx)
 
         output['Den_Asso'].fill(
             pt_dimu=DimuDstar[ak.num(DimuDstar)>0].slot0.pt[:,0], 
@@ -331,7 +331,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         DimuDstar = DimuDstar[DimuDstar.slot1.associationProb > self.config['vertex_probability_cut']]
         MuonDstar = MuonDstar[DimuDstar.slot1.associationProb > self.config['vertex_probability_cut']]
 
-        weight = get_dimu_weight(evaluator, MuonDstar.slot0, DimuDstar.slot1, PVtx)
+        weight = get_weight(evaluator, MuonDstar.slot0, DimuDstar.slot1, PVtx)
 
         output['Num_Asso'].fill(
             pt_dimu=DimuDstar[ak.num(DimuDstar)>0].slot0.pt[:,0], 
