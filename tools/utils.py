@@ -159,3 +159,41 @@ def get_all_xsec():
     get_xsec(open_charm, xsection_total['D*+'], 0, 1, 1e-6)
 
     return xsection_total
+
+
+def get_evt_eff(hists_eff, data):
+    from coffea.lookup_tools.dense_lookup import dense_lookup
+    
+    corr = {h:dense_lookup(hists_eff[h].values(), [ax.edges for ax in hists_eff[h].axes]) for h in hists_eff}
+
+    effs = {}
+    effs['acc_dimu']                  = ak.flatten(corr['acc_dimu'](data.dimu_pt, data.dimu_rap))
+    effs['acc_dstar']                 = ak.flatten(corr['acc_dstar'](data.dstar_pt, data.dstar_rap))
+    effs['eff_cuts_dimu']             = ak.flatten(corr['eff_cuts_dimu'](data.dimu_pt, data.dimu_rap))
+    effs['eff_cuts_dstar']            = ak.flatten(corr['eff_cuts_dstar'](data.dstar_pt, data.dstar_rap))
+    effs['eff_trigger_dimu']          = ak.flatten(corr['eff_trigger'](data.dimu_pt, data.dimu_rap))
+    effs['eff_asso_pt']               = ak.flatten(corr['eff_asso_pt'](data.dimu_pt, data.dstar_pt))
+    
+    effs_err_up = {}
+    effs_err_up['acc_dimu']           = ak.flatten(corr['acc_dimu_err_up'](data.dimu_pt, data.dimu_rap))
+    effs_err_up['acc_dstar']          = ak.flatten(corr['acc_dstar_err_up'](data.dstar_pt, data.dstar_rap))
+    effs_err_up['eff_cuts_dimu']      = ak.flatten(corr['eff_cuts_dimu_err_up'](data.dimu_pt, data.dimu_rap))
+    effs_err_up['eff_cuts_dstar']     = ak.flatten(corr['eff_cuts_dstar_err_up'](data.dstar_pt, data.dstar_rap))
+    effs_err_up['eff_trigger_dimu']   = ak.flatten(corr['eff_trigger_err_up'](data.dimu_pt, data.dimu_rap))
+    effs_err_up['eff_asso_pt']        = ak.flatten(corr['eff_asso_pt_err_up'](data.dimu_pt, data.dstar_pt))
+
+    effs_err_down = {}
+    effs_err_down['acc_dimu']         = ak.flatten(corr['acc_dimu_err_down'](data.dimu_pt, data.dimu_rap))
+    effs_err_down['acc_dstar']        = ak.flatten(corr['acc_dstar_err_down'](data.dstar_pt, data.dstar_rap))
+    effs_err_down['eff_cuts_dimu']    = ak.flatten(corr['eff_cuts_dimu_err_down'](data.dimu_pt, data.dimu_rap))
+    effs_err_down['eff_cuts_dstar']   = ak.flatten(corr['eff_cuts_dstar_err_down'](data.dstar_pt, data.dstar_rap))
+    effs_err_down['eff_trigger_dimu'] = ak.flatten(corr['eff_trigger_err_down'](data.dimu_pt, data.dimu_rap))
+    effs_err_down['eff_asso_pt']      = ak.flatten(corr['eff_asso_pt_err_down'](data.dimu_pt, data.dstar_pt))
+
+    total_eff = np.prod([effs[h] for h in effs], axis=0)
+    total_eff_err_up = total_eff*np.sqrt(np.sum([(effs_err_up[h]/effs[h])**2 for h in effs], axis=0))
+    total_eff_err_down = total_eff*np.sqrt(np.sum([(effs_err_down[h]/effs[h])**2 for h in effs], axis=0))
+    
+    wgt = 1/total_eff
+
+    return total_eff, total_eff_err_up, total_eff_err_down, wgt

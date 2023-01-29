@@ -5,12 +5,18 @@ trigger:
   "2018": "HLT_Dimuon24_Upsilon_noCorrL1"
 
 limits: 
-  Upsilon_min_pt: 20
-  Upsilon_max_pt: 130
-  Upsilon_rap: 1.2
+  Upsilon_min_pt: 15
+  Upsilon_max_pt: 150
+  Upsilon_rap: 2.5
   Dstar_min_pt: 4.0
-  Dstar_max_pt: 100
-  Dstar_rap: 2.1
+  Dstar_max_pt: 80
+  Dstar_rap: 2.5
+  #Upsilon_min_pt: 20
+  #Upsilon_max_pt: 130
+  #Upsilon_rap: 1.2
+  #Dstar_min_pt: 4.0
+  #Dstar_max_pt: 100
+  #Dstar_rap: 2.1
   Dstar_D0_pt: 3.0
   Dstar_D0_cosphi: 0.99
   Dstar_D0_mass: 0.028

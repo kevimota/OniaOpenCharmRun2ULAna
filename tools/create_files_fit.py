@@ -10,6 +10,7 @@ if __name__ == '__main__':
     parser.add_argument("-y", "--years", help="Year to fit", type=str, nargs='+', required=True)
     parser.add_argument("-c", "--channels", help="Particle to fit", type=str, nargs='+', required=True)
     parser.add_argument("-cf", "--create_files", action="store_true", help="create files for the fit", default=False)
+    parser.add_argument("-f", "--fit", action="store_true", help="create files for the fit", default=False)
     args = parser.parse_args()
 
     years_to_run = [year for year in args.years if year in years]
@@ -45,7 +46,8 @@ if __name__ == '__main__':
 
     base_folder = 'output/fom_vtxfit'
 
-    for year in years_to_run:
-        for particle in particles_to_run:
-            os.system(f'python nanoAODplus_fit.py -y {year} -c {particle}')
-            os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} -p')
+    if args.fit:
+        for year in years_to_run:
+            for particle in particles_to_run:
+                os.system(f'python nanoAODplus_fit.py -y {year} -c {particle}')
+                os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} -p')
