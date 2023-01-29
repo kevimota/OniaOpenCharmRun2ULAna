@@ -8,7 +8,6 @@ from coffea.nanoevents import BaseSchema
 
 import awkward as ak
 import numpy as np
-import pandas as pd
 import mplhep as hep
 from coffea import processor
 
@@ -25,7 +24,7 @@ from matplotlib.text import Text
 
 from tools.utils import *
 from tools.collections import *
-from tools.figure import create_plot1d, create_plot2d
+from tools.figure import create_plot2d
 
 years = ['2016APV', '2016', '2017', '2018']
 ps = [
@@ -48,7 +47,7 @@ def create_eff_hists2D(hist_num, hist_den, bins, names, hist_labels):
         Hist.new
         .Variable(bins[0], name=names[0], label=hist_labels[0])
         .Variable(bins[1], name=names[1], label=hist_labels[1])
-        .Weight()
+        .Double()
     )
 
     num = hist_num.values()
@@ -59,15 +58,15 @@ def create_eff_hists2D(hist_num, hist_den, bins, names, hist_labels):
         num/den,
         1.0,    
     )
-    err_up, err_down = np.where(
+    err_down, err_up = np.where(
         (den > 0),
-        ratio_uncertainty(num, den, uncertainty_type='poisson-ratio'),
+        ratio_uncertainty(num, den, uncertainty_type='efficiency'),
         0.0
     )
-    err = np.where((err_up > err_down), err_up, err_down)
+    #err = np.where((err_up > err_down), err_up, err_down)
 
-    #eff_hist[...] = values
-    eff_hist[...] = np.stack([values, err**2], axis=-1)
+    eff_hist[...] = values
+    #eff_hist[...] = np.stack([values, err**2], axis=-1)
 
     return eff_hist, err_up, err_down
     
@@ -124,7 +123,7 @@ def create_eff_plot1D(hist_num, hist_den, bins, names, hist_labels, savename, **
     )
     err_up, err_down = np.where(
         (den > 0),
-        ratio_uncertainty(num, den, uncertainty_type='poisson-ratio'),
+        ratio_uncertainty(num, den, uncertainty_type='efficiency'),
         0.0
     )
     err = np.where((err_up > err_down), err_up, err_down)
@@ -254,13 +253,80 @@ if __name__ == '__main__':
     pathlib.Path('output/efficiency').mkdir(parents=True, exist_ok=True)
     eff_file = uproot.recreate(f'output/efficiency/efficiencies_{year}.root')
 
-    eff_file['acc_dimu_2D']        = acc_dimu_hist.to_numpy()
-    eff_file['acc_dstar_2D']       = acc_dstar_hist.to_numpy()
-    eff_file['eff_cuts_dimu_2D']   = eff_cuts_dimu_hist.to_numpy()
-    eff_file['eff_cuts_dstar_2D']  = eff_cuts_dstar_hist.to_numpy()
-    eff_file['eff_trigger_2D']     = eff_trigger_hist.to_numpy()
-    eff_file['eff_asso_pt_2D']     = eff_asso_pt_hist.to_numpy()
-    eff_file['eff_asso_rap_2D']    = eff_asso_rap_hist.to_numpy()
+    acc_dimu_err_up_hist = (
+        Hist.new
+        .Variable(config['bins_pt_dimu'], name='pt_dimu', label=r'$p_{T, \mu^+\mu^-}$')
+        .Variable(config['bins_rap_dimu'], name='rap_dimu', label=r'$y_{\mu^+\mu^-}$')
+        .Double()
+    )
+    acc_dimu_err_down_hist = acc_dimu_err_up_hist.copy()
+    eff_cuts_dimu_err_up_hist = acc_dimu_err_up_hist.copy()
+    eff_cuts_dimu_err_down_hist = acc_dimu_err_up_hist.copy()
+    eff_trigger_err_up_hist = acc_dimu_err_up_hist.copy()
+    eff_trigger_err_down_hist = acc_dimu_err_up_hist.copy()
+
+    acc_dstar_err_up_hist = (
+        Hist.new
+        .Variable(config['bins_pt_dstar'], name='pt_dstar', label=r'$p_{T, \mu^+\mu^-}$')
+        .Variable(config['bins_rap_dstar'], name='rap_dstar', label=r'$y_{\mu^+\mu^-}$')
+        .Double()
+    )
+    acc_dstar_err_down_hist = acc_dstar_err_up_hist.copy()
+    eff_cuts_dstar_err_up_hist = acc_dstar_err_up_hist.copy()
+    eff_cuts_dstar_err_down_hist = acc_dstar_err_up_hist.copy()
+    
+    eff_asso_pt_err_up_hist = (
+        Hist.new
+        .Variable(config['bins_pt_dimu'], name='pt_dimu', label=r'$p_{T, \mu^+\mu^-}$')
+        .Variable(config['bins_pt_dstar'], name='pt_dstar', label=r'$p_{T, D^*}$')
+        .Double()
+    )
+    eff_asso_pt_err_down_hist = eff_asso_pt_err_up_hist.copy()
+    eff_asso_rap_err_up_hist = (
+        Hist.new
+        .Variable(config['bins_rap_dimu'], name='rap_dimu', label=r'$y_{\mu^+\mu^-}$')
+        .Variable(config['bins_rap_dstar'], name='rap_dstar', label=r'$y_{D^*}$')
+        .Double()
+    )
+    eff_asso_rap_err_down_hist = eff_asso_rap_err_up_hist.copy()
+    
+    acc_dimu_err_up_hist[...] = acc_dimu_err_up
+    acc_dimu_err_down_hist[...] = acc_dimu_err_down
+    acc_dstar_err_up_hist[...] = acc_dstar_err_up
+    acc_dstar_err_down_hist[...] = acc_dstar_err_down
+    eff_cuts_dimu_err_up_hist[...] = eff_cuts_dimu_err_up
+    eff_cuts_dimu_err_down_hist[...] = eff_cuts_dimu_err_down
+    eff_cuts_dstar_err_up_hist[...] = eff_cuts_dstar_err_up
+    eff_cuts_dstar_err_down_hist[...] = eff_cuts_dstar_err_down
+    eff_trigger_err_up_hist[...] = eff_trigger_err_up
+    eff_trigger_err_down_hist[...] = eff_trigger_err_down
+    eff_asso_pt_err_up_hist[...] = eff_asso_pt_err_up
+    eff_asso_pt_err_down_hist[...] = eff_asso_pt_err_down
+    eff_asso_rap_err_up_hist[...] = eff_asso_rap_err_up
+    eff_asso_rap_err_down_hist[...] = eff_asso_rap_err_down
+
+    eff_file['acc_dimu']                 = acc_dimu_hist.to_numpy()
+    eff_file['acc_dstar']                = acc_dstar_hist.to_numpy()
+    eff_file['eff_cuts_dimu']            = eff_cuts_dimu_hist.to_numpy()
+    eff_file['eff_cuts_dstar']           = eff_cuts_dstar_hist.to_numpy()
+    eff_file['eff_trigger']              = eff_trigger_hist.to_numpy()
+    eff_file['eff_asso_pt']              = eff_asso_pt_hist.to_numpy()
+    eff_file['eff_asso_rap']             = eff_asso_rap_hist.to_numpy()
+    eff_file['acc_dimu_err_up']          = acc_dimu_err_up_hist.to_numpy()
+    eff_file['acc_dimu_err_down']        = acc_dimu_err_down_hist.to_numpy()
+    eff_file['acc_dimu_err_down']        = acc_dimu_err_down_hist.to_numpy()
+    eff_file['acc_dstar_err_up']         = acc_dstar_err_up_hist.to_numpy()
+    eff_file['acc_dstar_err_down']       = acc_dstar_err_down_hist.to_numpy()
+    eff_file['eff_cuts_dimu_err_up']     = eff_cuts_dimu_err_up_hist.to_numpy()
+    eff_file['eff_cuts_dimu_err_down']   = eff_cuts_dimu_err_down_hist.to_numpy()
+    eff_file['eff_cuts_dstar_err_up']    = eff_cuts_dstar_err_up_hist.to_numpy()
+    eff_file['eff_cuts_dstar_err_down']  = eff_cuts_dstar_err_down_hist.to_numpy()
+    eff_file['eff_trigger_err_up']       = eff_trigger_err_up_hist.to_numpy()
+    eff_file['eff_trigger_err_down']     = eff_trigger_err_down_hist.to_numpy()
+    eff_file['eff_asso_pt_err_up']       = eff_asso_pt_err_up_hist.to_numpy()
+    eff_file['eff_asso_pt_err_down']     = eff_asso_pt_err_down_hist.to_numpy()
+    eff_file['eff_asso_rap_err_up']      = eff_asso_rap_err_up_hist.to_numpy()
+    eff_file['eff_asso_rap_err_down']    = eff_asso_rap_err_down_hist.to_numpy()
 
     if args.plot:
         # Create plots of all the components

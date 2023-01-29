@@ -1,8 +1,8 @@
 dimu_mass_low: 8.5
 dimu_mass_high: 11.5
-bins_pt_dimu: [15, 30, 60, 120, 300]
+bins_pt_dimu: [15, 30, 60, 90, 120, 150]
 bins_rap_dimu: [0.0, 0.5, 1.0, 1.5, 2.5]
-bins_pt_dstar: [4, 10, 20, 30, 50, 70, 100]
+bins_pt_dstar: [4, 10, 20, 30, 50, 80]
 bins_rap_dstar: [0.0, 0.5, 1.0, 1.5, 2.5]
 #bins_pt_dimu: [20, 30, 50, 70, 100, 130]
 #bins_rap_dimu: [0.0, 0.5, 1.2]
@@ -13,12 +13,12 @@ particle: "Y"
 #Acceptance
 muon_pt_min: 3.
 muon_eta: 2.4
-dimu_pt_min: 20.
-dimu_pt_max: 130.
+dimu_pt_min: 15.
+dimu_pt_max: 150.
 dimu_rap: 2.5
 dstar_pt_min: 4.
-dstar_pt_max: 100.
-dstar_rap: 2.1
+dstar_pt_max: 80.
+dstar_rap: 2.5
 
 # Cuts Efficiency
 dstar_track_pt_cut: 1.0
