@@ -61,6 +61,7 @@ def create_eff_hists2D(hist_num, hist_den, bins, names, hist_labels):
     err_down, err_up = np.where(
         (den > 0),
         ratio_uncertainty(num, den, uncertainty_type='efficiency'),
+        #ratio_uncertainty(num, den, uncertainty_type='poisson-ratio'),
         0.0
     )
     #err = np.where((err_up > err_down), err_up, err_down)
@@ -71,7 +72,7 @@ def create_eff_hists2D(hist_num, hist_den, bins, names, hist_labels):
     return eff_hist, err_up, err_down
     
 
-def create_eff_plot2D(hist_eff, err_up, err_down, savename, with_labels=True, **kwargs):
+def create_eff_plot2D(hist_eff, err_up, err_down, savename, year, with_labels=True, **kwargs):
     fig, ax = plt.subplots()
 
     if with_labels:
@@ -91,7 +92,7 @@ def create_eff_plot2D(hist_eff, err_up, err_down, savename, with_labels=True, **
         x = ax.get_children()
         for i0 in x:
             if isinstance(i0, Text):
-                i0.set_size(10)
+                i0.set_size(11)
                 i0.set_rotation(270)
         
         """ if ('dimu' in file_eff) or ('asso' in file_eff):
@@ -106,11 +107,18 @@ def create_eff_plot2D(hist_eff, err_up, err_down, savename, with_labels=True, **
     else:
         artists = hep.hist2dplot(hist_eff, ax=ax, **kwargs)
 
+    hep.cms.text('Simulation', loc=0)
+    year_text = plt.text(1., 1., f"{year} (13 TeV)",
+                    fontsize=18,
+                    horizontalalignment='right',
+                    verticalalignment='bottom',
+                    transform=ax.transAxes
+                    )
     fig.savefig(f'plots/efficiency/{savename}')
     plt.close()
 
 
-def create_eff_plot1D(hist_num, hist_den, bins, names, hist_labels, savename, **kwargs):
+def create_eff_plot1D(hist_num, hist_den, bins, names, hist_labels, savename, ylim=(0, 1.2), **kwargs):
     eff_hist = Hist.new.Variable(bins, name=names, label=hist_labels).Weight()
     
     num = hist_num.values()
@@ -132,10 +140,19 @@ def create_eff_plot1D(hist_num, hist_den, bins, names, hist_labels, savename, **
     eff_hist[...] = np.stack([values, err**2], axis=-1)
 
     fig, ax = plt.subplots()
-    artists = hep.histplot(eff_hist, ax=ax)
+    artists = hep.histplot(eff_hist, ax=ax, histtype='errorbar', xerr=True, **kwargs)
+    ax.set_ylim(*ylim)
+    plt.axhline(1.0, linestyle='--')
+    hep.cms.text('Simulation', loc=0)
+    year_text = plt.text(1., 1., f"{year} (13 TeV)",
+                    fontsize=18,
+                    horizontalalignment='right',
+                    verticalalignment='bottom',
+                    transform=ax.transAxes
+                    )
+    
     fig.savefig(f'plots/efficiency/{savename}')
     plt.close()
-
 
 if __name__ == '__main__':
     import argparse
@@ -246,7 +263,7 @@ if __name__ == '__main__':
         hists['Den_Asso'].project('rap_dimu', 'rap_dstar'),
         (config['bins_rap_dimu'], config['bins_rap_dstar']),
         ('rap_dimu', 'rap_dstar'),
-        (r'$|y_{\mu^+\mu^-}|$', r'$y_{D^*}$'),
+        (r'$|y_{\mu^+\mu^-}|$', r'$|y_{D^*}|$'),
     )
 
     # Save files to root
@@ -340,14 +357,53 @@ if __name__ == '__main__':
             fig.savefig(f'plots/efficiency/{hist}_{year}.png')
             plt.close()
 
+        if year == '2016APV':
+            year_int = 2016
+        else:
+            year_int = int(year)
         # Create plots 2D for efficiencies
-        create_eff_plot2D(acc_dimu_hist, acc_dimu_err_up, acc_dimu_err_down, f'acc_dimu_{year}.png', vmin=0, vmax=1)
-        create_eff_plot2D(acc_dstar_hist, acc_dstar_err_up, acc_dstar_err_down, f'acc_dstar_{year}.png', vmin=0, vmax=1)
-        create_eff_plot2D(eff_cuts_dimu_hist, eff_cuts_dimu_err_up, eff_cuts_dimu_err_down, f'eff_cuts_dimu_{year}.png', vmin=0, vmax=1)
-        create_eff_plot2D(eff_cuts_dstar_hist, eff_cuts_dstar_err_up, eff_cuts_dstar_err_down, f'eff_cuts_dstar_{year}.png', vmin=0, vmax=1)
-        create_eff_plot2D(eff_trigger_hist, eff_trigger_err_up, eff_trigger_err_down, f'eff_trigger_{year}.png', vmin=0, vmax=1)
-        create_eff_plot2D(eff_asso_pt_hist, eff_asso_pt_err_up, eff_asso_pt_err_down, f'eff_asso_pt_{year}.png', vmin=0, vmax=1)
-        create_eff_plot2D(eff_asso_rap_hist, eff_asso_rap_err_up, eff_asso_rap_err_down, f'eff_asso_rap_{year}.png', vmin=0, vmax=1)
+        create_eff_plot2D(
+            acc_dimu_hist, acc_dimu_err_up, acc_dimu_err_down, 
+            f'acc_dimu_{year}.png', 
+            year_int, 
+            vmin=0, vmax=1
+        )
+        create_eff_plot2D(
+            acc_dstar_hist, acc_dstar_err_up, acc_dstar_err_down, 
+            f'acc_dstar_{year}.png', 
+            year_int, 
+            vmin=0, vmax=1
+        )
+        create_eff_plot2D(
+            eff_cuts_dimu_hist, eff_cuts_dimu_err_up, eff_cuts_dimu_err_down, 
+            f'eff_cuts_dimu_{year}.png', 
+            year_int, 
+            vmin=0, vmax=1
+        )
+        create_eff_plot2D(
+            eff_cuts_dstar_hist, eff_cuts_dstar_err_up, eff_cuts_dstar_err_down, 
+            f'eff_cuts_dstar_{year}.png', 
+            year_int, 
+            vmin=0, vmax=1
+        )
+        create_eff_plot2D(
+            eff_trigger_hist, eff_trigger_err_up, eff_trigger_err_down, 
+            f'eff_trigger_{year}.png', 
+            year_int, 
+            vmin=0, vmax=1
+        )
+        create_eff_plot2D(
+            eff_asso_pt_hist, eff_asso_pt_err_up, eff_asso_pt_err_down, 
+            f'eff_asso_pt_{year}.png', 
+            year_int, 
+            vmin=0, vmax=1
+        )
+        create_eff_plot2D(
+            eff_asso_rap_hist, eff_asso_rap_err_up, eff_asso_rap_err_down, 
+            f'eff_asso_rap_{year}.png', 
+            year_int, 
+            vmin=0, vmax=1
+        )
 
         create_eff_plot1D(
             hists['Reco_Dimu'].project('pt'), 
@@ -355,7 +411,7 @@ if __name__ == '__main__':
             config['bins_pt_dimu'],
             'pt',
             r'$p_{T, \mu^+\mu^-}$',
-            f'acc_dimu_pt_{year}.png'
+            f'acc_dimu_pt_{year}.png',
         )
         create_eff_plot1D(
             hists['Reco_Dimu'].project('rap'), 
@@ -363,7 +419,7 @@ if __name__ == '__main__':
             config['bins_rap_dimu'],
             'rap',
             r'$|y_{\mu^+\mu^-}|$',
-            f'acc_dimu_rap_{year}.png'
+            f'acc_dimu_rap_{year}.png',
         )
         create_eff_plot1D(
             hists['Reco_Dstar'].project('pt'), 
@@ -371,7 +427,7 @@ if __name__ == '__main__':
             config['bins_pt_dstar'],
             'pt',
             r'$p_{T, \mu^+\mu^-}$',
-            f'acc_dstar_pt_{year}.png'
+            f'acc_dstar_pt_{year}.png',
         )
         create_eff_plot1D(
             hists['Reco_Dstar'].project('rap'), 
@@ -379,7 +435,7 @@ if __name__ == '__main__':
             config['bins_rap_dstar'],
             'rap',
             r'$|y_{\mu^+\mu^-}|$',
-            f'acc_dstar_rap_{year}.png'
+            f'acc_dstar_rap_{year}.png',
         )
         create_eff_plot1D(
             hists['Cuts_Dimu'].project('pt'), 
@@ -387,7 +443,7 @@ if __name__ == '__main__':
             config['bins_pt_dimu'],
             'pt',
             r'$p_{T, \mu^+\mu^-}$',
-            f'eff_cuts_dimu_pt_{year}.png'
+            f'eff_cuts_dimu_pt_{year}.png',
         )
         create_eff_plot1D(
             hists['Cuts_Dimu'].project('rap'), 
@@ -395,7 +451,7 @@ if __name__ == '__main__':
             config['bins_rap_dimu'],
             'rap',
             r'$|y_{\mu^+\mu^-}|$',
-            f'eff_cuts_dimu_rap_{year}.png'
+            f'eff_cuts_dimu_rap_{year}.png',
         )
         create_eff_plot1D(
             hists['Cuts_Dstar'].project('pt'), 
@@ -403,7 +459,7 @@ if __name__ == '__main__':
             config['bins_pt_dstar'],
             'pt',
             r'$p_{T, \mu^+\mu^-}$',
-            f'eff_cuts_dstar_pt_{year}.png'
+            f'eff_cuts_dstar_pt_{year}.png',
         )
         create_eff_plot1D(
             hists['Cuts_Dstar'].project('rap'), 
@@ -411,7 +467,7 @@ if __name__ == '__main__':
             config['bins_rap_dstar'],
             'rap',
             r'$|y_{\mu^+\mu^-}|$',
-            f'eff_cuts_dstar_rap_{year}.png'
+            f'eff_cuts_dstar_rap_{year}.png',
         )
         create_eff_plot1D(
             hists['Trigger_Dimu'].project('pt'), 
@@ -419,7 +475,7 @@ if __name__ == '__main__':
             config['bins_pt_dimu'],
             'pt',
             r'$p_{T, \mu^+\mu^-}$',
-            f'eff_trigger_pt_{year}.png'
+            f'eff_trigger_pt_{year}.png',
         )
         create_eff_plot1D(
             hists['Trigger_Dimu'].project('rap'), 
@@ -427,6 +483,6 @@ if __name__ == '__main__':
             config['bins_rap_dimu'],
             'rap',
             r'$|y_{\mu^+\mu^-}|$',
-            f'eff_trigger_rap_{year}.png'
+            f'eff_trigger_rap_{year}.png',
         )
         

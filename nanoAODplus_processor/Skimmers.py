@@ -169,14 +169,14 @@ class Skimmer:
         DimuDstar = DimuDstar[DimuDstar.dstar_d0_dlSig > self.config['limits']['Dstar_D0_dlSig']]
         DimuDstar = DimuDstar[DimuDstar.dstar_k_pt > self.config['limits']['Dstar_track_pt']]
         DimuDstar = DimuDstar[DimuDstar.dstar_pi_pt > self.config['limits']['Dstar_track_pt']]
-        DimuDstar = DimuDstar[DimuDstar.dstar_k_dxy < 0.1]
+        DimuDstar = DimuDstar[DimuDstar.dstar_k_dxy < 0.5]
         DimuDstar.dstar_k_theta = 2 * np.arctan(np.exp(-DimuDstar.dstar_k_eta))
-        #DimuDstar = DimuDstar[DimuDstar.dstar_k_dz < 0.5/np.sin(DimuDstar.dstar_k_theta)]
-        DimuDstar = DimuDstar[DimuDstar.dstar_k_dz < 1]
-        DimuDstar = DimuDstar[DimuDstar.dstar_pi_dxy < 0.1]
+        DimuDstar = DimuDstar[DimuDstar.dstar_k_dz < 0.5/np.sin(DimuDstar.dstar_k_theta)]
+        #DimuDstar = DimuDstar[DimuDstar.dstar_k_dz < 1]
+        DimuDstar = DimuDstar[DimuDstar.dstar_pi_dxy < 0.5]
         DimuDstar.dstar_pi_theta = 2 * np.arctan(np.exp(-DimuDstar.dstar_pi_eta))
-        #DimuDstar = DimuDstar[DimuDstar.dstar_pi_dz < 0.5/np.sin(DimuDstar.dstar_pi_theta)]
-        DimuDstar = DimuDstar[DimuDstar.dstar_pi_dz < 1]
+        DimuDstar = DimuDstar[DimuDstar.dstar_pi_dz < 0.5/np.sin(DimuDstar.dstar_pi_theta)]
+        #DimuDstar = DimuDstar[DimuDstar.dstar_pi_dz < 1]
         DimuDstar = DimuDstar[DimuDstar.dstar_asso_prob > self.config['limits']['Dstar_association_prob']]
 
         DimuDstar = DimuDstar[~DimuDstar.wrg_chg]

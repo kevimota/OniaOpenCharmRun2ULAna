@@ -251,8 +251,10 @@ class EfficiencyProcessor(processor.ProcessorABC):
         Dstar = Dstar[(Dstar.Kpt > self.config['dstar_track_pt_cut']) & (Dstar.pipt > self.config['dstar_track_pt_cut'])]
         Dstar = Dstar[(Dstar.Kchindof < 2.5) & (Dstar.pichindof < 2.5)]
         Dstar = Dstar[(Dstar.KnValid > 4) & (Dstar.pinValid > 4) & (Dstar.KnPix > 1) & (Dstar.pinPix > 1)]
-        Dstar = Dstar[(Dstar.Kdxy < 0.5/(2 * np.arctan(np.exp(-Dstar.Keta)))) & (Dstar.pidxy < 0.5/(2 * np.arctan(np.exp(-Dstar.pieta))))]
-        Dstar = Dstar[(Dstar.Kdz < 0.5/(2 * np.arctan(np.exp(-Dstar.Keta)))) & (Dstar.pidz < 0.5/(2 * np.arctan(np.exp(-Dstar.pieta))))]
+        Dstar = Dstar[(Dstar.Kdxy < 0.5) & (Dstar.pidxy < 0.5)]
+        K_theta = 2 * np.arctan(np.exp(-Dstar.Keta))
+        pi_theta = 2 * np.arctan(np.exp(-Dstar.pieta))
+        Dstar = Dstar[(Dstar.Kdz < 0.5/np.sin(K_theta)) & (Dstar.pidz < 0.5/np.sin(pi_theta))]
 
         # pis cuts
         Dstar = Dstar[Dstar.pisptr > 0.3]
