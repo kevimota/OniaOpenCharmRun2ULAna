@@ -1,152 +1,229 @@
-from coffea import hist
-from coffea.analysis_objects import JaggedCandidateArray
-import coffea.processor as processor
-from awkward import JaggedArray
+import awkward as ak
 import numpy as np
+import coffea.processor as processor
+from coffea.util import save
+
+from coffea.nanoevents.methods import candidate
+ak.behavior.update(candidate.behavior)
+
+import random, yaml
+
+from tools.collections import *
+from tools.utils import *
+
+D0_PDG_MASS = 1.864
 
 class GenParticleProcessor(processor.ProcessorABC):
-   def __init__(self):
-      dataset_axis = hist.Cat("dataset", "Primary dataset")
+    def __init__(self, analyzer_name, year):
+        self.analyzer_name = analyzer_name
+        self.year = year
 
-      Muon_lead_pt_axis = hist.Bin("pt", r"$p_{T,\mu lead}$ [GeV]", 1000, 0.25, 300)
-      Muon_trail_pt_axis = hist.Bin("pt", r"$p_{T,\mu trail}$ [GeV]", 1000, 0.25, 300)
-      Muon_eta_axis = hist.Bin("eta", r"$\eta_{\mu}$", 60, -3.0, 3.0)
-      Muon_phi_axis = hist.Bin("phi", r"$\phi_{\mu}$", 70, -3.5, 3.5)
+        self._accumulator = processor.dict_accumulator({
+            'cutflow': processor.defaultdict_accumulator(int),
+        })
 
-      Dimuon_mass_axis = hist.Bin("mass", r"$m_{\mu\mu}$ [GeV]", 200, 8.5, 10.5)
-      Dimuon_pt_axis = hist.Bin("pt", r"$p_{T,\mu\mu}$ [GeV]", 1000, 0.25, 300)
-      Dimuon_eta_axis = hist.Bin("eta", r"$\eta_{\mu\mu}$", 100, -5.0, 5.0)
-      Dimuon_phi_axis = hist.Bin("phi", r"$\phi_{\mu\mu}$", 70, -3.5, 3.5)
+    @property
+    def accumulator(self):
+        return self._accumulator
 
-      D0_mass_axis = hist.Bin("mass", r"$m_{D^0}$ [GeV]", 10, 1.2, 2.2)
-      D0_pt_axis = hist.Bin("pt", r"$p_{T,D^0}$ [GeV]", 1000, 0.25, 300)
-      D0_eta_axis = hist.Bin("eta", r"$\eta_{D^0}$", 100, -5.0, 5.0)
-      D0_phi_axis = hist.Bin("phi", r"$\phi_{D^0}$", 70, -3.5, 3.5)
+    def process(self, events):
+        output = self.accumulator.identity()
+        
+        # test if there are any events in the file
+        if len(events) == 0:
+            return output
+        
+        ############### Get All the interesting candidates from NTuples
+        Dimu = ak.zip({**get_vars_dict(events, dimu_cols)}, with_name="PtEtaPhiMCandidate")
+        Muon = ak.zip({**get_vars_dict(events, muon_cols)}, with_name="PtEtaPhiMCandidate")
+        D0 = ak.zip({'mass': events.D0_mass12, **get_vars_dict(events, d0_cols)}, with_name="PtEtaPhiMCandidate")
+        Dstar = ak.zip({'mass': (events.Dstar_D0mass + events.Dstar_deltamr),
+                        'charge': events.Dstar_pischg,
+                        **get_vars_dict(events, dstar_cols)}, 
+                        with_name="PtEtaPhiMCandidate")
+        HLT = ak.zip({**get_hlt(events, hlt_cols[self.year])})
+        PVtx = ak.zip({**get_vars_dict(events, pvtx_cols)})
+        GenPart = ak.zip({**get_vars_dict(events, gen_part_cols)}, with_name="PtEtaPhiMCandidate")
 
-      D0_rec_mass_axis = hist.Bin("mass", r"$m_{D^0}$ [GeV]", 10, 1.85, 1.90)
-      D0_rec_pt_axis = hist.Bin("pt", r"$p_{T,D^0}$ [GeV]", 1000, 0.25, 300)
-      D0_rec_eta_axis = hist.Bin("eta", r"$\eta_{D^0}$", 100, -5.0, 5.0)
-      D0_rec_phi_axis = hist.Bin("phi", r"$\phi_{D^0}$", 70, -3.5, 3.5)
+        ############### Load config files
+        with open("config/skim_trigger.yaml", 'r') as f:
+            skim_trigger = yaml.load(f, Loader=yaml.FullLoader)
+            trigger = skim_trigger['trigger']
+            cuts = skim_trigger['limits']
 
-      Dplus_rec_mass_axis = hist.Bin("mass", r"$m_{D^+}$ [GeV]", 10, 1.86, 1.88)
-      Dplus_rec_pt_axis = hist.Bin("pt", r"$p_{T,D^0}$ [GeV]", 1000, 0.25, 300)
-      Dplus_rec_eta_axis = hist.Bin("eta", r"$\eta_{D^0}$", 100, -5.0, 5.0)
-      Dplus_rec_phi_axis = hist.Bin("phi", r"$\phi_{D^0}$", 70, -3.5, 3.5)
-      
-      self._accumulator = processor.dict_accumulator({
-         'Muon_lead_pt': hist.Hist("Counts", dataset_axis, Muon_lead_pt_axis),
-         'Muon_trail_pt': hist.Hist("Counts", dataset_axis, Muon_trail_pt_axis),
-         'Muon_eta': hist.Hist("Counts", dataset_axis, Muon_eta_axis),
-         'Muon_phi': hist.Hist("Counts", dataset_axis, Muon_phi_axis),
-         'Dimuon_mass': hist.Hist("Counts", dataset_axis, Dimuon_mass_axis),
-         'Dimuon_pt': hist.Hist("Counts", dataset_axis, Dimuon_pt_axis),
-         'Dimuon_eta': hist.Hist("Counts", dataset_axis, Dimuon_eta_axis),
-         'Dimuon_phi': hist.Hist("Counts", dataset_axis, Dimuon_phi_axis),
-         'D0_mass': hist.Hist("Counts", dataset_axis, D0_mass_axis),
-         'D0_pt': hist.Hist("Counts", dataset_axis, D0_pt_axis),
-         'D0_eta': hist.Hist("Counts", dataset_axis, D0_eta_axis),
-         'D0_phi': hist.Hist("Counts", dataset_axis, D0_phi_axis),
-         'D0_rec_mass': hist.Hist("Counts", dataset_axis, D0_rec_mass_axis),
-         'D0_rec_pt': hist.Hist("Counts", dataset_axis, D0_rec_pt_axis),
-         'D0_rec_eta': hist.Hist("Counts", dataset_axis, D0_rec_eta_axis),
-         'D0_rec_phi': hist.Hist("Counts", dataset_axis, D0_rec_phi_axis),
-         'Dplus_rec_mass': hist.Hist("Counts", dataset_axis, Dplus_rec_mass_axis),
-         'Dplus_rec_pt': hist.Hist("Counts", dataset_axis, Dplus_rec_pt_axis),
-         'Dplus_rec_eta': hist.Hist("Counts", dataset_axis, Dplus_rec_eta_axis),
-         'Dplus_rec_phi': hist.Hist("Counts", dataset_axis, Dplus_rec_phi_axis),
-         'cutflow': processor.defaultdict_accumulator(int),
-      })
-    
-   @property
-   def accumulator(self):
-      return self._accumulator
-    
-   def process(self, df):
-      output = self.accumulator.identity()
-      
-      # GenParticles
-      dataset = df['dataset']
-      if df['nGenPart'].size != 0:
-         GenPart = JaggedCandidateArray.candidatesfromcounts(
-               df['nGenPart'],
-               pt=df['GenPart_pt'],
-               eta=df['GenPart_eta'],
-               phi=df['GenPart_phi'],
-               mass=df['GenPart_mass'],
-               charge=df['GenPart_charge'],
-               pdgId=df['GenPart_pdgId'],
-               vx=df['GenPart_vx'],
-               vy=df['GenPart_vy'],
-               vz=df['GenPart_vz'],
-               mpdgId=df['GenPart_mpdgId'],
-               mvx=df['GenPart_mvx'],
-               mvy=df['GenPart_mvy'],
-               mvz=df['GenPart_mvz'],
-               )
-      else: 
-         GenPart = JaggedCandidateArray.candidatesfromcounts(
-               np.array([]),
-               pt=np.array([]),
-               eta=np.array([]),
-               phi=np.array([]),
-               mass=np.array([]),
-               charge=np.array([]),
-               pdgId=np.array([]),
-               vx=np.array([]),
-               vy=np.array([]),
-               vz=np.array([]),
-               mpdgId=np.array([]),
-               mvx=np.array([]),
-               mvy=np.array([]),
-               mvz=np.array([]),
-               )
+        ############### GenParticles processing
+        # Gen_Muon
+        GenPart_Muon = GenPart[(np.absolute(GenPart.pdgId) == 13) & (GenPart.genPartIdxMother > -1)]
+        gen_ups = (GenPart_Muon.parpdgId == 553) | (GenPart_Muon.parpdgId == 100553) | (GenPart_Muon.parpdgId == 200553)
+        GenPart_Muon = GenPart_Muon[gen_ups]
+        GenPart_Muon = GenPart_Muon[GenPart_Muon.pt > 3]
+        GenPart_Muon = ak.combinations(GenPart_Muon, 2)
+        GenPart_Muon = GenPart_Muon[GenPart_Muon.slot0.genPartIdxMother == GenPart_Muon.slot1.genPartIdxMother]
 
-      # Particle selection
-      muonid = (np.absolute(GenPart.pdgId) == 13)
-      Muon = GenPart[muonid]
+        # Gen_Upsilon
+        GenPart_Ups = GenPart[(GenPart_Muon.slot0.genPartIdxMother)]
+        GenPart_Ups = GenPart_Ups[GenPart_Ups.pt > cuts['Upsilon_pt']]
+        GenPart_Ups = GenPart_Ups[np.absolute(GenPart_Ups.eta) < cuts['Upsilon_eta']] # change to eta cut
 
-      upsilonid = (np.absolute(GenPart.pdgId) == 553)
-      Upsilon = GenPart[upsilonid]
-      
-      Dimuon = Muon.distincts()
-      
-      opposite_charge = (Dimuon.i0['charge'] * Dimuon.i1['charge'] < 0)
-      Dimuon = Dimuon[opposite_charge]
+        leading_mu = (GenPart_Muon.slot0.pt > GenPart_Muon.slot1.pt)
+        GenPart_Muon_lead = ak.where(leading_mu, GenPart_Muon.slot0, GenPart_Muon.slot1)
+        GenPart_Muon_trail = ak.where(~leading_mu, GenPart_Muon.slot0, GenPart_Muon.slot1)
 
-      same_vtx = ((Dimuon.i0['vx'] == Dimuon.i1['vx']) & (Dimuon.i0['vy'] == Dimuon.i1['vy']) & (Dimuon.i0['vz'] == Dimuon.i1['vz']))
-      Dimuon = Dimuon[same_vtx]
+        # Gen_Ds
+        GenPart_D0 = GenPart[(np.absolute(GenPart.pdgId) == 421) & (np.absolute(GenPart.parpdgId) == 413)]
+        GenPart_Dstar = GenPart[GenPart_D0.genPartIdxMother]
+        GenPart_Dstar = GenPart_Dstar[GenPart_Dstar.pt > cuts['Dstar_pt']]
+        GenPart_Dstar = GenPart_Dstar[np.absolute(GenPart_Dstar.eta) < cuts['Dstar_eta']]
+        
+        ############### Dimu cuts charge = 0, mass cuts and chi2...
+        Dimu = Dimu[Dimu.charge == 0]
+        Dimu = Dimu[((Dimu.mass > 8.5) & (Dimu.mass < 11.5))]
 
-      mass_cut = ((Dimuon.mass < 12) & (Dimuon.mass > 7))
-      Dimuon = Dimuon[mass_cut]
+        ############### Get the Muons from Dimu, for cuts in their params
+        Muon = ak.zip({'0': Muon[Dimu.t1muIdx], '1': Muon[Dimu.t2muIdx]})
 
-      leading_mu = (Dimuon.i0.pt.content > Dimuon.i1.pt.content)
-      Muon_lead = JaggedCandidateArray.candidatesfromoffsets(Dimuon.offsets, 
-                                                       pt=np.where(leading_mu, Dimuon.i0.pt.content, Dimuon.i1.pt.content),
-                                                       eta=np.where(leading_mu, Dimuon.i0.eta.content, Dimuon.i1.eta.content),
-                                                       phi=np.where(leading_mu, Dimuon.i0.phi.content, Dimuon.i1.phi.content),
-                                                       mass=np.where(leading_mu, Dimuon.i0.mass.content, Dimuon.i1.mass.content),
-                                                       mpdgId=np.where(leading_mu, Dimuon.i0.mpdgId.content, Dimuon.i1.mpdgId.content))
+        # SoftId and Global Muon cuts
+        soft_id = (Muon.slot0.softId > 0) & (Muon.slot1.softId > 0)
+        Dimu = Dimu[soft_id]
+        Muon = Muon[soft_id]
 
-      Muon_trail = JaggedCandidateArray.candidatesfromoffsets(Dimuon.offsets, 
-                                                       pt=np.where(~leading_mu, Dimuon.i0.pt.content, Dimuon.i1.pt.content),
-                                                       eta=np.where(~leading_mu, Dimuon.i0.eta.content, Dimuon.i1.eta.content),
-                                                       phi=np.where(~leading_mu, Dimuon.i0.phi.content, Dimuon.i1.phi.content),
-                                                       mass=np.where(~leading_mu, Dimuon.i0.mass.content, Dimuon.i1.mass.content),
-                                                       mpdgId=np.where(leading_mu, Dimuon.i0.mpdgId.content, Dimuon.i1.mpdgId.content))
-      
-      output['Muon_lead_pt'].fill(dataset=dataset, pt=Muon_lead.pt.flatten())
-      output['Muon_trail_pt'].fill(dataset=dataset, pt= Muon_trail.pt.flatten())
-      output['Muon_eta'].fill(dataset=dataset, eta=Muon_lead.eta.flatten())
-      output['Muon_eta'].fill(dataset=dataset, eta=Muon_trail.eta.flatten())
-      output['Muon_phi'].fill(dataset=dataset, phi=Muon_lead.phi.flatten())
-      output['Muon_phi'].fill(dataset=dataset, phi=Muon_trail.phi.flatten())
+        # pt and eta cuts
+        muon_pt_cut = (Muon.slot0.pt > 3) & (Muon.slot1.pt > 3)
+        Dimu = Dimu[muon_pt_cut]
+        Muon = Muon[muon_pt_cut]
 
-      output['Dimuon_mass'].fill(dataset=dataset, mass=Dimuon.mass.flatten())
-      output['Dimuon_pt'].fill(dataset=dataset, pt=Dimuon.pt.flatten())
-      output['Dimuon_eta'].fill(dataset=dataset, eta=Dimuon.eta.flatten())
-      output['Dimuon_phi'].fill(dataset=dataset, phi=Dimuon.phi.flatten())
-    
-      return output
+        muon_eta_cut = (np.absolute(Muon.slot0.eta) <= 2.4) & (np.absolute(Muon.slot1.eta) <= 2.4)
+        Dimu = Dimu[muon_eta_cut]
+        Muon = Muon[muon_eta_cut]
 
-   def postprocess(self, accumulator):
-      return accumulator
+        Dimu['is_ups'] = (Dimu.mass > 8.5) & (Dimu.mass < 11.5)
+        Dimu['is_jpsi'] = (Dimu.mass > 2.95) & (Dimu.mass < 3.25)
+
+        ############### Cuts for D0
+        D0 = D0[~D0.hasMuon]
+        D0 = D0[(D0.t1pt > 0.8) & (D0.t2pt > 0.8)]
+        D0 = D0[(D0.t1chindof < 2.5) & (D0.t2chindof < 2.5)]
+        D0 = D0[(D0.t1nValid > 4) & (D0.t2nValid > 4) & (D0.t1nPix > 1) & (D0.t2nPix > 1)]
+        D0 = D0[(D0.t1dxy < 0.1) & (D0.t2dxy < 0.1)]
+        D0 = D0[(D0.t1dz < 1.) & (D0.t2dz < 1.)]
+
+        # D0 cosphi
+        D0 = D0[D0.cosphi > 0.99]
+
+        # D0 dl Significance
+        D0 = D0[D0.dlSig > 5.]
+
+        # D0 pt
+        D0 = D0[D0.pt > 3.]
+
+        ############### Cuts for Dstar
+
+        # trks cuts
+        Dstar = Dstar[~Dstar.hasMuon]
+        Dstar = Dstar[(Dstar.Kpt > 0.5) & (Dstar.pipt > 0.5)]
+        Dstar = Dstar[(Dstar.Kchindof < 2.5) & (Dstar.pichindof < 2.5)]
+        Dstar = Dstar[(Dstar.KnValid > 4) & (Dstar.pinValid > 4) & (Dstar.KnPix > 1) & (Dstar.pinPix > 1)]
+        Dstar = Dstar[(Dstar.Kdxy < 0.1) & (Dstar.pidxy < 0.1)]
+        Dstar = Dstar[(Dstar.Kdz < 1) & (Dstar.pidz < 1)]
+
+        # pis cuts
+        Dstar = Dstar[Dstar.pispt > 0.3]
+        Dstar = Dstar[Dstar.pischindof < 3]
+        Dstar = Dstar[Dstar.pisnValid > 2]
+
+        # D0 of Dstar cuts
+        Dstar = Dstar[Dstar.D0cosphi > 0.99]
+        Dstar = Dstar[(Dstar.D0mass < D0_PDG_MASS + 0.025) & (Dstar.D0mass > D0_PDG_MASS - 0.025)]
+        Dstar = Dstar[Dstar.D0pt > cuts['Dstar_D0_pt']]
+        Dstar = Dstar[Dstar.D0eta < 2.5]
+        Dstar = Dstar[Dstar.D0dlSig > 3]
+
+        Dstar['wrg_chg'] = (Dstar.Kchg == Dstar.pichg)
+        if cuts['right_charge_only']:
+            Dstar = Dstar[~Dstar.wrg_chg]
+
+        ############### Dimu + OpenCharm associations
+
+        DimuDstar = association(Dimu, Dstar)
+
+        ############### Leading and Trailing muon separation
+        leading_mu = (Muon.slot0.pt > Muon.slot1.pt)
+        Muon_lead = ak.where(leading_mu, Muon.slot0, Muon.slot1)
+        Muon_trail = ak.where(~leading_mu, Muon.slot0, Muon.slot1)
+
+        ############### Create the accumulators to save output
+        muon_lead_acc = processor.dict_accumulator({})
+        for var in Muon_lead.fields:
+            muon_lead_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(Muon_lead[var])))
+        muon_lead_acc["nMuon"] = processor.column_accumulator(ak.to_numpy(ak.num(Muon_lead)))
+        output["Muon_lead"] = muon_lead_acc
+
+        muon_trail_acc = processor.dict_accumulator({})
+        for var in Muon_trail.fields:
+            muon_trail_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(Muon_trail[var])))
+        muon_trail_acc["nMuon"] = processor.column_accumulator(ak.to_numpy(ak.num(Muon_trail)))
+        output["Muon_trail"] = muon_trail_acc
+
+        dimu_acc = processor.dict_accumulator({})
+        for var in Dimu.fields:
+            if (var.startswith('t')): continue
+            dimu_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(Dimu[var])))
+        dimu_acc["nDimu"] = processor.column_accumulator(ak.to_numpy(ak.num(Dimu)))
+        output["Dimu"] = dimu_acc
+
+        D0_acc = processor.dict_accumulator({})
+        D0_trk_acc = processor.dict_accumulator({})
+        for var in D0.fields:
+            if (var.startswith('t')):
+                D0_trk_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(D0[var])))
+            else:
+                D0_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(D0[var])))
+        D0_acc["nD0"] = processor.column_accumulator(ak.to_numpy(ak.num(D0)))
+        output["D0"] = D0_acc
+        output["D0_trk"] = D0_trk_acc
+
+        Dstar_acc = processor.dict_accumulator({})
+        Dstar_D0_acc = processor.dict_accumulator({})
+        Dstar_trk_acc = processor.dict_accumulator({})
+        for var in Dstar.fields:
+            if var.startswith('D0'):
+                Dstar_D0_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(Dstar[var])))
+            elif (var.startswith('K') or var.startswith('pi')):
+                Dstar_trk_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(Dstar[var])))
+            else:
+                Dstar_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(Dstar[var])))
+        Dstar_acc["nDstar"] = processor.column_accumulator(ak.to_numpy(ak.num(Dstar)))
+        output["Dstar"] = Dstar_acc
+        output["Dstar_D0"] = Dstar_D0_acc
+        output["Dstar_trk"] = Dstar_trk_acc
+
+        DimuDstar_acc = processor.dict_accumulator({})
+        DimuDstar_acc['Dimu'] = processor.dict_accumulator({})
+        DimuDstar_acc['Dstar'] = processor.dict_accumulator({})
+        for var in DimuDstar.fields:
+            if (var == '0') or (var =='1'):
+                continue
+            elif var == 'cand':
+                for i0 in DimuDstar[var].fields:
+                    DimuDstar_acc[i0] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar[var][i0])))
+            else:
+                DimuDstar_acc[var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar[var])))
+
+        for var in DimuDstar.slot0.fields:
+            DimuDstar_acc['Dimu'][var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar.slot0[var])))
+
+        for var in DimuDstar.slot1.fields:
+            DimuDstar_acc['Dstar'][var] = processor.column_accumulator(ak.to_numpy(ak.flatten(DimuDstar.slot1[var])))
+        DimuDstar_acc['nDimuDstar'] = processor.column_accumulator(ak.to_numpy(ak.num(DimuDstar)))
+        output['DimuDstar'] = DimuDstar_acc
+
+        file_hash = str(random.getrandbits(128)) + str(len(events))
+        save(output, "output/" + self.analyzer_name + "/" + self.analyzer_name + "_" + file_hash + ".coffea")
+
+        # return dummy accumulator
+        return processor.dict_accumulator({
+                'cutflow': output['cutflow']
+        })
+
+    def postprocess(self, accumulator):
+        return accumulator

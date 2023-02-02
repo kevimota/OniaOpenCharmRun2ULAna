@@ -1,10 +1,8 @@
 import time
-import os, sys, subprocess
+import os, subprocess
 from tqdm import tqdm
 
 from coffea.util import save, load
-import coffea.processor as processor
-import numpy as np
 
 def merger(name):
     tstart = time.time()
@@ -29,9 +27,8 @@ def merger(name):
         os.system("rm -rf " + f)
 
     #finally saving the merged file into the folder merged/
-    print("Saving as output/" + name + "/merged/" + name + "_merged.coffea")
-    os.system("mkdir -p output/" + name + "/merged")
-    save(acc, "output/" + name + "/merged/" + name + "_merged.coffea")
+    print("Saving as output/" + name + "/" + name + ".coffea")
+    save(acc, "output/" + name + "/" + name + ".coffea")
 
     elapsed = round(time.time() - tstart, 2)
     print(f"Merge finished in: {elapsed} s")

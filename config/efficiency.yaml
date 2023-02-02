@@ -1,0 +1,55 @@
+dimu_mass_low: 8.5
+dimu_mass_high: 11.5
+bins_pt_dimu: [15, 30, 60, 90, 120, 150]
+bins_rap_dimu: [0.0, 0.5, 1.0, 1.5, 2.5]
+bins_pt_dstar: [4, 10, 20, 30, 50, 80]
+bins_rap_dstar: [0.0, 0.5, 1.0, 1.5, 2.5]
+#bins_pt_dimu: [20, 30, 50, 70, 100, 130]
+#bins_rap_dimu: [0.0, 0.5, 1.2]
+#bins_pt_dstar: [4, 10, 20, 30, 50, 70, 100]
+#bins_rap_dstar: [0.0, 0.5, 1.2, 2.1]
+particle: "Y"
+
+#Acceptance
+muon_pt_min: 3.
+muon_eta: 2.4
+dimu_pt_min: 15.
+dimu_pt_max: 150.
+dimu_rap: 2.5
+dstar_pt_min: 4.
+dstar_pt_max: 80.
+dstar_rap: 2.5
+
+# Cuts Efficiency
+dstar_track_pt_cut: 1.0
+dstar_d0_cosphi: 0.99
+dstar_d0_dlSig: 2.7
+dstar_d0_mass: 0.028
+dstar_d0_pt: 3.0
+
+# Trigger Efficiency
+trigger: 
+  "2016APV": "HLT_Dimuon13_Upsilon"
+  "2016":    "HLT_Dimuon13_Upsilon"
+  "2017":    "HLT_Dimuon24_Upsilon_noCorrL1"
+  "2018":    "HLT_Dimuon24_Upsilon_noCorrL1"
+
+# Association Efficiency
+vertex_probability_cut: 0.01
+
+corrections:
+  pileup:
+    "2016APV": "data/corrections/pileup_reweight_2016.root"
+    "2016":    "data/corrections/pileup_reweight_2016.root"
+    "2017":    "data/corrections/pileup_reweight_2017.root"
+    "2018":    "data/corrections/pileup_reweight_2018.root"
+  muon_track:
+    "2016APV": "data/corrections/Efficiency_muon_generalTracks_Run2016preVFP_UL_trackerMuon.json"
+    "2016":    "data/corrections/Efficiency_muon_generalTracks_Run2016postVFP_UL_trackerMuon.json"
+    "2017":    "data/corrections/Efficiency_muon_generalTracks_Run2017_UL_trackerMuon.json"
+    "2018":    "data/corrections/Efficiency_muon_generalTracks_Run2018_UL_trackerMuon.json"
+  muon_id:
+    "2016APV": "data/corrections/Efficiency_muon_trackerMuon_Run2016preVFP_UL_ID.json"
+    "2016":    "data/corrections/Efficiency_muon_trackerMuon_Run2016postVFP_UL_ID.json"
+    "2017":    "data/corrections/Efficiency_muon_trackerMuon_Run2017_UL_ID.json"
+    "2018":    "data/corrections/Efficiency_muon_trackerMuon_Run2018_UL_ID.json"

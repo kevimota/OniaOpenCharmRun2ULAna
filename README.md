@@ -6,17 +6,18 @@ Repository for Quarkonia + Open Charm Analysis using Run2 UL datasets.
 
 ## Setting up the conda environment
 
-Miniconda should be installed as in:
+Using Miniforge as python package manager:
 
-https://conda.io/projects/conda/en/latest/user-guide/install/linux.html
+https://github.com/conda-forge/miniforge
+
+To install in a UNIX-like platform:
 
 ```
 cd ~
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b 
-~/miniconda3/bin/conda init
-echo 'conda deactivate ; conda deactivate' >> ~/.bashrc
-rm Miniconda3-latest-Linux-x86_64.sh
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh -b 
+conda config --set auto_activate_base false
+rm Miniforge3-$(uname)-$(uname -m).sh
 ```
 
 After installation, reload the session.
@@ -25,11 +26,8 @@ After installation, reload the session.
 
 ```
 conda deactivate ; conda deactivate 
-
 conda env create -f environment.yml
-
-# for jupyterlab w/ ipython widgets
-jupyter labextension install @jupyter-widgets/jupyterlab-manager
+conda activate OniaOpenCharmRun2ULenv
 
 #only if CMSSW needed:
 
@@ -51,3 +49,38 @@ mkdir output
 cd OniaOpenCharmRun2ULAna
 . quick_setup.sh
 ```
+
+# Running the Analysis
+
+Events selection: `nanoAODplus_analyzer.py`, can be used with condor with `nanoAODplus_condor.py`. With the selection done, follow the steps
+
+## Do trigger and more tight selection:
+
+Run the code `nanoAODplus_trigger.py` by:
+```
+python nanoAODplus_trigger.py -p {path} -y {year} -m
+```
+path = path to the directory where the data is stored
+
+years = ['2016APV', '2016', '2017', '2018']
+
+The data can be plotted by using `nanoAODplus_plotter.py`
+```
+python nanoAODplus_plotter.py -y {year}
+```
+
+Save the data to ROOT TTrees to be able to use RooFit:
+```
+python tools/save_ttree.py -p {path_in} -o {path_out} -a
+```
+
+Fit to the 2D model:
+```
+python nanoAODplus_fit.py -y {year} -c {particle}
+python nanoAODplus_fit.py -y {year} -c {particle} -p
+```
+particles = ['Upsilon', 'Dstar', 'UpsilonDstar']
+
+## Calculate efficiency from MC
+
+TODO

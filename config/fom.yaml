@@ -1,0 +1,32 @@
+dlSig: [1.5, 2.0, 2.3, 2.5, 2.7, 2.8, 2.9, 3.0, 3.2, 3.4, 3.6, 4.0, 4.5, 5.0]
+D0pt: [1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0, 9.0, 10.0]
+#cosphi: [0.95, 0.96, 0.97, 0.98, 0.99, 0.995, 0.999]
+#track_pt: [0.5, 1.0, 1.2, 1.4, 1.5, 1.6, 1.7, 1.8, 2.0, 2.5]
+#association_prob: [0.005, 0.008, 0.01, 0.02, 0.03, 0.04, 0.05]
+
+#dlSig: [1.5, 2.0, 3.6, 4.0, 4.5, 5.0]
+#dlSig: [1.5]
+#D0pt: [6.5, 7.0, 8.0]
+
+path:
+  '2016APV': 
+  - output/fom_vtxfit/2016APV/MuOniaRun2016B-ver2-HIPM
+  - output/fom_vtxfit/2016APV/MuOniaRun2016C-HIPM
+  - output/fom_vtxfit/2016APV/MuOniaRun2016D-HIPM
+  - output/fom_vtxfit/2016APV/MuOniaRun2016E-HIPM
+  - output/fom_vtxfit/2016APV/MuOniaRun2016F-HIPM
+  '2016': 
+  - output/fom_vtxfit/2016/MuOniaRun2016F
+  - output/fom_vtxfit/2016/MuOniaRun2016G
+  - output/fom_vtxfit/2016/MuOniaRun2016H
+  '2017':
+  - output/fom_vtxfit/2017/MuOniaRun2017B
+  - output/fom_vtxfit/2017/MuOniaRun2017C
+  - output/fom_vtxfit/2017/MuOniaRun2017D
+  - output/fom_vtxfit/2017/MuOniaRun2017E
+  - output/fom_vtxfit/2017/MuOniaRun2017F
+  '2018':
+  - output/fom_vtxfit/2018/MuOniaRun2018A
+  - output/fom_vtxfit/2018/MuOniaRun2018B
+  - output/fom_vtxfit/2018/MuOniaRun2018C
+  - output/fom_vtxfit/2018/MuOniaRun2018D

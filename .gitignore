@@ -1,7 +1,7 @@
 # Specifics:
 plots/
 output/
-sandbox/
+sandbox/*
 data/path/*
 test.txt
 .DS_store
