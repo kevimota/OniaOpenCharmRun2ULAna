@@ -6,11 +6,24 @@ from collections import defaultdict
 from coffea.nanoevents.methods import candidate
 ak.behavior.update(candidate.behavior)
 
+from coffea.util import load
+
 import numpy as np
 
 import yaml
 
 D0_PDG_MASS = 1.864
+
+Y1S_BR       = 0.0248
+Y1S_BR_err   = 0.0005
+Y2S_BR       = 0.0193
+Y2S_BR_err   = 0.0017
+Y3S_BR       = 0.0218
+Y3S_BR_err   = 0.0021
+Dstar_BR     = 67.7
+Dstar_BR_err = 0.005
+D0_BR        = 0.03947
+D0_BR_err    = 0.00030
 
 def atoi(text):
     return int(text) if text.isdigit() else text
@@ -197,3 +210,25 @@ def get_evt_eff(hists_eff, data):
     wgt = 1/total_eff
 
     return total_eff, total_eff_err_up, total_eff_err_down, wgt
+
+
+def get_eff(year):
+    years = ['2016APV', '2016', '2017', '2018']
+    acc = None
+    if str(year) not in years:
+        raise ValueError('Year not valid!')
+    base_folder = f'output/RunII_trigger_processed_vtxfit/{year}'
+    for it in os.scandir(base_folder):
+        if not it.is_dir(): continue
+        for it in os.scandir(it.path):
+            if not it.name.endswith('.coffea'): continue
+            if acc:
+                acc += load(it.path)
+            else:
+                acc = load(it.path)
+
+    eff = np.mean(acc['DimuDstar']['eff'].value)
+    eff_err_up = np.mean(acc['DimuDstar']['eff_err_up'].value)
+    eff_err_down = np.mean(acc['DimuDstar']['eff_err_down'].value)
+
+    return eff, eff_err_up, eff_err_down
