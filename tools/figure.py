@@ -9,18 +9,19 @@ from hist import Hist
 import os
 
 from uncertainties import unumpy
+from matplotlib import ticker
 
 plt.style.use(mplhep.style.CMS)
     
 plt.rcParams.update({
-    'font.size': 16,
-    'axes.titlesize': 18,
-    'axes.labelsize': 18,
-    'xtick.labelsize': 14,
-    'ytick.labelsize': 14
+    'font.size': 18,
+    'axes.titlesize': 20,
+    'axes.labelsize': 20,
+    'xtick.labelsize': 16,
+    'ytick.labelsize': 16
 })
 
-def create_plot1d(hist1d, labels=None, log=False, ax=None, lumi=None, **kwargs):
+def create_plot1d(hist1d, labels=None, log=False, ax=None, lumi=None, is_data=True, **kwargs):
     from matplotlib.offsetbox import AnchoredOffsetbox, TextArea
 
     if ax == None:
@@ -33,19 +34,41 @@ def create_plot1d(hist1d, labels=None, log=False, ax=None, lumi=None, **kwargs):
         if len(labels) != len(stairs_artists): print("len of labels does not match artists")
         else: plt.legend(stairs_artists, labels)
     
-    if not lumi == None:
+    """ if not lumi == None:
         lumi = plt.text(1., 1., f'{lumi:.2f}' + r" fb$^{-1}$ (13 TeV)",
                         fontsize=18,
                         horizontalalignment='right',
                         verticalalignment='bottom',
                         transform=ax.transAxes
-                       )
+                       ) """
+    if is_data: mplhep.cms.label('Preliminary', loc=0, data=True, lumi=lumi, lumi_format='{0:.2f}')
+    else: mplhep.cms.text('Simulation', loc=0)
+
+    if isinstance(hist1d, Hist):
+        values = hist1d.values()
+    if isinstance(hist1d, list):
+        try:
+            values = np.max([h.values() for h in hist1d])
+        except:
+            raise ValueError('Hist not passed')
     
+    #ax.set_ylim(1, 1.1*values)
+
     if log:
         ax.set_yscale('log')
-        ax.set_ylim(1, None)
+        #ax.set_ylim(1, 1e1*values)
+        
     else:
-        ax.ticklabel_format(axis='y', style='sci', scilimits=(0,3), useMathText=True)
+        yfmt = ticker.ScalarFormatter(useMathText=True)
+        yfmt.set_powerlimits((0, 3))
+        ax.yaxis.set_major_formatter(yfmt)
+        ax.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))
+        ax.get_yaxis().get_offset_text().set_visible(False)
+        ax_max = max(ax.get_yticks())
+        exponent_axis = np.floor(np.log10(ax_max)).astype(int)
+        ax.annotate(r'$\times$10$^{%i}$'%(exponent_axis),
+             xy=(.01, .94), xycoords='axes fraction')
+
     
     if isinstance(hist1d, Hist):
         centers = hist1d.axes.centers[0]

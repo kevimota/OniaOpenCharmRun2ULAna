@@ -58,12 +58,18 @@ def create_eff_hists2D(hist_num, hist_den, bins, names, hist_labels):
         num/den,
         1.0,    
     )
-    err_down, err_up = np.where(
-        (den > 0),
-        ratio_uncertainty(num, den, uncertainty_type='efficiency'),
-        #ratio_uncertainty(num, den, uncertainty_type='poisson-ratio'),
-        0.0
-    )
+    try:
+        err_down, err_up = np.where(
+            (den > 0),
+            ratio_uncertainty(num, den, uncertainty_type='efficiency'),
+            0.0
+        )
+    except ValueError:
+        err_down, err_up = np.where(
+            (den > 0),
+            ratio_uncertainty(num, den, uncertainty_type='poisson-ratio'),
+            0.0
+        )
     #err = np.where((err_up > err_down), err_up, err_down)
 
     eff_hist[...] = values

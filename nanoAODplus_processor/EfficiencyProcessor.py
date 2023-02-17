@@ -287,7 +287,6 @@ class EfficiencyProcessor(processor.ProcessorABC):
         ############### /Cuts Efficiency 
 
         ############### Trigger Efficiency
-
         trigger = HLT[self.config['trigger'][self.year]]
         Dimu = Dimu[trigger]
         Muon = Muon[trigger]
@@ -320,7 +319,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         DimuDstar = DimuDstar[arg_sort]
         MuonDstar = MuonDstar[arg_sort]
 
-        weight = get_weight(evaluator, MuonDstar.slot0, DimuDstar.slot1, PVtx)
+        weight = get_weight(evaluator, MuonDstar.slot0, DimuDstar.slot0, PVtx)
 
         output['Den_Asso'].fill(
             pt_dimu=DimuDstar[ak.num(DimuDstar)>0].slot0.pt[:,0], 
@@ -333,7 +332,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         DimuDstar = DimuDstar[DimuDstar.slot1.associationProb > self.config['vertex_probability_cut']]
         MuonDstar = MuonDstar[DimuDstar.slot1.associationProb > self.config['vertex_probability_cut']]
 
-        weight = get_weight(evaluator, MuonDstar.slot0, DimuDstar.slot1, PVtx)
+        weight = get_weight(evaluator, MuonDstar.slot0, DimuDstar.slot0, PVtx)
 
         output['Num_Asso'].fill(
             pt_dimu=DimuDstar[ak.num(DimuDstar)>0].slot0.pt[:,0], 

@@ -163,6 +163,7 @@ class Skimmer:
         DimuDstar = DimuDstar[DimuDstar.dstar_pt > self.config['limits']['Dstar_min_pt']]
         DimuDstar = DimuDstar[DimuDstar.dstar_pt < self.config['limits']['Dstar_max_pt']]
         DimuDstar = DimuDstar[np.absolute(DimuDstar.dstar_rap) < self.config['limits']['Dstar_rap']]
+        #DimuDstar = DimuDstar[np.absolute(DimuDstar.dstar_eta) < self.config['limits']['Dstar_rap']]
         DimuDstar = DimuDstar[DimuDstar.dstar_d0_pt > self.config['limits']['Dstar_D0_pt']]
         DimuDstar = DimuDstar[DimuDstar.dstar_d0_cosphi > self.config['limits']['Dstar_D0_cosphi']]
         DimuDstar = DimuDstar[(DimuDstar.dstar_d0_mass < D0_PDG_MASS + self.config['limits']['Dstar_D0_mass']) & (DimuDstar.dstar_d0_mass > D0_PDG_MASS - self.config['limits']['Dstar_D0_mass'])]
@@ -187,14 +188,20 @@ class Skimmer:
         file_eff = uproot.open(f'output/efficiency/efficiencies_{self.year}.root')
         hists_eff = {h[:h.find(';')]:file_eff[h].to_hist() for h in file_eff}
 
-        eff, eff_err_up, eff_err_down, wgt = get_evt_eff(hists_eff, DimuDstar)
+        eff, eff_err_up, eff_err_down, eff_asso, eff_asso_err_up, eff_asso_err_down, wgt = get_evt_eff(hists_eff, DimuDstar)
         eff = ak.unflatten(eff, ak.num(DimuDstar))
         eff_err_up = ak.unflatten(eff_err_up, ak.num(DimuDstar))
         eff_err_down = ak.unflatten(eff_err_down, ak.num(DimuDstar))
+        eff_asso = ak.unflatten(eff_asso, ak.num(DimuDstar))
+        eff_asso_err_up = ak.unflatten(eff_asso_err_up, ak.num(DimuDstar))
+        eff_asso_err_down = ak.unflatten(eff_asso_err_down, ak.num(DimuDstar))
         wgt = ak.unflatten(wgt, ak.num(DimuDstar))
         DimuDstar['eff'] = eff
         DimuDstar['eff_err_up'] = eff_err_up
         DimuDstar['eff_err_down'] = eff_err_down
+        DimuDstar['eff_asso'] = eff_asso
+        DimuDstar['eff_asso_err_up'] = eff_asso_err_up
+        DimuDstar['eff_asso_err_down'] = eff_asso_err_down
         DimuDstar['wgt'] = wgt
 
         pDimu_acc = build_acc(Dimu)

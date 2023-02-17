@@ -80,6 +80,7 @@ def association(cand1, cand2):
     asso['deltaeta'] = asso.slot0.eta - asso.slot1.eta
     asso['deltaphi'] = np.remainder(np.abs(asso.slot0.phi - asso.slot1.phi), np.pi)
     asso['cand'] = cand1 + cand2
+    asso['rap'] = np.log((asso['cand'].energy + asso['cand'].z)/np.sqrt(asso['cand'].mass2 + asso['cand'].pt2))
     
     return asso
 
@@ -209,10 +210,10 @@ def get_evt_eff(hists_eff, data):
     
     wgt = 1/total_eff
 
-    return total_eff, total_eff_err_up, total_eff_err_down, wgt
+    return total_eff, total_eff_err_up, total_eff_err_down, effs['eff_asso_pt'], effs_err_up['eff_asso_pt'], effs_err_down['eff_asso_pt'], wgt
 
 
-def get_eff(year):
+def get_eff(year, asso=False):
     years = ['2016APV', '2016', '2017', '2018']
     acc = None
     if str(year) not in years:
@@ -230,5 +231,10 @@ def get_eff(year):
     eff = np.mean(acc['DimuDstar']['eff'].value)
     eff_err_up = np.mean(acc['DimuDstar']['eff_err_up'].value)
     eff_err_down = np.mean(acc['DimuDstar']['eff_err_down'].value)
-
+    
+    eff_asso = np.mean(acc['DimuDstar']['eff_asso'].value)
+    eff_asso_err_up = np.mean(acc['DimuDstar']['eff_asso_err_up'].value)
+    eff_asso_err_down = np.mean(acc['DimuDstar']['eff_asso_err_down'].value)
+    
+    if asso: return eff_asso, eff_asso_err_up, eff_asso_err_down
     return eff, eff_err_up, eff_err_down

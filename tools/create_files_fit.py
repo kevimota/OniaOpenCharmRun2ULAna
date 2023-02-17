@@ -10,7 +10,8 @@ if __name__ == '__main__':
     parser.add_argument("-y", "--years", help="Year to fit", type=str, nargs='+', required=True)
     parser.add_argument("-c", "--channels", help="Particle to fit", type=str, nargs='+', required=True)
     parser.add_argument("-cf", "--create_files", action="store_true", help="create files for the fit", default=False)
-    parser.add_argument("-f", "--fit", action="store_true", help="create files for the fit", default=False)
+    parser.add_argument("-f", "--fit", action="store_true", help="do fits", default=False)
+    parser.add_argument("-s", "--sps", action="store_true", help="do sps fit", default=False)
     args = parser.parse_args()
 
     years_to_run = [year for year in args.years if year in years]
@@ -51,3 +52,8 @@ if __name__ == '__main__':
             for particle in particles_to_run:
                 os.system(f'python nanoAODplus_fit.py -y {year} -c {particle}')
                 os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} -p')
+                if args.sps:
+                    if particle == 'UpsilonDstar': continue
+                    os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} --sps')
+        for year in years_to_run:
+            os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} -cm')

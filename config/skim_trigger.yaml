@@ -19,8 +19,8 @@ limits:
   #Dstar_rap: 2.1
   Dstar_D0_pt: 3.0
   Dstar_D0_cosphi: 0.99
-  Dstar_D0_mass: 0.028
+  Dstar_D0_mass: 0.027
   Dstar_D0_dlSig: 2.7
   Dstar_track_pt: 1.0
-  Dstar_association_prob: 0.01
+  Dstar_association_prob: 0.005
   right_charge_only: True

@@ -1,6 +1,7 @@
 import uproot
 import numpy as np
 from hist import Hist
+from hist.intervals import ratio_uncertainty
 
 import pathlib
 
@@ -47,13 +48,17 @@ def get_weights(hist_data: Hist, hist_mc: Hist) -> Hist:
         scaled_num/scaled_den,
         1.0,    
     )
+    
 
     hist_weights = Hist.new.Regular(100, 0, 100, name='n_vtx', label='Num. of reco vertices').Double()
+    #hist_weights_err = Hist.new.Regular(100, 0, 100, name='n_vtx', label='Num. of reco vertices').Double()
     hist_weights[...] = weights
+    #hist_weights_err[...] = weights_err
 
     # Save to root
     save_hist = uproot.recreate(f'{save_folder_files}/pileup_reweight_{year}.root')
     save_hist['h_weights'] = hist_weights
+    #save_hist['h_weights_err'] = hist_weights_err
 
     return hist_weights
 

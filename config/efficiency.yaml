@@ -4,7 +4,7 @@ bins_pt_dimu: [15, 30, 60, 90, 120, 150]
 bins_rap_dimu: [0.0, 0.5, 1.0, 1.5, 2.5]
 bins_pt_dstar: [4, 10, 20, 30, 50, 80]
 bins_rap_dstar: [0.0, 0.5, 1.0, 1.5, 2.5]
-#bins_pt_dimu: [20, 30, 50, 70, 100, 130]
+#bins_pt_dimu: [20, 30, 60, 90, 130]
 #bins_rap_dimu: [0.0, 0.5, 1.2]
 #bins_pt_dstar: [4, 10, 20, 30, 50, 70, 100]
 #bins_rap_dstar: [0.0, 0.5, 1.2, 2.1]
@@ -19,6 +19,12 @@ dimu_rap: 2.5
 dstar_pt_min: 4.
 dstar_pt_max: 80.
 dstar_rap: 2.5
+#dimu_pt_min: 20.
+#dimu_pt_max: 130.
+#dimu_rap: 1.2
+#dstar_pt_min: 4.
+#dstar_pt_max: 100.
+#dstar_rap: 2.1
 
 # Cuts Efficiency
 dstar_track_pt_cut: 1.0
@@ -35,7 +41,7 @@ trigger:
   "2018":    "HLT_Dimuon24_Upsilon_noCorrL1"
 
 # Association Efficiency
-vertex_probability_cut: 0.01
+vertex_probability_cut: 0.005
 
 corrections:
   pileup:
