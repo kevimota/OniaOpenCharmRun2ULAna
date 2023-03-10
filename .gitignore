@@ -1,7 +1,7 @@
 # Specifics:
 plots/
 output/
-sandbox/*
+sandbox/
 data/path/*
 test.txt
 .DS_store
@@ -251,3 +251,4 @@ cython_debug/
 
 #vs code
 .vscode/
+test.ipynb
