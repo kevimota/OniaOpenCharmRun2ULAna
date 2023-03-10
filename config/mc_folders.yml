@@ -1,0 +1,46 @@
+Particle_Gun:
+  - /Users/kevimota/cernbox/CRAB_UserFiles/D0PtGun
+  - /Users/kevimota/cernbox/CRAB_UserFiles/DstarPtGun
+  - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPtGun
+DPS:
+  2016APV:
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt9To30ToMuMuDstarToD0pi_2016APV-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt30To60ToMuMuDstarToD0pi_2016APV-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt60To120ToMuMuDstarToD0pi_2016APV-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt120ToMuMuDstarToD0pi_2016APV-v2
+  '2016':
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt9To30ToMuMuDstarToD0pi_2016-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt30To60ToMuMuDstarToD0pi_2016-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt60To120ToMuMuDstarToD0pi_2016-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt120ToMuMuDstarToD0pi_2016-v2
+  '2017':
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt9To30ToMuMuDstarToD0pi_2017-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt30To60ToMuMuDstarToD0pi_2017-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt60To120ToMuMuDstarToD0pi_2017-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt120ToMuMuDstarToD0pi_2017-v2
+  '2018':
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt9To30ToMuMuDstarToD0pi_2018-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt30To60ToMuMuDstarToD0pi_2018-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt60To120ToMuMuDstarToD0pi_2018-v2
+    - /Users/kevimota/cernbox/CRAB_UserFiles/UpsilonPt120ToMuMuDstarToD0pi_2018-v2
+SPS:
+  2016APV:
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_9to30_Dstar_2016APV
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_30to60_Dstar_2016APV
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_60to120_Dstar_2016APV
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_120_Dstar_2016APV
+  '2016':
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_9to30_Dstar_2016
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_30to60_Dstar_2016
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_60to120_Dstar_2016
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_120_Dstar_2016
+  '2017':
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_9to30_Dstar_2017
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_30to60_Dstar_2017
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_60to120_Dstar_2017
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_120_Dstar_2017
+  '2018':
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_9to30_Dstar_2018
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_30to60_Dstar_2018
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_60to120_Dstar_2018
+    - /Users/kevimota/cernbox/CRAB_UserFiles/Upsilon_120_Dstar_2018

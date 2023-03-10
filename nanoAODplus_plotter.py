@@ -49,6 +49,7 @@ if __name__ == '__main__':
     parser.add_argument("-y", "--year", help="Year of the dataset", type=str, required=True, choices=years)
     parser.add_argument("-s", "--sel", help="Selection", type=str, required=False, default='sel', choices=["sel", "raw"])
     parser.add_argument("-m", "--is_mc", help="is mc", action="store_true")
+    parser.add_argument("--mc_process", help="Which MC to process", type=str, choices=['SPS', 'DPS'])
     args = parser.parse_args()
 
     config_run = yaml.load(open("config/multicore.yaml", "r"), Loader=yaml.FullLoader)
@@ -75,19 +76,15 @@ if __name__ == '__main__':
         files = get_files(folders, pattern='.coffea')
 
     else:
-        folder = '/Users/kevimota/cernbox/CRAB_UserFiles/'
-        folders = []
-        for it in os.scandir(folder):
-            if it.name.find('Upsilon') < 0: continue
-            if it.name.find('Dstar') < 0: continue
-            if it.name.find(args.year) < 0: continue
-            if args.year == '2016':
-                if it.name.find('2016APV') > -1: continue
-            folders.append(it.path)
+        if args.mc_process is None: parser.error('--is_mc requires --mc-process')
+        if not os.path.exists(f'output/mc_{args.mc_process}_hists/{args.year}'): os.makedirs(f'output/mc_{args.mc_process}_hists/{args.year}')
+        with open('config/mc_folders.yml') as f:
+            mc_folders = yaml.load(f, Loader=yaml.FullLoader)
+        folders = mc_folders[args.mc_process][args.year]
 
         files = get_files(folders, pattern='.root', exclude=exclude)
         
-    h = HistogrammingProcessor(args.sel, args.is_mc, args.year)
+    h = HistogrammingProcessor(args.sel, args.is_mc, args.year, args.mc_process)
     print(f"Creating histogram files for year {args.year}")
     if config_run['executor'] == 'iterative_executor' or len(files) == 1:
         for f in tqdm(files, total=len(files), unit=" files", desc="Processing"):
@@ -151,7 +148,7 @@ if __name__ == '__main__':
             save_folder = f'plots/raw_data_hists/{args.year}'
             plotter(hists, args.year, processed_lumi, save_folder)
     else:
-        hists = get_files([f"output/mc_hists/{args.year}"], pattern='.hists')
+        hists = get_files([f"output/mc_{args.mc_process}_hists/{args.year}"], pattern='.hists')
         hists = [load(h) for h in hists]
 
         for i in range(len(hists)):
@@ -169,5 +166,5 @@ if __name__ == '__main__':
             'Dstar': hs_Dstar,
             'DimuDstar': hs_DimuDstar,
         }
-        save_folder = f'plots/mc_hists/{args.year}'
+        save_folder = f'plots/mc_{args.mc_process}_hists/{args.year}'
         plotter(hists, args.year, None, save_folder, False)

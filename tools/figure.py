@@ -34,30 +34,11 @@ def create_plot1d(hist1d, labels=None, log=False, ax=None, lumi=None, is_data=Tr
         if len(labels) != len(stairs_artists): print("len of labels does not match artists")
         else: plt.legend(stairs_artists, labels)
     
-    """ if not lumi == None:
-        lumi = plt.text(1., 1., f'{lumi:.2f}' + r" fb$^{-1}$ (13 TeV)",
-                        fontsize=18,
-                        horizontalalignment='right',
-                        verticalalignment='bottom',
-                        transform=ax.transAxes
-                       ) """
     if is_data: mplhep.cms.label('Preliminary', loc=0, data=True, lumi=lumi, lumi_format='{0:.2f}')
     else: mplhep.cms.text('Simulation', loc=0)
 
-    if isinstance(hist1d, Hist):
-        values = hist1d.values()
-    if isinstance(hist1d, list):
-        try:
-            values = np.max([h.values() for h in hist1d])
-        except:
-            raise ValueError('Hist not passed')
-    
-    #ax.set_ylim(1, 1.1*values)
-
     if log:
-        ax.set_yscale('log')
-        #ax.set_ylim(1, 1e1*values)
-        
+        ax.set_yscale('log')        
     else:
         yfmt = ticker.ScalarFormatter(useMathText=True)
         yfmt.set_powerlimits((0, 3))
@@ -85,6 +66,10 @@ def create_plot1d(hist1d, labels=None, log=False, ax=None, lumi=None, is_data=Tr
         at = AnchoredOffsetbox('upper right', child=annotation)
         at.patch.set_facecolor('None')
         ax.add_artist(at)
+
+        down_lim, up_lim = ax.get_ylim()
+        up_lim *= 1.05
+        ax.set_ylim(down_lim, up_lim)
     
     return ax
 

@@ -1,15 +1,12 @@
+import os
 import yaml
 from uncertainties import ufloat
 
-years = ['2016APV', '2016', '2017', '2018']
+years = ['2016APV', '2016', '2017', '2018', 'all']
 
 for year in years:
-    with open(f"output/RunII_trigger_processed_vtxfit/{year}/UpsilonDstar_fit_params.yaml", 'r') as f:
+    with open(f"output/fit/{year}/UpsilonDstar_fit_params.yaml", 'r') as f:
         fit_params = yaml.load(f, Loader=yaml.FullLoader)
-    with open(f"output/RunII_trigger_processed_vtxfit/{year}/Upsilon_SPS_fit_params.yaml", 'r') as f:
-        fit_params_y_sps = yaml.load(f, Loader=yaml.FullLoader)
-    with open(f"output/RunII_trigger_processed_vtxfit/{year}/Dstar_SPS_fit_params.yaml", 'r') as f:
-        fit_params_dstar_sps = yaml.load(f, Loader=yaml.FullLoader)
     
     n_evt = fit_params['n_evt']
     chi2_upsilon = fit_params['chi2_upsilon']
@@ -24,6 +21,28 @@ for year in years:
     N_upsilon1S = N_signal*upsilon1S_frac
     N_upsilon2S = N_signal*(1-upsilon1S_frac)*(upsilon2S_frac)
     N_upsilon3S = N_signal*(1-upsilon1S_frac)*(1-upsilon2S_frac)
+
+
+    print(f"------------- Report for year {year:^10} -------------")
+    print(f"n_evt             = {n_evt:.0f}")
+    print(f"N_upsilon1S       = {N_upsilon1S:.0f}")
+    print(f"N_upsilon2S       = {N_upsilon2S:.0f}")
+    print(f"N_upsilon3S       = {N_upsilon3S:.0f}")
+    print(f"mscale            = {mscale:.4f}")
+    print(f"dstar_mean        = {dstar_mean*1e3:.2f}")
+    print(f"chi2_upsilon      = {chi2_upsilon:.2f}")
+    print(f"chi2_dstar        = {chi2_dstar:.2f}")
+
+    if not os.path.exists(f"output/fit/{year}/Upsilon_SPS_fit_params.yaml"): 
+        print('\n')
+        continue
+    if not os.path.exists(f"output/fit/{year}/Dstar_SPS_fit_params.yaml"): 
+        print('\n')   
+        continue
+    with open(f"output/fit/{year}/Upsilon_SPS_fit_params.yaml", 'r') as f:
+        fit_params_y_sps = yaml.load(f, Loader=yaml.FullLoader)
+    with open(f"output/fit/{year}/Dstar_SPS_fit_params.yaml", 'r') as f:
+        fit_params_dstar_sps = yaml.load(f, Loader=yaml.FullLoader)
 
     n_evt_upsilon_sps = fit_params_y_sps['n_evt']
     #chi2_upsilon_sps = fit_params_y_sps['chi2_upsilon']
@@ -43,15 +62,6 @@ for year in years:
 
     N_dstar_sps = n_evt_dstar_sps*signal_frac_sps
 
-    print(f"------------- Report for year {year:^10} -------------")
-    print(f"n_evt             = {n_evt:.0f}")
-    print(f"N_upsilon1S       = {N_upsilon1S:.0f}")
-    print(f"N_upsilon2S       = {N_upsilon2S:.0f}")
-    print(f"N_upsilon3S       = {N_upsilon3S:.0f}")
-    print(f"mscale            = {mscale:.4f}")
-    print(f"dstar_mean        = {dstar_mean*1e3:.2f}")
-    print(f"chi2_upsilon      = {chi2_upsilon:.2f}")
-    print(f"chi2_dstar        = {chi2_dstar:.2f}")
     print(f"N_evt_upsilon_SPS = {n_evt_upsilon_sps:.0f}")
     print(f"N_upsilon1S_SPS   = {N_upsilon1S_sps:.0f}")
     print(f"N_upsilon2S_SPS   = {N_upsilon2S_sps:.0f}")

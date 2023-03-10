@@ -39,10 +39,11 @@ def get_weight(evaluator, Muon, PVtx):
     return weight
 
 class HistogrammingProcessor:
-    def __init__(self, selection, is_mc, year) -> None:
+    def __init__(self, selection, is_mc, year, mc_process) -> None:
         self.selection = selection
         self.year = year
         self.is_mc = is_mc
+        self.mc_process = mc_process
 
         with open('config/efficiency.yaml', 'r') as f:
             self.config = yaml.load(f, Loader=yaml.FullLoader)
@@ -244,17 +245,30 @@ class HistogrammingProcessor:
 
     def process_mc(self, f) -> None:
         events = uproot.open(f)['Events'].arrays(filter_name=branch_filter.match)
-        pt_range = f[f.rfind('Pt')+2:f.rfind('ToMuMuDstar')]
-        if 'To' in pt_range:
-            min_value, max_value = pt_range.split('To')
-            dimu_pt_min = float(min_value)
-            dimu_pt_max = float(max_value)
-        else:
-            dimu_pt_min = float(pt_range)
-            dimu_pt_max = 9999.
-
         if len(events) == 0:
             return
+
+        if self.mc_process == 'DPS':
+            pt_range = f[f.rfind('Pt')+2:f.rfind('ToMuMuDstar')]
+            if 'To' in pt_range:
+                min_value, max_value = pt_range.split('To')
+                dimu_pt_min = float(min_value)
+                dimu_pt_max = float(max_value)
+            else:
+                dimu_pt_min = float(pt_range)
+                dimu_pt_max = 9999.
+        elif self.mc_process == 'SPS':
+            pt_range = f[f.rfind('Upsilon_')+8:f.rfind('_Dstar')]
+            if 'to' in pt_range:
+                min_value, max_value = pt_range.split('to')
+                dimu_pt_min = float(min_value)
+                dimu_pt_max = float(max_value)
+            else:
+                dimu_pt_min = float(pt_range)
+                dimu_pt_max = 9999.
+        else:
+            dimu_pt_min = 0
+            dimu_pt_max = 9999.
 
         Dimu = ak.zip({**get_vars_dict(events, dimu_cols)}, with_name="PtEtaPhiMCandidate")
         Muon_all = ak.zip({**get_vars_dict(events, muon_cols)}, with_name="PtEtaPhiMCandidate")
@@ -437,7 +451,7 @@ class HistogrammingProcessor:
         [DimuDstar_hists[h].fill(ak.flatten(DimuDstar.slot0[h[h.find('_')+1:]]), weight=ak.flatten(dimudstar_weight)) for h in DimuDstar_hists if 'dimu' in h]
         [DimuDstar_hists[h].fill(ak.flatten(DimuDstar.slot1[h[h.find('_')+1:]]), weight=ak.flatten(dimudstar_weight)) for h in DimuDstar_hists if 'dstar' in h]
 
-        filename = f"output/mc_hists/{self.year}{f[f.rfind('/'):]}".replace('root', 'hists')
+        filename = f"output/mc_{self.mc_process}_hists/{self.year}{f[f.rfind('/'):]}".replace('root', 'hists')
 
         hists = {
             'Dimu': Dimu_hists,

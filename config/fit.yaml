@@ -78,15 +78,6 @@ path:
   - output/RunII_trigger_processed_vtxfit/2016/MuOniaRun2016F
   - output/RunII_trigger_processed_vtxfit/2016/MuOniaRun2016G
   - output/RunII_trigger_processed_vtxfit/2016/MuOniaRun2016H
-#  '2016':
-#  - output/RunII_trigger_processed_vtxfit/2016APV/MuOniaRun2016B-ver2-HIPM
-#  - output/RunII_trigger_processed_vtxfit/2016APV/MuOniaRun2016C-HIPM
-#  - output/RunII_trigger_processed_vtxfit/2016APV/MuOniaRun2016D-HIPM
-#  - output/RunII_trigger_processed_vtxfit/2016APV/MuOniaRun2016E-HIPM
-#  - output/RunII_trigger_processed_vtxfit/2016APV/MuOniaRun2016F-HIPM
-#  - output/RunII_trigger_processed_vtxfit/2016/MuOniaRun2016F
-#  - output/RunII_trigger_processed_vtxfit/2016/MuOniaRun2016G
-#  - output/RunII_trigger_processed_vtxfit/2016/MuOniaRun2016H
   '2017':
   - output/RunII_trigger_processed_vtxfit/2017/MuOniaRun2017B
   - output/RunII_trigger_processed_vtxfit/2017/MuOniaRun2017C

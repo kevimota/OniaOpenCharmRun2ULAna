@@ -1,5 +1,4 @@
 import os
-import hist
 import mplhep
 import numpy as np
 import yaml
@@ -15,7 +14,7 @@ years = ['2016APV', '2016', '2017', '2018']
 hist_log = ['pt', 'chi2', 'dl', 'dlSig']
 rebin = 3j
 
-def plotter(hists, year, processed_lumi, save_folder, is_data=True):
+def plotter(hists, year, processed_lumi, save_folder):
     fig, ax = plt.subplots()
 
     print(f'Creating plots in {save_folder}')
@@ -42,12 +41,13 @@ def plotter(hists, year, processed_lumi, save_folder, is_data=True):
                 break
         if log:
             mplhep.histplot(
-                hists['mc'][h_mc],
+                [hists['mc_DPS'][h_mc], hists['mc_SPS'][h_mc]],
                 histtype="fill",
                 edgecolor="black",
-                label="DPS MC",
+                label=["DPS MC", "SPS MC"],
                 ax=ax,
-                density=True
+                density=True,
+                alpha=0.7
             )
             ax.errorbar(
                 data_centers,
@@ -72,12 +72,13 @@ def plotter(hists, year, processed_lumi, save_folder, is_data=True):
             ax.clear()
 
         mplhep.histplot(
-            hists['mc'][h_mc],
+            [hists['mc_DPS'][h_mc], hists['mc_SPS'][h_mc]],
             histtype="fill",
             edgecolor="black",
-            label="DPS MC",
+            label=["DPS MC", "SPS MC"],
             ax=ax,
-            density=True
+            density=True,
+            alpha=0.7
         )
         ax.errorbar(
             data_centers,
@@ -99,16 +100,19 @@ def plotter(hists, year, processed_lumi, save_folder, is_data=True):
         ax.clear()
 
 for year in years:
-    f_hists_mc = get_files([f"output/mc_hists/{year}"], pattern='.hists')
+    f_hists_mc_DPS = get_files([f"output/mc_DPS_hists/{year}"], pattern='.hists')
+    f_hists_mc_SPS = get_files([f"output/mc_SPS_hists/{year}"], pattern='.hists')
     f_hists_data = get_files([f"output/sel_data_hists/{year}"], pattern='.hists')
-    hists_mc = {f[f.rfind('/')+1:]:load(f) for f in f_hists_mc}
+    hists_mc_DPS = {f[f.rfind('/')+1:]:load(f) for f in f_hists_mc_DPS}
+    hists_mc_SPS = {f[f.rfind('/')+1:]:load(f) for f in f_hists_mc_SPS}
     hists_data = {f[f.rfind('/')+1:]:load(f) for f in f_hists_data}
 
     with open('data/n_signal.yaml') as f:
         n_signal = yaml.load(f, Loader=yaml.FullLoader)
 
     hs_data_DimuDstar = None
-    hs_mc_DimuDstar = None
+    hs_mc_DPS_DimuDstar = None
+    hs_mc_SPS_DimuDstar = None
 
     for i in hists_data:
         if hs_data_DimuDstar is None:
@@ -127,42 +131,71 @@ for year in years:
         pt_min, pt_max = i.split(';')
         n_data[i] = hs_data_DimuDstar['dimu_pt'][hist.loc(float(pt_min)):hist.loc(float(pt_max))].sum() """
 
-    n_mc = {
+    n_mc_DPS = {
         '15;30': 0,
         '30;60': 0,
         '60;120': 0,
         '120;150': 0,
     }
 
-    for i in hists_mc:
+    n_mc_SPS = {
+        '15;30': 0,
+        '30;60': 0,
+        '60;120': 0,
+        '120;150': 0,
+    }
+
+    for i in hists_mc_DPS:
         pt_range = ";".join(i[i.rfind('Pt')+2:i.rfind('ToMuMu')].split('To'))
         pt_range = pt_range.replace('9', '15')
         if pt_range == '120':
             pt_range = '120;150'
 
-        n_mc[pt_range] += hists_mc[i]['DimuDstar']['dimu_pt'].sum().value
+        n_mc_DPS[pt_range] += hists_mc_DPS[i]['DimuDstar']['dimu_pt'].sum().value
 
-    for i in hists_mc:
+    for i in hists_mc_SPS:
+        pt_range = ";".join(i[i.rfind('Upsilon_')+8:i.rfind('_Dstar')].split('to'))
+        pt_range = pt_range.replace('9', '15')
+        if pt_range == '120':
+            pt_range = '120;150'
+
+        n_mc_SPS[pt_range] += hists_mc_SPS[i]['DimuDstar']['dimu_pt'].sum().value
+
+    for i in hists_mc_DPS:
         pt_range = ";".join(i[i.rfind('Pt')+2:i.rfind('ToMuMu')].split('To'))
         pt_range = pt_range.replace('9', '15')
         if pt_range == '120':
             pt_range = '120;150'
 
-        sf = n_signal[year][pt_range]/n_mc[pt_range]
-        #sf = n_data[pt_range]/n_mc[pt_range]
-        if hs_mc_DimuDstar is None:
-            hs_mc_DimuDstar = {k: hists_mc[i]['DimuDstar'].get(k, 0)[::rebin]*sf for k in set(hists_mc[i]['DimuDstar'])}
+        sf = n_signal[year][pt_range]/n_mc_DPS[pt_range]
+        #sf = n_data[pt_range]/n_mc_DPS[pt_range]
+        if hs_mc_DPS_DimuDstar is None:
+            hs_mc_DPS_DimuDstar = {k: hists_mc_DPS[i]['DimuDstar'].get(k, 0)[::rebin]*sf for k in set(hists_mc_DPS[i]['DimuDstar'])}
         else:
-            hs_mc_DimuDstar = {k: hs_mc_DimuDstar.get(k, 0) + hists_mc[i]['DimuDstar'].get(k, 0)[::rebin]*sf for k in set(hs_mc_DimuDstar)}
+            hs_mc_DPS_DimuDstar = {k: hs_mc_DPS_DimuDstar.get(k, 0) + hists_mc_DPS[i]['DimuDstar'].get(k, 0)[::rebin]*sf for k in set(hs_mc_DPS_DimuDstar)}
+
+    for i in hists_mc_SPS:
+        pt_range = ";".join(i[i.rfind('Upsilon_')+8:i.rfind('_Dstar')].split('to'))
+        pt_range = pt_range.replace('9', '15')
+        if pt_range == '120':
+            pt_range = '120;150'
+
+        sf = n_signal[year][pt_range]/n_mc_SPS[pt_range]
+        #sf = n_data[pt_range]/n_mc_SPS[pt_range]
+        if hs_mc_SPS_DimuDstar is None:
+            hs_mc_SPS_DimuDstar = {k: hists_mc_SPS[i]['DimuDstar'].get(k, 0)[::rebin]*sf for k in set(hists_mc_SPS[i]['DimuDstar'])}
+        else:
+            hs_mc_SPS_DimuDstar = {k: hs_mc_SPS_DimuDstar.get(k, 0) + hists_mc_SPS[i]['DimuDstar'].get(k, 0)[::rebin]*sf for k in set(hs_mc_SPS_DimuDstar)}
 
     hists = {
         'data': hs_data_DimuDstar,
-        'mc': hs_mc_DimuDstar,
+        'mc_DPS': hs_mc_DPS_DimuDstar,
+        'mc_SPS': hs_mc_SPS_DimuDstar,
     }
     
     processed_lumi = get_lumi(year, get_trigger(year))
 
     save_folder = f'plots/comparison/{year}'
-    plotter(hists, year, processed_lumi, save_folder, False)
+    plotter(hists, year, processed_lumi, save_folder)
 
     

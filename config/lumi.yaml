@@ -36,40 +36,6 @@
     HLT_Dimuon8_Upsilon_Barrel: 8.739883636
     Full_Era: 8.739883636
 
-#"2016":
-#  MuOniaRun2016B-ver2-HIPM:
-#    HLT_Dimuon13_Upsilon: 5.824066408
-#    HLT_Dimuon8_Upsilon_Barrel: 5.265197875
-#    Full_Era: 5.824235614
-#  MuOniaRun2016C-HIPM:
-#    HLT_Dimuon13_Upsilon: 2.621295973
-#    HLT_Dimuon8_Upsilon_Barrel: 2.621295973
-#    Full_Era: 2.621295973
-#  MuOniaRun2016D-HIPM:
-#    HLT_Dimuon13_Upsilon: 4.285851496
-#    HLT_Dimuon8_Upsilon_Barrel: 4.285851496
-#    Full_Era: 4.285851496
-#  MuOniaRun2016E-HIPM:
-#    HLT_Dimuon13_Upsilon: 4.034930658
-#    HLT_Dimuon8_Upsilon_Barrel: 3.669489150
-#    Full_Era: 4.065974639
-#  MuOniaRun2016F-HIPM:
-#    HLT_Dimuon13_Upsilon: 2.627511758
-#    HLT_Dimuon8_Upsilon_Barrel: 2.610302367
-#    Full_Era: 2.717344923
-#  MuOniaRun2016F:
-#    HLT_Dimuon13_Upsilon: 0.418120616
-#    HLT_Dimuon8_Upsilon_Barrel: 0.418120616
-#    Full_Era: 0.418120616
-#  MuOniaRun2016G:
-#    HLT_Dimuon13_Upsilon: 7.652808366
-#    HLT_Dimuon8_Upsilon_Barrel: 7.652808366
-#    Full_Era: 7.652808366
-#  MuOniaRun2016H:
-#    HLT_Dimuon13_Upsilon: 8.739883636
-#    HLT_Dimuon8_Upsilon_Barrel: 8.739883636
-#    Full_Era: 8.739883636
-
 "2017":
   MuOniaRun2017B:
     HLT_Dimuon10_Upsilon_Barrel_Seagulls: 0.
@@ -123,3 +89,85 @@
     HLT_Dimuon24_Upsilon_noCorrL1: 31.834889477
     Full_Era: 31.834889477
   
+"all":
+  MuOniaRun2016B-ver2-HIPM:
+    HLT_Dimuon13_Upsilon: 5.824066408
+    HLT_Dimuon8_Upsilon_Barrel: 5.265197875
+    Full_Era: 5.824235614
+  MuOniaRun2016C-HIPM:
+    HLT_Dimuon13_Upsilon: 2.621295973
+    HLT_Dimuon8_Upsilon_Barrel: 2.621295973
+    Full_Era: 2.621295973
+  MuOniaRun2016D-HIPM:
+    HLT_Dimuon13_Upsilon: 4.285851496
+    HLT_Dimuon8_Upsilon_Barrel: 4.285851496
+    Full_Era: 4.285851496
+  MuOniaRun2016E-HIPM:
+    HLT_Dimuon13_Upsilon: 4.034930658
+    HLT_Dimuon8_Upsilon_Barrel: 3.669489150
+    Full_Era: 4.065974639
+  MuOniaRun2016F-HIPM:
+    HLT_Dimuon13_Upsilon: 2.627511758
+    HLT_Dimuon8_Upsilon_Barrel: 2.610302367
+    Full_Era: 2.717344923 
+  MuOniaRun2016F:
+    HLT_Dimuon13_Upsilon: 0.418120616
+    HLT_Dimuon8_Upsilon_Barrel: 0.418120616
+    Full_Era: 0.418120616
+  MuOniaRun2016G:
+    HLT_Dimuon13_Upsilon: 7.652808366
+    HLT_Dimuon8_Upsilon_Barrel: 7.652808366
+    Full_Era: 7.652808366
+  MuOniaRun2016H:
+    HLT_Dimuon13_Upsilon: 8.739883636
+    HLT_Dimuon8_Upsilon_Barrel: 8.739883636
+    Full_Era: 8.739883636
+  MuOniaRun2017B:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 0.
+    HLT_Dimuon12_Upsilon_eta1p5: 4.803363110
+    HLT_Dimuon24_Upsilon_noCorrL1: 0.
+    Full_Era: 4.803363110
+  MuOniaRun2017C:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 9.571439703
+    HLT_Dimuon12_Upsilon_eta1p5: 9.571439703
+    HLT_Dimuon24_Upsilon_noCorrL1: 0.019933432
+    Full_Era: 9.571439703
+  MuOniaRun2017D:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 4.247682053
+    HLT_Dimuon12_Upsilon_eta1p5: 4.247682053
+    HLT_Dimuon24_Upsilon_noCorrL1: 4.247682053
+    Full_Era: 4.247682053
+  MuOniaRun2017E:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 9.313642393
+    HLT_Dimuon12_Upsilon_eta1p5: 9.313642393
+    HLT_Dimuon24_Upsilon_noCorrL1: 9.313642393
+    Full_Era: 9.313642393
+  MuOniaRun2017F:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 13.538614115
+    HLT_Dimuon12_Upsilon_eta1p5: 13.538614115
+    HLT_Dimuon24_Upsilon_noCorrL1: 13.538614115
+    Full_Era: 13.538886094
+  MuOniaRun2018A:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 5.290841785
+    HLT_Dimuon12_Upsilon_eta1p5: 5.290841785
+    HLT_Dimuon12_Upsilon_y1p4: 8.736205714
+    HLT_Dimuon24_Upsilon_noCorrL1: 14.027047499
+    Full_Era: 14.027047499
+  MuOniaRun2018B:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 0.
+    HLT_Dimuon12_Upsilon_eta1p5: 0.
+    HLT_Dimuon12_Upsilon_y1p4: 7.060622497
+    HLT_Dimuon24_Upsilon_noCorrL1: 7.060622497
+    Full_Era: 7.060622497
+  MuOniaRun2018C:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 0.
+    HLT_Dimuon12_Upsilon_eta1p5: 0.
+    HLT_Dimuon12_Upsilon_y1p4: 6.893793063
+    HLT_Dimuon24_Upsilon_noCorrL1: 6.893793063
+    Full_Era: 6.893793063
+  MuOniaRun2018D:
+    HLT_Dimuon10_Upsilon_Barrel_Seagulls: 0.
+    HLT_Dimuon12_Upsilon_eta1p5: 0.
+    HLT_Dimuon12_Upsilon_y1p4: 31.834889477
+    HLT_Dimuon24_Upsilon_noCorrL1: 31.834889477
+    Full_Era: 31.834889477

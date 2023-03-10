@@ -4,6 +4,13 @@ import sys
 particles = ['Upsilon', 'Dstar', 'UpsilonDstar']
 years = ['2016APV', '2016', '2017', '2018']
 
+def run_until_works(cmd):
+    error = 1
+    while error:
+        error = os.system(cmd)
+        if error == 2: break
+        print("Error:", error)
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description="Helper to create fits")
@@ -45,15 +52,13 @@ if __name__ == '__main__':
                 if not it.is_dir(): continue
                 os.system(f'python tools/save_ttree.py -p {it.path} -o {it.path}')
 
-    base_folder = 'output/fom_vtxfit'
-
     if args.fit:
         for year in years_to_run:
             for particle in particles_to_run:
-                os.system(f'python nanoAODplus_fit.py -y {year} -c {particle}')
-                os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} -p')
+                run_until_works(f'python nanoAODplus_fit.py -y {year} -c {particle}')
+                run_until_works(f'python nanoAODplus_fit.py -y {year} -c {particle} -p')
                 if args.sps:
                     if particle == 'UpsilonDstar': continue
-                    os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} --sps')
+                    run_until_works(f'python nanoAODplus_fit.py -y {year} -c {particle} --sps')
         for year in years_to_run:
             os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} -cm')

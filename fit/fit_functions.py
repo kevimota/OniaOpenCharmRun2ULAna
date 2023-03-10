@@ -5,6 +5,8 @@ import tools.root_plotting as plot
 
 import yaml, os
 
+from tools.utils import get_lumi, get_trigger, years
+
 colors_hex = ['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33']
 TColor = ROOT.TColor()
 
@@ -37,12 +39,18 @@ def save_fit_params(path, result, wspace, channel, sps=False):
 
 def fit_upsilon(config, year):
     chain = ROOT.TChain("UpsilonDstar")
-    for f in config['path'][year]:
-        chain.Add(f"{f}/UpsilonDstar.root")
+
+    if year == 'all':
+        for y in years:
+            for f in config['path'][y]:
+                chain.Add(f"{f}/UpsilonDstar.root")
+    else:
+        for f in config['path'][year]:
+            chain.Add(f"{f}/UpsilonDstar.root")
 
     wspace = ROOT.RooWorkspace(f"upsilon_fit_{year}")
     mass = ROOT.RooRealVar("dimu_mass", "Mass Upsilon", 8.7, 11.2)
-    data = ROOT.RooDataSet("data", "Data Upsilon", ROOT.RooArgSet(mass), ROOT.RooFit.Import(chain))
+    data = ROOT.RooDataSet("data", "Data Upsilon", ROOT.RooArgSet(mass), Import=chain)
 
     # Signal Variables
     m1S = ROOT.RooRealVar("m1S","PDG mass Upsilon(1S)", config['Upsilon']['M1S'])
@@ -91,14 +99,21 @@ def fit_upsilon(config, year):
     getattr(wspace, "import")(model)
     getattr(wspace, "import")(result)
 
-    save_path = config['path'][year][0][:config['path'][year][0].rfind('/')]
+    save_path = f'output/fit/{year}'
+    if not os.path.exists(save_path): os.makedirs(save_path)
     wspace.writeToFile(save_path + "/Upsilon_fit.root")
     save_fit_params(save_path, result, wspace, "Upsilon")
 
 def fit_dstar(config, year):
     chain = ROOT.TChain("UpsilonDstar")
-    for f in config['path'][year]:
-        chain.Add(f"{f}/UpsilonDstar.root")
+
+    if year == 'all':
+        for y in years:
+            for f in config['path'][y]:
+                chain.Add(f"{f}/UpsilonDstar.root")
+    else:
+        for f in config['path'][year]:
+            chain.Add(f"{f}/UpsilonDstar.root")
 
     wspace = ROOT.RooWorkspace(f"dstar_fit_{year}")
     deltamr = ROOT.RooRealVar("dstar_deltamr", "Dstar Delta m ", 0.14, 0.158)
@@ -151,14 +166,20 @@ def fit_dstar(config, year):
     getattr(wspace, "import")(model)
     getattr(wspace, "import")(result)
 
-    save_path = config['path'][year][0][:config['path'][year][0].rfind('/')]
+    save_path = f'output/fit/{year}'
+    if not os.path.exists(save_path): os.makedirs(save_path)
     wspace.writeToFile(save_path + "/Dstar_fit.root")
     save_fit_params(save_path, result, wspace, "Dstar")
 
 def fit_upsilondstar(config, year):
     chain = ROOT.TChain("UpsilonDstar")
-    for f in config['path'][year]:
-        chain.Add(f"{f}/UpsilonDstar.root")
+    if year == 'all':
+        for y in years:
+            for f in config['path'][y]:
+                chain.Add(f"{f}/UpsilonDstar.root")
+    else:
+        for f in config['path'][year]:
+            chain.Add(f"{f}/UpsilonDstar.root")
 
     wspace = ROOT.RooWorkspace(f"upsilondstar_fit_{year}")
     upsilon_mass = ROOT.RooRealVar("dimu_mass", "Mass Upsilon", 8.7, 11.2)
@@ -179,8 +200,7 @@ def fit_upsilondstar(config, year):
     ) """
 
     # Load previous Upsilon results
-    save_path = config['path'][year][0][:config['path'][year][0].rfind('/')]
-    with open(f"{save_path}/Upsilon_fit_params.yaml") as f:
+    """ with open(f"{save_path}/Upsilon_fit_params.yaml") as f:
         upsilon_fit = yaml.load(f, Loader=yaml.FullLoader)
 
     with open(f"{save_path}/Dstar_fit_params.yaml") as f:
@@ -190,7 +210,7 @@ def fit_upsilondstar(config, year):
         with open(f"{save_path}/UpsilonDstar_fit_params_uncons.yaml") as f:
             upsilondstar_fit = yaml.load(f, Loader=yaml.FullLoader)
     else:
-        upsilondstar_fit = None
+        upsilondstar_fit = None """
 
     # Signal PDFs
     m1S = ROOT.RooRealVar("m1S","PDG mass Upsilon(1S)", config['Upsilon']['M1S'])
@@ -284,25 +304,22 @@ def fit_upsilondstar(config, year):
     getattr(wspace, "import")(model2D)
     getattr(wspace, "import")(result)
 
+    save_path = f"output/fit/{year}"
     wspace.writeToFile(save_path + "/UpsilonDstar_fit.root")
     save_fit_params(save_path, result, wspace, "UpsilonDstar")
 
-def plot_fit(config, year, channel):
+def plot_fit(year, channel):
     # Get Lumi files
-    with open("config/lumi.yaml", 'r') as f:
-        lumi = yaml.load(f, Loader=yaml.FullLoader)[year]
-    with open("config/skim_trigger.yaml", 'r') as f:
-        trigger = yaml.load(f, Loader=yaml.FullLoader)['trigger'][year]
-
-    processed_lumi = 0
-    for era in lumi:
-        processed_lumi += lumi[era][trigger]
+    if year == 'all':
+        processed_lumi = 0
+        for y in years: processed_lumi += get_lumi(y, get_trigger(y))
+    else: processed_lumi = get_lumi(year, get_trigger(year))
 
     plot.ModTDRStyle(width=800)
     plot.lumi_13TeV = f"{processed_lumi:.2f} " + "fb^{-1}"
     plot.extraText = 'Preliminary'
 
-    path = config['path'][year][0][:config['path'][year][0].rfind('/')]
+    path = f'output/fit/{year}'
     if channel == "Upsilon":
         if not os.path.exists(path + "/Upsilon_fit.root"): 
             print(f"File {path + '/Upsilon_fit.root'} does not exist")
@@ -319,6 +336,8 @@ def plot_fit(config, year, channel):
         data = wspace.data("data")
         model = wspace.pdf("model")
         result = wspace.obj("fitresult_model_data")
+
+        f.Close()
 
         frame = mass.frame(ROOT.RooFit.Title("Dimuon Invariant mass"))
         data.plotOn(frame, ROOT.RooFit.Name("Data"), ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2))
@@ -373,6 +392,8 @@ def plot_fit(config, year, channel):
         model = wspace.pdf("model")
         result = wspace.obj("fitresult_model_data")
 
+        f.Close()
+
         frame = deltamr.frame(ROOT.RooFit.Title("D* #Delta m fit"))
         data.plotOn(frame, ROOT.RooFit.Name("Data"), ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2))
         #model.plotOn(frame, ROOT.RooFit.Name("D* fit"), ROOT.RooFit.Components("g*"), ROOT.RooFit.LineColor(colors[1]))
@@ -424,6 +445,8 @@ def plots_upsilondstar(path, year, lumi):
     f = ROOT.TFile.Open(path + "/UpsilonDstar_fit.root")
     wspace = f.Get(f"upsilondstar_fit_{year}")
 
+    f.Close()
+
     upsilon_mass = wspace.var("dimu_mass")
     dstar_deltamr = wspace.var("dstar_deltamr")
     data = wspace.data("data")
@@ -432,7 +455,7 @@ def plots_upsilondstar(path, year, lumi):
     
     # Canvas for plotting Upsilon projection 
     c1 = ROOT.TCanvas("Upsilon mass")
-    frame_upsilon = upsilon_mass.frame(ROOT.RooFit.Title("Dimuon Invariant mass"))
+    frame_upsilon = upsilon_mass.frame()
     frame_upsilon.GetXaxis().SetTitle("M(\mu^+\mu^-) [GeV/c^2]")
     
     # Plot the Data
@@ -624,8 +647,13 @@ def plots_upsilondstar(path, year, lumi):
     with open('config/fit.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
     chain = ROOT.TChain("UpsilonDstar")
-    for f in config['path'][year]:
-        chain.Add(f"{f}/UpsilonDstar.root")
+    if year == 'all':
+        for y in years:
+            for f in config['path'][y]:
+                chain.Add(f"{f}/UpsilonDstar.root")
+    else:
+        for f in config['path'][year]:
+            chain.Add(f"{f}/UpsilonDstar.root")
 
     hist = ROOT.TH2D('h1', 'Associated Particles; ;; ', 30, 8.7, 11.2, 30, 0.141, 0.16)
     hist.SetTitle("Mass correlation - #Upsilon D*")
@@ -815,6 +843,8 @@ def check_cov_matrix(path, year):
     wspace = f.Get(f"upsilondstar_fit_{year}")
     result = wspace.obj("fitresult_model2D_data")
 
+    f.Close()
+
     status = result.status()
     quality = result.covQual()
     print(f"Cheking validity for year: {year}")
@@ -831,6 +861,8 @@ def get_signal_significance(path, year):
     data = wspace.data("data")
     signal_frac = wspace.var("signal_frac")
     result = wspace.obj("fitresult_model2D_data")
+
+    f.Close()
 
     nll = model2D.createNLL(data)
     ROOT.RooMinimizer(nll).migrad()

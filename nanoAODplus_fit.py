@@ -5,10 +5,12 @@
 import yaml, sys
 from fit.fit_functions import *
 
+years = ['2016APV', '2016', '2017', '2018', 'all']
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description="Run fit routines to data")
-    parser.add_argument("-y", "--year", help="Year to fit", type=str, required=True)
+    parser.add_argument("-y", "--year", help="Year to fit", type=str, required=True, choices=years)
     parser.add_argument("-c", "--channel", help="Particle to fit", type=str, required=True, choices={"Upsilon", "Dstar", "UpsilonDstar"})
     parser.add_argument("-s", "--sps", action="store_true", help="Do full Run 2 fit on data")
     parser.add_argument("-p", "--plot", action="store_true", help="Plot the results of previous fit")
@@ -18,10 +20,9 @@ if __name__ == '__main__':
     with open('config/fit.yaml') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
-    if args.year not in config['path']:
-        print("Year not found in the config file!")
-        sys.exit()
-    
+    save_path = f'output/fit/{args.year}'
+    if not os.path.exists(save_path): os.makedirs(save_path)
+
     if not args.plot:
         if not args.check_matrix:
             if args.sps:
@@ -44,10 +45,10 @@ if __name__ == '__main__':
                 if args.channel == "UpsilonDstar":
                     fit_upsilondstar(config, args.year)
         else:
-            path = config['path'][args.year][0][:config['path'][args.year][0].rfind('/')]
+            path = f'output/fit/{args.year}'
             check_cov_matrix(path, args.year)
     else:
         print(f"Ploting {args.channel} for year {args.year}")
-        plot_fit(config, args.year, args.channel)
+        plot_fit(args.year, args.channel)
         
 

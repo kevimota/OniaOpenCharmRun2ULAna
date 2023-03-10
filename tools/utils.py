@@ -25,6 +25,8 @@ Dstar_BR_err = 0.005
 D0_BR        = 0.03947
 D0_BR_err    = 0.00030
 
+years = ['2016APV', '2016', '2017', '2018']
+
 def atoi(text):
     return int(text) if text.isdigit() else text
 
@@ -78,7 +80,7 @@ def association(cand1, cand2):
     asso['deltarap'] = asso.slot0.rap - asso.slot1.rap
     asso['deltapt'] = asso.slot0.pt - asso.slot1.pt
     asso['deltaeta'] = asso.slot0.eta - asso.slot1.eta
-    asso['deltaphi'] = np.remainder(np.abs(asso.slot0.phi - asso.slot1.phi), np.pi)
+    asso['deltaphi'] = np.pi - np.abs(np.abs(asso.slot0.phi - asso.slot1.phi) - np.pi)
     asso['cand'] = cand1 + cand2
     asso['rap'] = np.log((asso['cand'].energy + asso['cand'].z)/np.sqrt(asso['cand'].mass2 + asso['cand'].pt2))
     
@@ -214,19 +216,28 @@ def get_evt_eff(hists_eff, data):
 
 
 def get_eff(year, asso=False):
-    years = ['2016APV', '2016', '2017', '2018']
     acc = None
-    if str(year) not in years:
-        raise ValueError('Year not valid!')
-    base_folder = f'output/RunII_trigger_processed_vtxfit/{year}'
-    for it in os.scandir(base_folder):
-        if not it.is_dir(): continue
-        for it in os.scandir(it.path):
-            if not it.name.endswith('.coffea'): continue
-            if acc:
-                acc += load(it.path)
-            else:
-                acc = load(it.path)
+    if year == 'all':
+        for y in years:
+            base_folder = f'output/RunII_trigger_processed_vtxfit/{y}'
+            for it in os.scandir(base_folder):
+                if not it.is_dir(): continue
+                for it in os.scandir(it.path):
+                    if not it.name.endswith('.coffea'): continue
+                    if acc:
+                        acc += load(it.path)
+                    else:
+                        acc = load(it.path)
+    else:
+        base_folder = f'output/RunII_trigger_processed_vtxfit/{year}'
+        for it in os.scandir(base_folder):
+            if not it.is_dir(): continue
+            for it in os.scandir(it.path):
+                if not it.name.endswith('.coffea'): continue
+                if acc:
+                    acc += load(it.path)
+                else:
+                    acc = load(it.path)
 
     eff = np.mean(acc['DimuDstar']['eff'].value)
     eff_err_up = np.mean(acc['DimuDstar']['eff_err_up'].value)
