@@ -12,4 +12,7 @@ dependencies:
   - pip:
     - pyyaml
     - uncertainties
+    - tensorflow-macos==2.10
+    - tensorflow-metal==0.6
+    - tensorflow-probability==0.18
     - zfit
