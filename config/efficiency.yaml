@@ -41,7 +41,7 @@ trigger:
   "2018":    "HLT_Dimuon24_Upsilon_noCorrL1"
 
 # Association Efficiency
-vertex_probability_cut: 0.005
+vertex_probability_cut: 0.01
 
 corrections:
   pileup:
