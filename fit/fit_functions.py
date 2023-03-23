@@ -1,5 +1,6 @@
 import ROOT
 ROOT.EnableImplicitMT()
+ROOT.gROOT.SetBatch(True)
 
 import tools.root_plotting as plot
 
@@ -329,7 +330,7 @@ def plot_fit(year, channel):
         
         n_params = fit_params['n_params']
 
-        f = ROOT.TFile.Open(path + "/Upsilon_fit.root")
+        f = ROOT.TFile.Open(path + "/Upsilon_fit.root", "read")
         wspace = f.Get(f"upsilon_fit_{year}")
 
         mass = wspace.var("dimu_mass")
@@ -384,7 +385,7 @@ def plot_fit(year, channel):
             fit_params = yaml.load(f, Loader=yaml.FullLoader)
         
         n_params = fit_params['n_params']
-        f = ROOT.TFile.Open(path + "/Dstar_fit.root")
+        f = ROOT.TFile.Open(path + "/Dstar_fit.root", "read")
         wspace = f.Get(f"dstar_fit_{year}")
 
         deltamr = wspace.var("dstar_deltamr")
@@ -442,10 +443,10 @@ def plots_upsilondstar(path, year, lumi):
         fit_params = yaml.load(f, Loader=yaml.FullLoader)
     n_params = fit_params['n_params']
 
-    f = ROOT.TFile.Open(path + "/UpsilonDstar_fit.root")
+    f = ROOT.TFile.Open(f"{path}/UpsilonDstar_fit.root")
     wspace = f.Get(f"upsilondstar_fit_{year}")
 
-    f.Close()
+    #f.Close()
 
     upsilon_mass = wspace.var("dimu_mass")
     dstar_deltamr = wspace.var("dstar_deltamr")
@@ -839,7 +840,7 @@ def fit_dstar_sps(config, year):
     save_fit_params(save_path, result, wspace, "Dstar", sps=True)
 
 def check_cov_matrix(path, year):
-    f = ROOT.TFile.Open(path + "/UpsilonDstar_fit.root")
+    f = ROOT.TFile.Open(path + "/UpsilonDstar_fit.root", "read")
     wspace = f.Get(f"upsilondstar_fit_{year}")
     result = wspace.obj("fitresult_model2D_data")
 
@@ -855,7 +856,7 @@ def check_cov_matrix(path, year):
     
 def get_signal_significance(path, year):
     from math import sqrt
-    f = ROOT.TFile.Open(path + "/UpsilonDstar_fit.root")
+    f = ROOT.TFile.Open(path + "/UpsilonDstar_fit.root", "read")
     wspace = f.Get(f"upsilondstar_fit_{year}")
     model2D = wspace.pdf("model2D")
     data = wspace.data("data")

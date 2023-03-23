@@ -60,5 +60,7 @@ if __name__ == '__main__':
                 if args.sps:
                     if particle == 'UpsilonDstar': continue
                     run_until_works(f'python nanoAODplus_fit.py -y {year} -c {particle} --sps')
+        
         for year in years_to_run:
-            os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} -cm')
+            for particle in particles_to_run:
+                os.system(f'python nanoAODplus_fit.py -y {year} -c {particle} -cm')
