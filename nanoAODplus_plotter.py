@@ -55,15 +55,14 @@ if __name__ == '__main__':
     config_run = yaml.load(open("config/multicore.yaml", "r"), Loader=yaml.FullLoader)
 
     if not args.is_mc:
+        folders = []
         if args.sel == 'sel':
             folder = f'output/RunII_trigger_processed_vtxfit/{args.year}'
-            folders = []
             for it in os.scandir(folder):
                 if not it.is_dir(): continue
                 folders.append(it.path)
         elif args.sel == 'raw':
             folder = '/Users/kevimota/cernbox/'
-            folders = []
             for it in os.scandir(folder):
                 if it.name.find('MuOnia') < 0: continue
                 if args.year == '2016APV':
@@ -95,13 +94,18 @@ if __name__ == '__main__':
 
     print('Done!')
 
+    hs_Dimu = dict()
+    hs_Dstar = dict()
+    hs_Dstar_D0 = dict()
+    hs_DimuDstar = dict()
+    
     if not args.is_mc:
         if args.sel == 'sel':
             hists = get_files([f"output/sel_data_hists/{args.year}"], pattern='.hists')
             hists = [load(h) for h in hists]
 
             processed_lumi = get_lumi(args.year, get_trigger(args.year))
-
+            
             for i in range(len(hists)):
                 if i == 0:
                     hs_Dimu = hists[i]['Dimu']
@@ -168,3 +172,4 @@ if __name__ == '__main__':
         }
         save_folder = f'plots/mc_{args.mc_process}_hists/{args.year}'
         plotter(hists, args.year, None, save_folder, False)
+        
