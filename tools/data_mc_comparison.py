@@ -146,7 +146,10 @@ for year in years:
     }
 
     for i in hists_mc_DPS:
-        pt_range = ";".join(i[i.rfind('Pt')+2:i.rfind('ToMuMu')].split('To'))
+        if i[i.rfind('/')+1:].startswith('DPS'):
+            pt_range = ";".join(i[i.rfind('Filter-')+7:i.rfind(f'_{year}')].split('To'))
+        else:
+            pt_range = ";".join(i[i.rfind('Pt')+2:i.rfind('ToMuMu')].split('To'))
         pt_range = pt_range.replace('9', '15')
         if pt_range == '120':
             pt_range = '120;150'
@@ -162,7 +165,10 @@ for year in years:
         n_mc_SPS[pt_range] += hists_mc_SPS[i]['DimuDstar']['dimu_pt'].sum().value
 
     for i in hists_mc_DPS:
-        pt_range = ";".join(i[i.rfind('Pt')+2:i.rfind('ToMuMu')].split('To'))
+        if i[i.rfind('/')+1:].startswith('DPS'):
+            pt_range = ";".join(i[i.rfind('Filter-')+7:i.rfind(f'_{year}')].split('To'))
+        else:
+            pt_range = ";".join(i[i.rfind('Pt')+2:i.rfind('ToMuMu')].split('To'))
         pt_range = pt_range.replace('9', '15')
         if pt_range == '120':
             pt_range = '120;150'

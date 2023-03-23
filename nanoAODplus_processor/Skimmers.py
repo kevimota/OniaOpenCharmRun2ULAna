@@ -180,7 +180,17 @@ class Skimmer:
         #DimuDstar = DimuDstar[DimuDstar.dstar_pi_dz < 1]
         DimuDstar = DimuDstar[DimuDstar.dstar_asso_prob > self.config['limits']['Dstar_association_prob']]
 
+        DimuDstar = DimuDstar[DimuDstar.mass > 18]
         DimuDstar = DimuDstar[~DimuDstar.wrg_chg]
+
+        Dstar_D0 = ak.zip({
+                'pt': DimuDstar.dstar_d0_pt,
+                'eta': DimuDstar.dstar_d0_eta,
+                'phi': DimuDstar.dstar_d0_phi,
+                'mass': DimuDstar.dstar_d0_mass,
+            }, with_name='PtEtaPhiMLorentzVector'
+        )
+        DimuDstar['dstar_d0_rap'] = np.log((Dstar_D0.energy + Dstar_D0.z)/np.sqrt(Dstar_D0.mass2 + Dstar_D0.pt2))
 
         folder = f[f.rfind('/'):f.rfind('_')]
         filename = f"output/RunII_trigger_processed_vtxfit/{self.year}{folder}{f[f.rfind('/'):]}"

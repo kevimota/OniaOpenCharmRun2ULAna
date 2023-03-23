@@ -32,7 +32,7 @@ def get_weight(evaluator, Muon, Dimu, PVtx):
     return weight
 
 class EfficiencyProcessor(processor.ProcessorABC):
-    def __init__(self, config, year, dimu_cut=0):
+    def __init__(self, config, year, dimu_cut=0.0):
         self.config = config
         self.year = year
         self.dimu_cut = dimu_cut
@@ -169,7 +169,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         GenPart_Dimu = GenPart_Dimu[(GenPart_Dimu.pt > max(self.config['dimu_pt_min'], self.dimu_cut)) & (GenPart_Dimu.pt < self.config['dimu_pt_max'])]
         GenPart_Dimu['rap'] = np.log((GenPart_Dimu.t+GenPart_Dimu.z)/(GenPart_Dimu.t-GenPart_Dimu.z))/2       
         GenPart_Dimu = GenPart_Dimu[np.absolute(GenPart_Dimu.rap) < self.config['dimu_rap']]   
-        arg_sort = ak.argsort(GenPart_Dimu.pt, axis=1, ascending=False)
+        arg_sort = ak.argsort(GenPart_Dimu.pt, axis=-1, ascending=False)
         GenPart_Dimu = GenPart_Dimu[arg_sort]    
 
         GenPart_D0 = GenPart[(np.absolute(GenPart.pdgId) == 421) & (np.absolute(GenPart.parpdgId) == 413)]
@@ -177,7 +177,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         GenPart_Dstar = GenPart_Dstar[(GenPart_Dstar.pt > self.config['dstar_pt_min']) & (GenPart_Dstar.pt < self.config['dstar_pt_max'])]
         GenPart_Dstar['rap'] = np.log((GenPart_Dstar.t+GenPart_Dstar.z)/(GenPart_Dstar.t-GenPart_Dstar.z))/2
         GenPart_Dstar = GenPart_Dstar[np.absolute(GenPart_Dstar.rap) < self.config['dstar_rap']]
-        arg_sort = ak.argsort(GenPart_Dstar.pt, axis=1, ascending=False)
+        arg_sort = ak.argsort(GenPart_Dstar.pt, axis=-1, ascending=False)
         GenPart_Dstar = GenPart_Dstar[arg_sort]  
 
         Dimu = ak.mask(Dimu, Dimu.charge == 0)
@@ -193,7 +193,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         dimu_eta_cut = np.absolute(Dimu.rap) < self.config['dimu_rap']
         Muon = ak.mask(Muon, muon_eta_cut & muon_pt_cut & muon_sim_cut & dimu_pt_cut & dimu_eta_cut)
         Dimu = ak.mask(Dimu, muon_eta_cut & muon_pt_cut & muon_sim_cut & dimu_pt_cut & dimu_eta_cut)
-        arg_sort = ak.argsort(Dimu.pt, axis=1, ascending=False)
+        arg_sort = ak.argsort(Dimu.pt, axis=-1, ascending=False)
         Dimu = Dimu[arg_sort]
         Muon = Muon[arg_sort]
         #muon_sim_cut_2 = (GenPart[Muon.slot0.simIdx] == GenPart_Muon.slot0) & (GenPart[Muon.slot1.simIdx] == GenPart_Muon.slot1)
@@ -211,7 +211,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         Dstar = Dstar[Dstar.Kchg != Dstar.pichg]
         Dstar = Dstar[(Dstar.pt > self.config['dstar_pt_min']) & (Dstar.pt < self.config['dstar_pt_max'])]
         Dstar = Dstar[np.absolute(Dstar.rap) < self.config['dstar_rap']]
-        arg_sort = ak.argsort(Dstar.pt, axis=1, ascending=False)
+        arg_sort = ak.argsort(Dstar.pt, axis=-1, ascending=False)
         Dstar = Dstar[arg_sort]
 
         Dstar_sim = Dstar[Dstar.simIdx > -1]
@@ -315,7 +315,7 @@ class EfficiencyProcessor(processor.ProcessorABC):
         MuonDstar = ak.zip({'0': Muon[Dstar.associationIdx], '1': Dstar})
         MuonDstar = MuonDstar[none_cut]
 
-        arg_sort = ak.argsort(DimuDstar['cand'].pt, axis=1, ascending=False)
+        arg_sort = ak.argsort(DimuDstar['cand'].pt, axis=-1, ascending=False)
         DimuDstar = DimuDstar[arg_sort]
         MuonDstar = MuonDstar[arg_sort]
 
@@ -329,8 +329,10 @@ class EfficiencyProcessor(processor.ProcessorABC):
             weight=weight,
         )
 
-        DimuDstar = DimuDstar[DimuDstar.slot1.associationProb > self.config['vertex_probability_cut']]
-        MuonDstar = MuonDstar[DimuDstar.slot1.associationProb > self.config['vertex_probability_cut']]
+        dimudstar_asso_cut = DimuDstar.slot1.associationProb > self.config['vertex_probability_cut']
+        dimudstar_mass_cut = DimuDstar.cand.mass > 18
+        DimuDstar = DimuDstar[dimudstar_asso_cut & dimudstar_mass_cut]
+        MuonDstar = MuonDstar[dimudstar_asso_cut & dimudstar_mass_cut]
 
         weight = get_weight(evaluator, MuonDstar.slot0, DimuDstar.slot0, PVtx)
 

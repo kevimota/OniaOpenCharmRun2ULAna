@@ -27,6 +27,15 @@ trgs = {
     "2018":    "HLT_Dimuon24_Upsilon_noCorrL1",
 } 
 
+def get_pt_range(pt_range, split):
+    if split in pt_range:
+        min_value, max_value = pt_range.split(split)
+        dimu_pt_min = float(min_value)
+        dimu_pt_max = float(max_value)
+    else:
+        dimu_pt_min = float(pt_range)
+        dimu_pt_max = 9999.
+    return dimu_pt_max, dimu_pt_min
 
 def get_weight(evaluator, Muon, PVtx):
     pileup_weight = evaluator['pileup'](ak.num(PVtx))
@@ -75,7 +84,7 @@ class HistogrammingProcessor:
             'rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$y_{\mu\mu}$").Double(),
             'dl': Hist.new.Regular(100, -1, 1, name="dl", label=r"decay length $\mu\mu$").Double(),
             'dlSig': Hist.new.Regular(100, -20, 20, name="dlSig", label=r"decay length significance $\mu\mu$").Double(),
-            'chi2': Hist.new.Regular(100, 0, 10, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Double(),
+            'chi2': Hist.new.Regular(100, 0, 8, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Double(),
             'cosphi': Hist.new.Regular(60, -1, 1, name="cosphi", label=r"cos of pointing angle $\mu\mu$").Double(),
         }
 
@@ -92,7 +101,7 @@ class HistogrammingProcessor:
             'D0dl': Hist.new.Regular(100, 0, 2, name="dl", label=r"decay length $D^0$ of $D^*$").Double(),
             'D0dlSig': Hist.new.Regular(100, 0, 20, name="dlSig", label=r"decay length significance $D^0$ of $D^*$").Double(),
             'D0pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^0}$ [GeV]").Double(),
-            'D0eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^0}$").Double(),
+            'D0eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^0}$").Double(),
             'D0phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^0}$").Double(),
             'D0mass': Hist.new.Regular(100, 1.82, 1.9, name="mass", label=r"$m_{D^0}$ [GeV]").Double(),
         }
@@ -106,21 +115,21 @@ class HistogrammingProcessor:
             'mass': Hist.new.Regular(100, 8.6, 70, name="mass", label=r"$m_{\Upsilon D^*}$ [GeV]").Double(),
             'rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$\eta_{\Upsilon D^*}$").Double(),
             'dimu_mass': Hist.new.Regular(100, 8.6, 11, name="mass", label=r"$m_{\mu\mu}$ [GeV]").Double(),
-            'dimu_pt': Hist.new.Regular(100, 0, 300, name='pt', label=r"$p_{T,\mu\mu}$ [GeV]").Double(),
+            'dimu_pt': Hist.new.Regular(50, 0, 150, name='pt', label=r"$p_{T,\mu\mu}$ [GeV]").Double(),
             'dimu_eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{\mu\mu}$").Double(),
             'dimu_phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{\mu\mu}$").Double(),
             'dimu_rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$y_{\mu\mu}$").Double(),
             'dimu_dl': Hist.new.Regular(100, -1, 1, name="dl", label=r"decay length $\mu\mu$").Double(),
             'dimu_dlSig': Hist.new.Regular(100, -20, 20, name="dlSig", label=r"decay length significance $\mu\mu$").Double(),
-            'dimu_chi2': Hist.new.Regular(100, 0, 10, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Double(),
+            'dimu_chi2': Hist.new.Regular(100, 0, 8, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Double(),
             'dimu_cosphi': Hist.new.Regular(60, -1, 1, name="cosphi", label=r"cos of pointing angle $\mu\mu$").Double(),
             'dstar_deltamr': Hist.new.Regular(50, 0.138, 0.162, name="deltam", label=r"$\Delta m_{D^*}$ [GeV]").Double(),
-            'dstar_pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^*}$ [GeV]").Double(),
-            'dstar_eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^*}$").Double(),
+            'dstar_pt': Hist.new.Regular(100, 0, 80, name='pt', label=r"$p_{T,D^*}$ [GeV]").Double(),
+            'dstar_eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^*}$").Double(),
             'dstar_phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^*}$").Double(),
-            'dstar_rap': Hist.new.Regular(60, -4, 4, name="rap", label=r"$y_{D^*}$").Double(),
-            'dstar_D0pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^0}$ [GeV]").Double(),
-            'dstar_D0eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^0}$").Double(),
+            'dstar_rap': Hist.new.Regular(60, -3, 3, name="rap", label=r"$y_{D^*}$").Double(),
+            'dstar_D0pt': Hist.new.Regular(100, 0, 80, name='pt', label=r"$p_{T,D^0}$ [GeV]").Double(),
+            'dstar_D0eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^0}$").Double(),
             'dstar_D0phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^0}$").Double(),
             'dstar_D0mass': Hist.new.Regular(100, 1.82, 1.9, name="mass", label=r"$m_{D^0}$ [GeV]").Double(),
             'dstar_D0cosphi': Hist.new.Regular(60, 0.95, 1, name="cosphi", label=r"cos of pointing angle $D^0$ of $D^*$").Double(),
@@ -128,9 +137,9 @@ class HistogrammingProcessor:
             'dstar_D0dlSig': Hist.new.Regular(100, 0, 20, name="dlSig", label=r"decay length significance $D^0$ of $D^*$").Double(),
             'dstar_associationchi2': Hist.new.Regular(100, 0, 5, name="assochi2", label=r"Association $\chi^2$").Double(),
             'dstar_associationProb': Hist.new.Regular(100, 0, 1, name="assoprob", label=r"Association probability").Double(),
-            'deltarap': Hist.new.Regular(60, -5, 5, name="deltarap", label=r"$\Delta y_{\Upsilon D^*}$").Double(),
-            'deltapt': Hist.new.Regular(100, -30, 80, name='deltapt', label=r"$\Delta p_{T,\Upsilon D^*}$ [GeV]").Double(),
-            'deltaeta': Hist.new.Regular(60, -6, 6, name="deltaeta", label=r"$\Delta \eta_{\Upsilon D^*}$").Double(),
+            'deltarap': Hist.new.Regular(60, 0, 5, name="deltarap", label=r"$|\Delta y_{\Upsilon D^*}|$").Double(),
+            'deltapt': Hist.new.Regular(100, 0, 80, name='deltapt', label=r"$|\Delta p_{T,\Upsilon D^*}|$ [GeV]").Double(),
+            'deltaeta': Hist.new.Regular(60, 0, 5, name="deltaeta", label=r"$|\Delta \eta_{\Upsilon D^*}|$").Double(),
             'deltaphi': Hist.new.Regular(60, 0, np.pi, name="deltaphi", label=r"$\Delta \phi_{\Upsilon D^*}$").Double(),
         }
 
@@ -143,9 +152,9 @@ class HistogrammingProcessor:
         DimuDstar_hists['phi'].fill(DimuDstar_p4.phi)
         DimuDstar_hists['mass'].fill(DimuDstar_p4.mass)
         DimuDstar_hists['rap'].fill(DimuDstar_p4.rap)
-        DimuDstar_hists['deltapt'].fill(DimuDstar_acc['deltapt'].value)
-        DimuDstar_hists['deltarap'].fill(DimuDstar_acc['deltarap'].value)
-        DimuDstar_hists['deltaeta'].fill(DimuDstar_acc['deltaeta'].value)
+        DimuDstar_hists['deltapt'].fill(np.abs(DimuDstar_acc['deltapt'].value))
+        DimuDstar_hists['deltarap'].fill(np.abs(DimuDstar_acc['deltarap'].value))
+        DimuDstar_hists['deltaeta'].fill(np.abs(DimuDstar_acc['deltaeta'].value))
         DimuDstar_hists['deltaphi'].fill(DimuDstar_acc['deltaphi'].value)
         
         [DimuDstar_hists[h].fill(DimuDstar_acc['Dimu'][h[h.find('_')+1:]].value) for h in DimuDstar_hists if 'dimu' in h]
@@ -176,7 +185,7 @@ class HistogrammingProcessor:
             'rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$y_{\mu\mu}$").Double(),
             'dl': Hist.new.Regular(100, -1, 1, name="dl", label=r"decay length $\mu\mu$").Double(),
             'dlSig': Hist.new.Regular(100, -20, 20, name="dlSig", label=r"decay length significance $\mu\mu$").Double(),
-            'chi2': Hist.new.Regular(100, 0, 10, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Double(),
+            'chi2': Hist.new.Regular(100, 0, 8, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Double(),
             'cosphi': Hist.new.Regular(60, -1, 1, name="cosphi", label=r"cos of pointing angle $\mu\mu$").Double(),
         }
 
@@ -190,7 +199,7 @@ class HistogrammingProcessor:
             'D0dl': Hist.new.Regular(100, 0, 2, name="dl", label=r"decay length $D^0$ of $D^*$").Double(),
             'D0dlSig': Hist.new.Regular(100, 0, 20, name="dlSig", label=r"decay length significance $D^0$ of $D^*$").Double(),
             'D0pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^0}$ [GeV]").Double(),
-            'D0eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^0}$").Double(),
+            'D0eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^0}$").Double(),
             'D0phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^0}$").Double(),
             'D0mass': Hist.new.Regular(100, 1.82, 1.9, name="mass", label=r"$m_{D^0}$ [GeV]").Double(),
         }
@@ -202,37 +211,56 @@ class HistogrammingProcessor:
             'mass': Hist.new.Regular(100, 8.6, 70, name="mass", label=r"$m_{\Upsilon D^*}$ [GeV]").Double(),
             'rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$\eta_{\Upsilon D^*}$").Double(),
             'dimu_mass': Hist.new.Regular(100, 8.6, 11, name="mass", label=r"$m_{\mu\mu}$ [GeV]").Double(),
-            'dimu_pt': Hist.new.Regular(100, 0, 300, name='pt', label=r"$p_{T,\mu\mu}$ [GeV]").Double(),
+            'dimu_pt': Hist.new.Regular(50, 0, 150, name='pt', label=r"$p_{T,\mu\mu}$ [GeV]").Double(),
             'dimu_eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{\mu\mu}$").Double(),
             'dimu_phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{\mu\mu}$").Double(),
             'dimu_rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$y_{\mu\mu}$").Double(),
             'dimu_dl': Hist.new.Regular(100, -1, 1, name="dl", label=r"decay length $\mu\mu$").Double(),
             'dimu_dlSig': Hist.new.Regular(100, -20, 20, name="dlSig", label=r"decay length significance $\mu\mu$").Double(),
-            'dimu_chi2': Hist.new.Regular(100, 0, 10, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Double(),
+            'dimu_chi2': Hist.new.Regular(100, 0, 8, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Double(),
             'dimu_cosphi': Hist.new.Regular(60, -1, 1, name="cosphi", label=r"cos of pointing angle $\mu\mu$").Double(),
             'dstar_deltamr': Hist.new.Regular(50, 0.138, 0.162, name="deltam", label=r"$\Delta m_{D^*}$ [GeV]").Double(),
-            'dstar_pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^*}$ [GeV]").Double(),
-            'dstar_eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^*}$").Double(),
+            'dstar_pt': Hist.new.Regular(100, 0, 80, name='pt', label=r"$p_{T,D^*}$ [GeV]").Double(),
+            'dstar_eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^*}$").Double(),
             'dstar_phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^*}$").Double(),
-            'dstar_rap': Hist.new.Regular(60, -4, 4, name="rap", label=r"$y_{D^*}$").Double(),
-            'dstar_d0_pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^0}$ [GeV]").Double(),
-            'dstar_d0_eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^0}$").Double(),
+            'dstar_rap': Hist.new.Regular(60, -3, 3, name="rap", label=r"$y_{D^*}$").Double(),
+            'dstar_d0_pt': Hist.new.Regular(100, 0, 80, name='pt', label=r"$p_{T,D^0}$ [GeV]").Double(),
+            'dstar_d0_eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^0}$").Double(),
             'dstar_d0_phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^0}$").Double(),
             'dstar_d0_mass': Hist.new.Regular(100, 1.82, 1.9, name="mass", label=r"$m_{D^0}$ [GeV]").Double(),
+            'dstar_d0_rap': Hist.new.Regular(60, -3, 3, name="rap", label=r"$y_{D^0}$").Double(),
             'dstar_d0_cosphi': Hist.new.Regular(60, 0.95, 1, name="cosphi", label=r"cos of pointing angle $D^0$ of $D^*$").Double(),
             'dstar_d0_dl': Hist.new.Regular(100, 0, 2, name="dl", label=r"decay length $D^0$ of $D^*$").Double(),
             'dstar_d0_dlSig': Hist.new.Regular(100, 0, 20, name="dlSig", label=r"decay length significance $D^0$ of $D^*$").Double(),
             'dstar_asso_chi2': Hist.new.Regular(100, 0, 5, name="assochi2", label=r"Association $\chi^2$").Double(),
             'dstar_asso_prob': Hist.new.Regular(100, 0, 1, name="assoprob", label=r"Association probability").Double(),
-            'deltarap': Hist.new.Regular(60, -5, 5, name="deltarap", label=r"$\Delta y_{\Upsilon D^*}$").Double(),
-            'deltapt': Hist.new.Regular(100, -30, 80, name='deltapt', label=r"$\Delta p_{T,\Upsilon D^*}$ [GeV]").Double(),
-            'deltaeta': Hist.new.Regular(60, -6, 6, name="deltaeta", label=r"$\Delta \eta_{\Upsilon D^*}$").Double(),
+            'deltarap': Hist.new.Regular(60, 0, 5, name="deltarap", label=r"$|\Delta y_{\Upsilon D^*}|$").Double(),
+            'deltapt': Hist.new.Regular(100, 0, 80, name='deltapt', label=r"$|\Delta p_{T,\Upsilon D^*}|$ [GeV]").Double(),
+            'deltaeta': Hist.new.Regular(60, 0, 5, name="deltaeta", label=r"$|\Delta \eta_{\Upsilon D^*}|$").Double(),
             'deltaphi': Hist.new.Regular(60, 0, np.pi, name="deltaphi", label=r"$\Delta \phi_{\Upsilon D^*}$").Double(),
         }
 
         [Dimu_hists[h].fill(Dimu_acc[h].value) for h in Dimu_hists]
         [Dstar_hists[h].fill(Dstar_acc[h].value) for h in Dstar_hists]
-        [DimuDstar_hists[h].fill(DimuDstar_acc[h].value) for h in DimuDstar_hists]
+
+        """ upsilon_bkg_cut = (DimuDstar_acc['dimu_mass'].value < 10.6) & (DimuDstar_acc['dimu_mass'].value > 9.0)
+        dstar_bkg_cut = (DimuDstar_acc['dstar_deltamr'].value < 0.148) & (DimuDstar_acc['dstar_deltamr'].value > 0.142)
+        bkg_cut = upsilon_bkg_cut & dstar_bkg_cut 
+
+        [DimuDstar_hists[h].fill(DimuDstar_acc[h].value[bkg_cut]) for h in DimuDstar_hists if 'delta' not in h]
+        DimuDstar_hists['dstar_deltamr'].fill(DimuDstar_acc['dstar_deltamr'].value[bkg_cut])
+        DimuDstar_hists['deltapt'].fill(np.abs(DimuDstar_acc['deltapt'].value[bkg_cut]))
+        DimuDstar_hists['deltarap'].fill(np.abs(DimuDstar_acc['deltarap'].value[bkg_cut]))
+        DimuDstar_hists['deltaeta'].fill(np.abs(DimuDstar_acc['deltaeta'].value[bkg_cut]))
+        DimuDstar_hists['deltaphi'].fill(DimuDstar_acc['deltaphi'].value[bkg_cut]) """
+
+        [DimuDstar_hists[h].fill(DimuDstar_acc[h].value) for h in DimuDstar_hists if 'delta' not in h]
+        DimuDstar_hists['dstar_deltamr'].fill(DimuDstar_acc['dstar_deltamr'].value)
+        DimuDstar_hists['deltapt'].fill(np.abs(DimuDstar_acc['deltapt'].value))
+        DimuDstar_hists['deltarap'].fill(np.abs(DimuDstar_acc['deltarap'].value))
+        DimuDstar_hists['deltaeta'].fill(np.abs(DimuDstar_acc['deltaeta'].value))
+        DimuDstar_hists['deltaphi'].fill(DimuDstar_acc['deltaphi'].value)
+
 
         hists = {
             'Dimu': Dimu_hists,
@@ -244,28 +272,21 @@ class HistogrammingProcessor:
         save(hists, filename)
 
     def process_mc(self, f) -> None:
-        events = uproot.open(f)['Events'].arrays(filter_name=branch_filter.match)
+        events = uproot.open(f)['Events'].arrays(filter_name=branch_filter.match) # type: ignore
         if len(events) == 0:
             return
 
         if self.mc_process == 'DPS':
-            pt_range = f[f.rfind('Pt')+2:f.rfind('ToMuMuDstar')]
-            if 'To' in pt_range:
-                min_value, max_value = pt_range.split('To')
-                dimu_pt_min = float(min_value)
-                dimu_pt_max = float(max_value)
+            if f[f.rfind('/')+1:].startswith('DPS'):
+                pt_range = f[f.rfind('Filter-')+7:f.rfind(f'_{self.year}')]
             else:
-                dimu_pt_min = float(pt_range)
-                dimu_pt_max = 9999.
+                pt_range = f[f.rfind('Pt')+2:f.rfind('ToMuMuDstar')]
+
+            dimu_pt_max, dimu_pt_min = get_pt_range(pt_range, 'To')
+
         elif self.mc_process == 'SPS':
             pt_range = f[f.rfind('Upsilon_')+8:f.rfind('_Dstar')]
-            if 'to' in pt_range:
-                min_value, max_value = pt_range.split('to')
-                dimu_pt_min = float(min_value)
-                dimu_pt_max = float(max_value)
-            else:
-                dimu_pt_min = float(pt_range)
-                dimu_pt_max = 9999.
+            dimu_pt_max, dimu_pt_min = get_pt_range(pt_range, 'to')
         else:
             dimu_pt_min = 0
             dimu_pt_max = 9999.
@@ -303,16 +324,17 @@ class HistogrammingProcessor:
         dimu_eta_cut = np.absolute(Dimu.rap) < self.config['dimu_rap']
         Muon = ak.mask(Muon, muon_eta_cut & muon_pt_cut & muon_sim_cut & dimu_pt_cut & dimu_eta_cut)
         Dimu = ak.mask(Dimu, muon_eta_cut & muon_pt_cut & muon_sim_cut & dimu_pt_cut & dimu_eta_cut)
-        arg_sort = ak.argsort(Dimu.pt, axis=1, ascending=False)
-        Dimu = Dimu[arg_sort]
-        Muon = Muon[arg_sort]
+        #arg_sort = ak.argsort(Dimu.pt, axis=-1, ascending=False)
+        
+        #Dimu = Dimu[arg_sort]
+        #Muon = Muon[arg_sort]
 
         Dstar = Dstar[~Dstar.hasMuon]
         Dstar = Dstar[Dstar.Kchg != Dstar.pichg]
         Dstar = Dstar[(Dstar.pt > self.config['dstar_pt_min']) & (Dstar.pt < self.config['dstar_pt_max'])]
         Dstar = Dstar[np.absolute(Dstar.rap) < self.config['dstar_rap']]
-        arg_sort = ak.argsort(Dstar.pt, axis=1, ascending=False)
-        Dstar = Dstar[arg_sort]
+        #arg_sort = ak.argsort(Dstar.pt, axis=-1, ascending=False)
+        #Dstar = Dstar[arg_sort]
 
         ############### Cuts
         soft_id = (Muon.slot0.softId > 0) & (Muon.slot1.softId > 0)
@@ -338,6 +360,15 @@ class HistogrammingProcessor:
         Dstar = Dstar[Dstar.D0pt > self.config['dstar_d0_pt']]
         Dstar = Dstar[Dstar.D0dlSig > self.config['dstar_d0_dlSig']]
 
+        Dstar_D0 = ak.zip({
+                'pt': Dstar.D0pt,
+                'eta': Dstar.D0eta,
+                'phi': Dstar.D0phi,
+                'mass': Dstar.D0mass,
+            }, with_name='PtEtaPhiMLorentzVector'
+        )
+        Dstar['D0rap'] = np.log((Dstar_D0.energy + Dstar_D0.z)/np.sqrt(Dstar_D0.mass2 + Dstar_D0.pt2))
+
         ############### Trigger
         Dimu = Dimu[trigger]
         Muon = Muon[trigger]
@@ -353,9 +384,13 @@ class HistogrammingProcessor:
         MuonDstar = ak.zip({'0': Muon[Dstar.associationIdx], '1': Dstar})
         MuonDstar = MuonDstar[none_cut]
 
-        arg_sort = ak.argsort(DimuDstar['cand'].pt, axis=1, ascending=False)
-        DimuDstar = DimuDstar[arg_sort]
-        MuonDstar = MuonDstar[arg_sort]
+        #arg_sort = ak.argsort(DimuDstar['cand'].pt, axis=-1, ascending=False)
+        #DimuDstar = DimuDstar[arg_sort]
+        #MuonDstar = MuonDstar[arg_sort]
+
+        dimudstar_mass_cut = DimuDstar.cand.mass > 18
+        DimuDstar = DimuDstar[dimudstar_mass_cut]
+        MuonDstar = MuonDstar[dimudstar_mass_cut]
 
         Dimu_hists = {
             'pt': Hist.new.Regular(100, 0, 300, name='pt', label=r"$p_{T,\mu\mu}$ [GeV]").Weight(),
@@ -365,7 +400,7 @@ class HistogrammingProcessor:
             'rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$y_{\mu\mu}$").Weight(),
             'dl': Hist.new.Regular(100, -1, 1, name="dl", label=r"decay length $\mu\mu$").Weight(),
             'dlSig': Hist.new.Regular(100, -20, 20, name="dlSig", label=r"decay length significance $\mu\mu$").Weight(),
-            'chi2': Hist.new.Regular(100, 0, 10, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Weight(),
+            'chi2': Hist.new.Regular(100, 0, 8, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Weight(),
             'cosphi': Hist.new.Regular(60, -1, 1, name="cosphi", label=r"cos of pointing angle $\mu\mu$").Weight(),
         }
 
@@ -379,7 +414,7 @@ class HistogrammingProcessor:
             'D0dl': Hist.new.Regular(100, 0, 2, name="dl", label=r"decay length $D^0$ of $D^*$").Weight(),
             'D0dlSig': Hist.new.Regular(100, 0, 20, name="dlSig", label=r"decay length significance $D^0$ of $D^*$").Weight(),
             'D0pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^0}$ [GeV]").Weight(),
-            'D0eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^0}$").Weight(),
+            'D0eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^0}$").Weight(),
             'D0phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^0}$").Weight(),
             'D0mass': Hist.new.Regular(100, 1.82, 1.9, name="mass", label=r"$m_{D^0}$ [GeV]").Weight(),
         }
@@ -391,21 +426,22 @@ class HistogrammingProcessor:
             'mass': Hist.new.Regular(100, 8.6, 70, name="mass", label=r"$m_{\Upsilon D^*}$ [GeV]").Weight(),
             'rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$\eta_{\Upsilon D^*}$").Weight(),
             'dimu_mass': Hist.new.Regular(100, 8.6, 11, name="mass", label=r"$m_{\mu\mu}$ [GeV]").Weight(),
-            'dimu_pt': Hist.new.Regular(100, 0, 300, name='pt', label=r"$p_{T,\mu\mu}$ [GeV]").Weight(),
+            'dimu_pt': Hist.new.Regular(50, 0, 150, name='pt', label=r"$p_{T,\mu\mu}$ [GeV]").Weight(),
             'dimu_eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{\mu\mu}$").Weight(),
             'dimu_phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{\mu\mu}$").Weight(),
             'dimu_rap': Hist.new.Regular(60, -2.5, 2.5, name="rap", label=r"$y_{\mu\mu}$").Weight(),
             'dimu_dl': Hist.new.Regular(100, -1, 1, name="dl", label=r"decay length $\mu\mu$").Weight(),
             'dimu_dlSig': Hist.new.Regular(100, -20, 20, name="dlSig", label=r"decay length significance $\mu\mu$").Weight(),
-            'dimu_chi2': Hist.new.Regular(100, 0, 10, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Weight(),
+            'dimu_chi2': Hist.new.Regular(100, 0, 8, name="chi2", label=r"$\mu\mu$ vtx fit $\chi^2$").Weight(),
             'dimu_cosphi': Hist.new.Regular(60, -1, 1, name="cosphi", label=r"cos of pointing angle $\mu\mu$").Weight(),
             'dstar_deltamr': Hist.new.Regular(50, 0.138, 0.162, name="deltam", label=r"$\Delta m_{D^*}$ [GeV]").Weight(),
-            'dstar_pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^*}$ [GeV]").Weight(),
-            'dstar_eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^*}$").Weight(),
+            'dstar_pt': Hist.new.Regular(100, 0, 80, name='pt', label=r"$p_{T,D^*}$ [GeV]").Weight(),
+            'dstar_eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^*}$").Weight(),
             'dstar_phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^*}$").Weight(),
-            'dstar_rap': Hist.new.Regular(60, -4, 4, name="rap", label=r"$y_{D^*}$").Weight(),
-            'dstar_D0pt': Hist.new.Regular(100, 0, 100, name='pt', label=r"$p_{T,D^0}$ [GeV]").Weight(),
-            'dstar_D0eta': Hist.new.Regular(60, -4, 4, name="eta", label=r"$\eta_{D^0}$").Weight(),
+            'dstar_rap': Hist.new.Regular(60, -3, 3, name="rap", label=r"$y_{D^*}$").Weight(),
+            'dstar_D0pt': Hist.new.Regular(100, 0, 80, name='pt', label=r"$p_{T,D^0}$ [GeV]").Weight(),
+            'dstar_D0eta': Hist.new.Regular(60, -3, 3, name="eta", label=r"$\eta_{D^0}$").Weight(),
+            'dstar_D0rap': Hist.new.Regular(60, -3, 3, name="rap", label=r"$y_{D^0}$").Weight(),
             'dstar_D0phi': Hist.new.Regular(60, -np.pi, np.pi, name="phi", label=r"$\phi_{D^0}$").Weight(),
             'dstar_D0mass': Hist.new.Regular(100, 1.82, 1.9, name="mass", label=r"$m_{D^0}$ [GeV]").Weight(),
             'dstar_D0cosphi': Hist.new.Regular(60, 0.95, 1, name="cosphi", label=r"cos of pointing angle $D^0$ of $D^*$").Weight(),
@@ -413,9 +449,9 @@ class HistogrammingProcessor:
             'dstar_D0dlSig': Hist.new.Regular(100, 0, 20, name="dlSig", label=r"decay length significance $D^0$ of $D^*$").Weight(),
             'dstar_associationchi2': Hist.new.Regular(100, 0, 5, name="assochi2", label=r"Association $\chi^2$").Weight(),
             'dstar_associationProb': Hist.new.Regular(100, 0, 1, name="assoprob", label=r"Association probability").Weight(),
-            'deltarap': Hist.new.Regular(60, -5, 5, name="deltarap", label=r"$\Delta y_{\Upsilon D^*}$").Weight(),
-            'deltapt': Hist.new.Regular(100, -30, 80, name='deltapt', label=r"$\Delta p_{T,\Upsilon D^*}$ [GeV]").Weight(),
-            'deltaeta': Hist.new.Regular(60, -6, 6, name="deltaeta", label=r"$\Delta \eta_{\Upsilon D^*}$").Weight(),
+            'deltarap': Hist.new.Regular(60, 0, 5, name="deltarap", label=r"$|\Delta y_{\Upsilon D^*}|$").Weight(),
+            'deltapt': Hist.new.Regular(100, 0, 80, name='deltapt', label=r"$|\Delta p_{T,\Upsilon D^*}|$ [GeV]").Weight(),
+            'deltaeta': Hist.new.Regular(60, 0, 5, name="deltaeta", label=r"$|\Delta \eta_{\Upsilon D^*}|$").Weight(),
             'deltaphi': Hist.new.Regular(60, 0, np.pi, name="deltaphi", label=r"$\Delta \phi_{\Upsilon D^*}$").Weight(),
         }
 
@@ -438,14 +474,21 @@ class HistogrammingProcessor:
         [Dimu_hists[h].fill(ak.flatten(Dimu[h]), weight=ak.flatten(dimu_weight)) for h in Dimu_hists]
         [Dstar_hists[h].fill(ak.flatten(Dstar[h]), weight=dstar_weight) for h in Dstar_hists]
 
+
+        """ upsilon_bkg_cut = (DimuDstar.slot0.mass < 10.6) & (DimuDstar.slot0.mass > 9.0)
+        dstar_bkg_cut = (DimuDstar.slot1.deltamr < 0.148) & (DimuDstar.slot1.deltamr > 0.142)
+        bkg_cut = upsilon_bkg_cut & dstar_bkg_cut
+        DimuDstar = DimuDstar[bkg_cut]
+        dimudstar_weight = dimudstar_weight[bkg_cut] """
+
         DimuDstar_hists['pt'].fill(ak.flatten(DimuDstar.cand.pt), weight=ak.flatten(dimudstar_weight))
         DimuDstar_hists['eta'].fill(ak.flatten(DimuDstar.cand.eta), weight=ak.flatten(dimudstar_weight))
         DimuDstar_hists['phi'].fill(ak.flatten(DimuDstar.cand.phi), weight=ak.flatten(dimudstar_weight))
         DimuDstar_hists['mass'].fill(ak.flatten(DimuDstar.cand.mass), weight=ak.flatten(dimudstar_weight))
         DimuDstar_hists['rap'].fill(ak.flatten(DimuDstar.rap), weight=ak.flatten(dimudstar_weight))
-        DimuDstar_hists['deltapt'].fill(ak.flatten(DimuDstar.deltapt), weight=ak.flatten(dimudstar_weight))
-        DimuDstar_hists['deltarap'].fill(ak.flatten(DimuDstar.deltarap), weight=ak.flatten(dimudstar_weight))
-        DimuDstar_hists['deltaeta'].fill(ak.flatten(DimuDstar.deltaeta), weight=ak.flatten(dimudstar_weight))
+        DimuDstar_hists['deltapt'].fill(ak.flatten(np.abs(DimuDstar.deltapt)), weight=ak.flatten(dimudstar_weight))
+        DimuDstar_hists['deltarap'].fill(ak.flatten(np.abs(DimuDstar.deltarap)), weight=ak.flatten(dimudstar_weight))
+        DimuDstar_hists['deltaeta'].fill(ak.flatten(np.abs(DimuDstar.deltaeta)), weight=ak.flatten(dimudstar_weight))
         DimuDstar_hists['deltaphi'].fill(ak.flatten(DimuDstar.deltaphi), weight=ak.flatten(dimudstar_weight))
         
         [DimuDstar_hists[h].fill(ak.flatten(DimuDstar.slot0[h[h.find('_')+1:]]), weight=ak.flatten(dimudstar_weight)) for h in DimuDstar_hists if 'dimu' in h]
