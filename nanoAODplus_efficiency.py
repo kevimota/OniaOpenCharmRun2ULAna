@@ -176,8 +176,11 @@ if __name__ == '__main__':
     tstart = time.time()
     for f in files:
         data = {"test": f[:]}
-
-        upsilon_cut = float(f[0][f[0].find('Pt')+2:f[0].find('To')])
+        upsilon_cut = 0.0
+        if f[0].startswith("DPS"):
+            print(f)
+        else:
+            upsilon_cut = float(f[0][f[0].find('Pt')+2:f[0].find('To')])
         print(f"Treating file with Pt > {upsilon_cut}")
 
         output.append(
